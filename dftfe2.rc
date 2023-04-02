@@ -1,10 +1,7 @@
 #!/bin/rc
 # Installation script for DFT-FE and its dependencies
 
-WD = /lustre/orion/stf006/world-shared/rogersdd/DFT-FE
-INST = $WD/env2
-
-. $INST/env.rc
+. ./env2/env.rc
 
 # Install alglib, libxc, spglib and p4est using the typical route (cf. manual)
 fn install_alglib {
@@ -377,7 +374,7 @@ fn install_torch {
   cd $WD/src
   enter_venv
   pip install pyyaml pandas matplotlib scikit-learn pybind11 \
-      typing_extensions six
+      typing_extensions six sympy filelock jinja2 networkx
   if(! test -d pytorch) {
       git clone --recursive $PYTORCH_URL
       @ {cd pytorch && git checkout v$$PYTORCH_VERSION}
