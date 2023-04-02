@@ -1,0 +1,66 @@
+diff -ruN elpa/test/shared/GPU/test_gpu_vendor_agnostic_layerFunctions.c b/test/shared/GPU/test_gpu_vendor_agnostic_layerFunctions.c
+--- a/elpa/test/shared/GPU/test_gpu_vendor_agnostic_layerFunctions.c	2022-12-24 07:37:59.000000000 -0500
++++ b/test/shared/GPU/test_gpu_vendor_agnostic_layerFunctions.c	2023-02-24 10:58:18.996079202 -0500
+@@ -66,8 +66,8 @@
+    gpuMemcpyDeviceToHost = cudaMemcpyDeviceToHostFromC();
+ #endif 
+ #ifdef WITH_AMD_GPU_VERSION
+-   gpuMemcpyHostToDevice = hipMemcpyHostToDeviceFromC();
+-   gpuMemcpyDeviceToHost = hipMemcpyDeviceToHostFromC();
++   //gpuMemcpyHostToDevice = hipMemcpyHostToDeviceFromC();
++   //gpuMemcpyDeviceToHost = hipMemcpyDeviceToHostFromC();
+ #endif 
+ }
+ 
+@@ -76,7 +76,7 @@
+    return cudaGetDeviceCountFromC(count);
+ #endif 
+ #ifdef WITH_AMD_GPU_VERSION
+-   return hipGetDeviceCountFromC(count);
++   return -1;// hipGetDeviceCountFromC(count);
+ #endif
+    return -1;
+ }
+@@ -86,7 +86,7 @@
+    return cudaSetDeviceFromC(n);
+ #endif   
+ #ifdef WITH_AMD_GPU_VERSION
+-   return hipSetDeviceFromC(n);
++   return -1;//hipSetDeviceFromC(n);
+ #endif
+ }
+ 
+@@ -95,7 +95,7 @@
+    return cudaMallocFromC(a, width_height);
+ #endif   
+ #ifdef WITH_AMD_GPU_VERSION
+-   return hipMallocFromC(a, width_height);
++   return -1;//hipMallocFromC(a, width_height);
+ #endif 
+ }
+ 
+@@ -104,7 +104,7 @@
+    return cudaFreeFromC(a);
+ #endif   
+ #ifdef WITH_AMD_GPU_VERSION
+-   return hipFreeFromC(a);
++   return -1;//hipFreeFromC(a);
+ #endif  
+ }
+ 
+@@ -113,6 +113,6 @@
+    return cudaMemcpyFromC(dest, src, count, dir);
+ #endif  
+ #ifdef WITH_AMD_GPU_VERSION
+-   return hipMemcpyFromC(dest, src, count, dir);
++   return -1;//hipMemcpyFromC(dest, src, count, dir);
+ #endif  
+ }
+diff -ruN elpa/test/shared/test_gpu_vendor_agnostic_layerVariables.h b/test/shared/test_gpu_vendor_agnostic_layerVariables.h
+--- a/elpa/test/shared/test_gpu_vendor_agnostic_layerVariables.h	2023-02-13 02:00:47.954483600 -0500
++++ b/test/shared/test_gpu_vendor_agnostic_layerVariables.h	1969-12-31 19:00:00.000000000 -0500
+@@ -1,3 +0,0 @@
+-// should be included only into the main c-file
+-int gpuMemcpyHostToDevice;
+-int gpuMemcpyDeviceToHost;
+\ No newline at end of file

@@ -1,0 +1,58 @@
+# This file must be used with ". activate <path>" *from rc*
+# you cannot run it directly
+
+base=`{cd $1; pwd}
+
+fn deactivate {
+    # reset old environment variables
+    if(! ~ $#_OLD_VIRTUAL_PATH 0) {
+        PATH=$_OLD_VIRTUAL_PATH
+        _OLD_VIRTUAL_PATH=()
+    }
+    if(~ $#_OLD_VIRTUAL_PYTHONHOME 1) {
+        PYTHONHOME=$_OLD_VIRTUAL_PYTHONHOME
+        _OLD_VIRTUAL_PYTHONHOME=()
+    }
+
+    # This should detect bash and zsh, which have a hash command that must
+    # be called to get it to forget past commands.  Without forgetting
+    # past commands the $PATH changes we made may not be respected
+    hash -r >[2]/dev/null
+
+    if(~ $#_OLD_VIRTUAL_PS1 1) {
+        prompt=$_OLD_VIRTUAL_PS1
+        _OLD_VIRTUAL_PS1=()
+    }
+
+    VIRTUAL_ENV=()
+    if(! ~ $1 nondestructive) {
+        # Self destruct!
+        fn deactivate
+    }
+}
+
+# unset irrelevant variables
+deactivate nondestructive
+
+VIRTUAL_ENV=$base
+
+_OLD_VIRTUAL_PATH=$PATH
+PATH=$VIRTUAL_ENV/bin:$PATH
+
+# unset PYTHONHOME if set
+# this will fail if PYTHONHOME is set to the empty string (which is bad anyway)
+# could use `if (set -u; : $PYTHONHOME) ;` in bash
+if(~ $#PYTHONHOME 1) {
+    _OLD_VIRTUAL_PYTHONHOME=$PYTHONHOME
+    PYTHONHOME=()
+}
+
+if(~ $#VIRTUAL_ENV_DISABLE_PROMPT 0) {
+    _OLD_VIRTUAL_PS1=$prompt
+    prompt='('^`{basename $base}^') '^$prompt
+}
+
+# This should detect bash and zsh, which have a hash command that must
+# be called to get it to forget past commands.  Without forgetting
+# past commands the $PATH changes we made may not be respected
+hash -r >[2]/dev/null
