@@ -56,9 +56,9 @@ For example,
     install_elpa
     install_dealii
     compile_dftfe
-    enter_venv
-    install_torch
-    compile_mlxc
+    #enter_venv
+    #install_torch
+    #compile_mlxc
 
 Each function follows a standard pattern - download source into `$WD/src`,
 patch, compile, and install into `$INST`.  It is HIGHLY recommended
