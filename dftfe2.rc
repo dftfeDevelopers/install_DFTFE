@@ -41,6 +41,29 @@ fn install_libxc {
   cd $WD
 }
 
+
+fn install_dftd4 {
+  cd $WD/src
+  if(test ! -d dftd4-3.4.0) {
+    wget 'https://github.com/dftd4/dftd4/archive/refs/tags/v3.4.0.tar.gz'
+    tar xzf v3.4.0.tar.gz
+    rm v3.4.0.tar.gz
+  }
+  cd dftd4-3.4.0
+  rm -fr build
+  mkdir build && cd build
+  cmake '-DCMAKE_Fortran_COMPILER=ftn' \
+        '-DCMAKE_C_COMPILER=cc' \
+        '-DBLAS_LIBRARIES='$OLCF_OPENBLAS_ROOT/lib/libopenblas.so \
+        '-DLAPACK_LIBRARIES='$OLCF_OPENBLAS_ROOT/lib/libopenblas.so \
+        '-DBUILD_SHARED_LIBS=ON' \
+        '-DCMAKE_INSTALL_PREFIX='$INST \
+        ..
+  make -j16
+  make install
+  cd $WD
+}
+
 fn install_spglib {
   cd $WD/src
   if(test ! -d spglib) {
@@ -61,8 +84,8 @@ fn install_spglib {
 
 fn install_p4est {
   cd $WD/src
-  CFLAGS_FAST='-O2 -fopenmp'
-  CFLAGS_DEBUG='-O0 -g -fopenmp'
+  CFLAGS_FAST='-O2'
+  CFLAGS_DEBUG='-O0 -g'
   if(test ! -d p4est) {
     git clone --recurse-submodules https://github.com/cburstedde/p4est.git
     bash -c 'cd p4est && git checkout v2.2 && module load libtool && ./bootstrap'
@@ -75,9 +98,12 @@ fn install_p4est {
   mkdir -p FAST
   cd FAST
   ../configure --enable-mpi --enable-shared \
-        --disable-vtk-binary --without-blas '--enable-openmp=-fopenmp' \
+        --disable-vtk-binary --without-blas  \
         '--prefix='$INST 'CFLAGS='$CFLAGS_FAST \
-        'CC=cc' 'CXX=CC' \
+        'CC=cc' \
+        'CXX=CC' \
+        'FC=ftn' \
+        'F77=ftn' \
         'CPPFLAGS=-DSC_LOG_PRIORITY=SC_LP_ESSENTIAL' \
         > config.output
   make -C sc -j 8 > make.output
@@ -258,107 +284,6 @@ fn install_dealii {
   cd $WD
 }
 
-#Finally for installation of publicGithubDevelop branch of DFT-FE use setupUserCrusher.sh as the template. Then do
-fn compile_dftfe {
-  cd $WD/src
-  branch = GB2023
-  if(! test -d dftfe) {
-    git clone -b $branch https://github.com/dftfeDevelopers/dftfe.git
-  } if not {
-    cd dftfe
-    git fetch
-    git checkout $branch
-    git pull
-  }
-  cd dftfe
-  SRC=`{pwd}
-  rm -fr build
-  mkdir build && cd build
-
-  dealiiDir=$INST
-  alglibDir=$INST/lib/alglib
-  libxcDir=$INST
-  spglibDir=$INST
-  xmlIncludeDir=/usr/include/libxml2
-  xmlLibDir=/usr/lib64
-
-  ELPA_PATH=$INST
-  DCCL_PATH=$ROCM_PATH/rccl
-
-  #Compiler options and flags
-  cxx_compiler = CC
-  cxx_flags = '-march=znver3 -fPIC -I'$MPICH_DIR'/include -I'$ROCM_PATH/include
-  cxx_flagsRelease = -O2 #sets DCMAKE_CXX_FLAGS_RELEASE
-  device_flags = '-march=znver3 -O2 -munsafe-fp-atomics -I'$MPICH_DIR'/include -I'$ROCM_PATH/include
-  device_architectures = gfx90a
-
-  # HIGHERQUAD_PSP option compiles with default or higher order
-  # quadrature for storing pseudopotential data
-  # ON is recommended for MD simulations with hard pseudopotentials
-
-  # build type: "Release" or "Debug"
-  build_type=Release
-  out=`{echo $build_type | tr '[:upper:]' '[:lower:]'}
-
-  # Note: MDI_PATH is not used by project.
-  cmake_flags = ( \
-      -DCMAKE_CXX_STANDARD=14 \
-      -DCMAKE_CXX_COMPILER=$cxx_compiler \
-      -DCMAKE_CXX_FLAGS=$cxx_flags \
-      -DCMAKE_CXX_FLAGS_RELEASE=$cxx_flagsRelease \
-      -DCMAKE_BUILD_TYPE=$build_type \
-      -DDEAL_II_DIR=$dealiiDir \
-      -DALGLIB_DIR=$alglibDir \
-      -DLIBXC_DIR=$libxcDir \
-      -DSPGLIB_DIR=$spglibDir \
-      -DXML_LIB_DIR=$xmlLibDir \
-      -DXML_INCLUDE_DIR=$xmlIncludeDir \
-      -DWITH_MDI=OFF \
-      -DMDI_PATH= \
-      -DWITH_DCCL=ON \
-      -DCMAKE_PREFIX_PATH=$ELPA_PATH';'$DCCL_PATH \
-      -DWITH_GPU=ON \
-      -DGPU_LANG=hip \
-      -DGPU_VENDOR=amd \
-      -DWITH_GPU_AWARE_MPI=ON \
-      -DCMAKE_HIP_FLAGS=$device_flags \
-      -DCMAKE_HIP_ARCHITECTURES=$device_architectures \
-      -DWITH_TESTING=OFF \
-      -DMINIMAL_COMPILE=OFF \
-      -DCMAKE_SHARED_LINKER_FLAGS=-L$ROCM_PATH'/lib -lamdhip64 -L'$MPICH_DIR'/lib -lmpi -L'$CRAY_MPICH_ROOTDIR'/gtl/lib -lmpi_gtl_hsa' \
-      -DHIGHERQUAD_PSP=OFF \
-  )
-
-  fn cmake_real {
-    mkdir -p real && cd real
-    cmake $cmake_flags \
-      -DWITH_COMPLEX=OFF \
-      $1  
-    make -j8
-    cd ..
-  }
-
-  fn cmake_cplx {
-    mkdir -p complex && cd complex
-    cmake $cmake_flags \
-      -DWITH_COMPLEX=ON \
-      $1
-    make -j8
-    cd ..
-  }
-
-  mkdir -p $out
-  cd $out
-
-  echo 'Building Real executable in $build_type mode...'
-  cmake_real $SRC
-
-  echo 'Building Complex executable in $build_type mode...'
-  cmake_cplx $SRC
-
-  echo 'Build complete.'
-  cd $WD
-}
 
 fn enter_venv {
   if(! test -d $INST/venv ) {
@@ -408,11 +333,13 @@ fn install_torch {
   cd $WD
 }
 
-fn compile_mlxc {
-  cd /lustre/orion/stf006/scratch/rogersdd/DFT-FE
-  branch = GB2023MLXC
+
+fn compile_dftfe{
+  mkdir -p /lustre/orion/mat187/scratch/dsambit/installDFTFEOpt
+  cd /lustre/orion/mat187/scratch/dsambit/installDFTFEOpt
+  branch = publicGithubDevelop
   if(! test -d dftfe) {
-    git clone -b $branch git@bitbucket.org:dftfedevelopers/dftfe.git
+    git clone -b $branch https://dsambit@bitbucket.org/dftfedevelopers/dftfe.git dftfe
   } if not {
     cd dftfe
     git fetch
@@ -466,6 +393,7 @@ fn compile_mlxc {
       -DWITH_MDI=OFF \
       -DMDI_PATH= \
       -DWITH_DCCL=ON \
+      -DWITH_TORCH=OFF \
       -DCMAKE_PREFIX_PATH=$ELPA_PATH';'$DCCL_PATH';'$TORCH_PATH \
       -DWITH_GPU=ON \
       -DGPU_LANG=hip \
@@ -476,14 +404,14 @@ fn compile_mlxc {
       -DWITH_TESTING=OFF \
       -DMINIMAL_COMPILE=OFF \
       '-DCMAKE_SHARED_LINKER_FLAGS=-L'$ROCM_PATH'/lib -lamdhip64 -L'$MPICH_DIR'/lib -lmpi -L'$CRAY_MPICH_ROOTDIR'/gtl/lib -lmpi_gtl_hsa' \
-      -DHIGHERQUAD_PSP=OFF \
-  )
+      -DHIGHERQUAD_PSP=ON \
+  )  
 
   fn cmake_real {
     mkdir -p real && cd real
     cmake $cmake_flags \
       -DWITH_COMPLEX=OFF \
-      $1  
+      $1
     make -j8
     cd ..
   }
@@ -509,5 +437,3 @@ fn compile_mlxc {
   echo 'Build complete.'
   cd $WD
 }
-
-
