@@ -335,8 +335,7 @@ fn install_torch {
 
 
 fn compile_dftfe{
-  mkdir -p /lustre/orion/mat187/scratch/dsambit/installDFTFEOpt
-  cd /lustre/orion/mat187/scratch/dsambit/installDFTFEOpt
+  cd $WD/src
   branch = publicGithubDevelop
   if(! test -d dftfe) {
     git clone -b $branch https://github.com/dftfeDevelopers/dftfe.git dftfe
