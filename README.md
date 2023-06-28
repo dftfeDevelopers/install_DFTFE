@@ -6,8 +6,11 @@ of [DFT-FE](https://github.com/dftfeDevelopers/dftfe).
 
 To use these scripts, we assume you have cloned this
 repository onto a system where you intend to install DFT-FE.
-I installed it into `/lustre/orion/[projid]/scratch/$USER/DFT-FE`,
-for example.
+For example, I installed it into `/lustre/orion/[projid]/scratch/$USER/DFT-FE` after 
+cloning into the scatch directory
+
+    cd /lustre/orion/[projid]/scratch/$USER
+    git clone https://github.com/dsambit/install_DFT-FE.git DFT-FE
 
 ## Pre-requisites
 
@@ -36,7 +39,6 @@ This environment file is used both by the install and run
 phases of DFT-FE.
 
 ## Running the installation
-
 The installation itself is contained within the functions in
 `dftfe2.rc`.  Edit this to define its WD and INST directories
 to reflect your own environment.
