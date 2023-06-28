@@ -82,49 +82,16 @@ fn install_spglib {
   cd $WD
 }
 
-fn install_p4est {
+fn install_p4est{
   cd $WD/src
-  CFLAGS_FAST='-O2'
-  CFLAGS_DEBUG='-O0 -g'
-  if(test ! -d p4est) {
-    git clone --recurse-submodules https://github.com/cburstedde/p4est.git
-    bash -c 'cd p4est && git checkout v2.2 && module load libtool && ./bootstrap'
-  }
+  rm -rf p4est
+  mkdir p4est
+  cp p4est-setup.sh p4est
   cd p4est
-  if(test ! -f src/p4est.h) {
-    echo 'Main header file missing'
-    return 1
-  }
-  mkdir -p FAST
-  cd FAST
-  ../configure --enable-mpi --enable-shared \
-        --disable-vtk-binary --without-blas  \
-        '--prefix='$INST 'CFLAGS='$CFLAGS_FAST \
-        'CC=cc' \
-        'CXX=CC' \
-        'FC=ftn' \
-        'F77=ftn' \
-        'CPPFLAGS=-DSC_LOG_PRIORITY=SC_LP_ESSENTIAL' \
-        > config.output
-  make -C sc -j 8 > make.output
-  make -j 8 >> make.output
-  make install >> make.output
-  echo FAST version installed in $INST
-  cd ..
-
-  # skipping debug build
-  #mkdir -p DEBUG
-  #cd DEBUG
-  #../configure --enable-debug --enable-mpi --enable-shared \
-  #        --disable-vtk-binary --without-blas '--enable-openmp=-fopenmp' \
-  #        '--prefix='$INSTALL_DEBUG 'CFLAGS='$CFLAGS_DEBUG \
-  #        'CPPFLAGS=-DSC_LOG_PRIORITY=SC_LP_ESSENTIAL' \
-  #        > config.output
-  #make -C sc -j 8 > make.output
-  #make -j 8 >> make.output
-  #make install >> make.output
-  #echo "DEBUG version installed in $INSTALL_DEBUG"
-}
+  wget 'https://github.com/p4est/p4est.github.io/raw/master/release/p4est-2.2.tar.gz'
+  chmod u+x p4est-setup.sh
+  ./p4est-setup.sh p4est-2.2.tar.gz $INST
+ }
 
 # Install netlib-scalapack 2.2.0 version linking to openblas
 # note that the openblas (sourced via module) provides lapack
