@@ -72,7 +72,7 @@ DFT-FE is built in real and cplx versions, depending on whether you
 want to enable k-points (implemented in the cplx version only).
 
 Assuming you have already sourced `env2/env.rc`, an example
-batch script running GPU-enabled DFT-FE is below:
+batch script running GPU-enabled DFT-FE on 280 nodes is below:
 
     #!/usr/bin/env rc
     #SBATCH -A spy007
