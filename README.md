@@ -6,7 +6,7 @@ of [DFT-FE](https://github.com/dftfeDevelopers/dftfe).
 
 To use these scripts, we assume you have cloned this
 repository onto a system where you intend to install DFT-FE.
-I installed it into `/lustre/orion/stf006/world-shared/$USER/DFT-FE`,
+I installed it into `/lustre/orion/[projid]/scratch/$USER/DFT-FE`,
 for example.
 
 ## Pre-requisites
@@ -56,24 +56,16 @@ For example,
     install_elpa
     install_dealii
     compile_dftfe
-    #enter_venv
-    #install_torch
-    #compile_mlxc
 
 Each function follows a standard pattern - download source into `$WD/src`,
 patch, compile, and install into `$INST`.  It is HIGHLY recommended
 to check all warnings and errors from these installs to be sure
 you have not ended up with broken packages.
 
-A few packages require interaction.  The elpa patch seems to have become
-partially out-dated since mid-March, and `compile_mlxc` requires
-appropriate git credentials.
 
 ## Running DFT-FE
 
-Two different versions of DFT-FE are built from the steps above:
-the GPU branch with ROCM and the GPU branch with ROCM and torch-based
-MLXC.  Both are built in real and cplx versions, depending on whether you
+DFT-FE is built in real and cplx versions, depending on whether you
 want to enable k-points (implemented in the cplx version only).
 
 Assuming you have already sourced `env2/env.rc`, an example
@@ -93,6 +85,7 @@ batch script running GPU-enabled DFT-FE is below:
     MPICH_OFI_NIC_POLICY = NUMA
     HSA_FORCE_FINE_GRAIN_PCIE = 1 
     LD_LIBRARY_PATH = $LD_LIBRARY_PATH:$WD/env2/lib
+    MPICH_SMP_SINGLE_COPY_MODE=NONE
 
     BASE = $WD/src/dftfe/build/release/real
     n=`{echo $SLURM_JOB_NUM_NODES '*' 8 | bc}
