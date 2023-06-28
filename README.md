@@ -11,6 +11,7 @@ cloning into the scatch directory
 
     cd /lustre/orion/[projid]/scratch/$USER
     git clone https://github.com/dsambit/install_DFT-FE.git DFT-FE
+    cd DFT-FE
 
 ## Pre-requisites
 
@@ -55,7 +56,7 @@ For example,
     install_p4est
     install_scalapack
     # install_ofi_rccl # (optional, skip this one for now)
-    install_elpa
+    install_elpa (press `y` when prompted to use patch)
     install_dealii
     compile_dftfe
 
@@ -71,7 +72,7 @@ DFT-FE is built in real and cplx versions, depending on whether you
 want to enable k-points (implemented in the cplx version only).
 
 Assuming you have already sourced `env2/env.rc`, an example
-batch script running GPU-enabled DFT-FE is below:
+batch script running GPU-enabled DFT-FE on 280 nodes is below:
 
     #!/usr/bin/env rc
     #SBATCH -A spy007
