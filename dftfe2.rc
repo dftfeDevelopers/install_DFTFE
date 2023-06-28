@@ -339,7 +339,7 @@ fn compile_dftfe{
   cd /lustre/orion/mat187/scratch/dsambit/installDFTFEOpt
   branch = publicGithubDevelop
   if(! test -d dftfe) {
-    git clone -b $branch https://dsambit@bitbucket.org/dftfedevelopers/dftfe.git dftfe
+    git clone -b $branch https://github.com/dftfeDevelopers/dftfe.git dftfe
   } if not {
     cd dftfe
     git fetch
