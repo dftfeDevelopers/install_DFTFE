@@ -11,6 +11,7 @@ cloning into the scatch directory
 
     cd /lustre/orion/[projid]/scratch/$USER
     git clone https://github.com/dsambit/install_DFT-FE.git DFT-FE
+    cd DFT-FE
 
 ## Pre-requisites
 
