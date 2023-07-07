@@ -91,6 +91,7 @@ fn install_p4est{
   wget 'https://raw.githubusercontent.com/dftfeDevelopers/dftfe/manual/p4est-setup.sh'
   chmod u+x p4est-setup.sh
   ./p4est-setup.sh p4est-2.2.tar.gz $INST
+  cd $WD
  }
 
 # Install netlib-scalapack 2.2.0 version linking to openblas
