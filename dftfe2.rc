@@ -24,12 +24,12 @@ fn install_alglib {
 
 fn install_libxc {
   cd $WD/src
-  if(test ! -d libxc-6.1.0) {
-    wget 'https://gitlab.com/libxc/libxc/-/archive/6.1.0/libxc-6.1.0.tar.gz'
-    tar xzf libxc-6.1.0.tar.gz
-    rm libxc-6.1.0.tar.gz
+  if(test ! -d libxc-6.2.2) {
+    wget 'http://www.tddft.org/programs/libxc/down.php?file=6.2.2/libxc-6.2.2.tar.gz'
+    tar xzf libxc-6.2.2.tar.gz
+    rm libxc-6.2.2.tar.gz
   }
-  cd libxc-6.1.0
+  cd libxc-6.2.2
   rm -fr build
   mkdir build && cd build
   cmake '-DCMAKE_C_COMPILER=cc' \
@@ -303,9 +303,9 @@ fn install_torch {
 
 fn compile_dftfe{
   cd $WD/src
-  branch = publicGithubDevelop
+  branch = GB2023Revision
   if(! test -d dftfe) {
-    git clone -b $branch https://github.com/dftfeDevelopers/dftfe.git dftfe
+    git clone -b $branch https://bitbucket.org/dftfedevelopers/dftfe.git dftfe
   } if not {
     cd dftfe
     git fetch
@@ -313,9 +313,9 @@ fn compile_dftfe{
     git pull
   }
   cd dftfe
-  rm -fr build
+  rm -fr buildgpudirecton
   SRC = `{pwd}
-  mkdir build && cd build
+  mkdir buildgpudirecton && cd buildgpudirecton
 
   dealiiDir=$INST
   alglibDir=$INST/lib/alglib
@@ -345,7 +345,7 @@ fn compile_dftfe{
 
   # Note: MDI_PATH is not used by project.
   cmake_flags = ( \
-      -DCMAKE_CXX_STANDARD=14 \
+      -DCMAKE_CXX_STANDARD=17 \
       -DCMAKE_CXX_COMPILER=$cxx_compiler \
       -DCMAKE_CXX_FLAGS=$cxx_flags \
       -DCMAKE_CXX_FLAGS_RELEASE=$cxx_flagsRelease \
