@@ -88,6 +88,7 @@ batch script running GPU-enabled DFT-FE on 280 nodes is below:
     MPICH_OFI_NIC_POLICY = NUMA
     HSA_FORCE_FINE_GRAIN_PCIE = 1 
     LD_LIBRARY_PATH = $LD_LIBRARY_PATH:$WD/env2/lib
+    MPICH_GPU_SUPPORT_ENABLED=1
     MPICH_SMP_SINGLE_COPY_MODE=NONE
 
     BASE = $WD/src/dftfe/build/release/real
