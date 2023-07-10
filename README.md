@@ -6,11 +6,11 @@ of [DFT-FE](https://github.com/dftfeDevelopers/dftfe) on OLCF Frontier machine.
 
 To use these scripts, we assume you have cloned this
 repository onto a system where you intend to install DFT-FE.
-For example, I installed it into `/lustre/orion/[projid]/scratch/$USER/DFT-FE` after 
+For example, I installed it into `/lustre/orion/[projid]/scratch/$USER/install_DFT-FE` after 
 cloning into the scatch directory
 
     cd /lustre/orion/[projid]/scratch/$USER
-    git clone https://github.com/dsambit/install_DFT-FE.git DFT-FE
+    git clone https://github.com/dsambit/install_DFT-FE.git install_DFT-FE
     cd DFT-FE
 
 ## Pre-requisites
@@ -86,8 +86,7 @@ batch script running GPU-enabled DFT-FE on 280 nodes is below:
     #SBATCH --gpu-bind closest
 
     OMP_NUM_THREADS = 1
-    MPICH_OFI_NIC_POLICY = NUMA
-    HSA_FORCE_FINE_GRAIN_PCIE = 1 
+    MPICH_OFI_NIC_POLICY = NUMA 
     LD_LIBRARY_PATH = $LD_LIBRARY_PATH:$WD/env2/lib
     MPICH_GPU_SUPPORT_ENABLED=1
     MPICH_SMP_SINGLE_COPY_MODE=NONE
