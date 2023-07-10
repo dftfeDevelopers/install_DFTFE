@@ -3,6 +3,52 @@
 
 . ./env2/env.rc
 
+
+fn install_blis {
+    cd $WD/src
+    if(test ! -d blis-3.0.1) {
+      wget 'https://github.com/amd/blis/archive/refs/tags/3.0.1.tar.gz'
+      tar xzf '3.0.1.tar.gz'
+      rm -f '3.0.1.tar.gz'
+    }
+    cd blis-3.0.1
+    ./configure '--prefix='$INST \
+                'CC=cc' 'CXX=CC' 'FC=ftn' \
+                'CFLAGS=-O2' \
+                'CPPFLAGS=-O2' \
+                'FFLAGS=-O2' \
+                'zen'
+
+    make -j16
+    make install
+    cd $WD
+}
+
+fn install_libflame {
+    cd $WD/src
+    if(test ! -d libflame-5.2.0) {
+      wget 'https://github.com/flame/libflame/archive/refs/tags/5.2.0.tar.gz'
+      tar xzf '5.2.0.tar.gz'
+      rm -f '5.2.0.tar.gz'
+    }
+    cd libflame-5.2.0
+
+    ./configure '--prefix='$INST \
+                'CC=cc' 'CXX=CC' 'FC=ftn' 'FC=ftn' \
+                'CFLAGS=-O2' \
+                'CPPFLAGS=-O2' \
+                'FFLAGS=-O2' \
+                '--enable-dynamic-build' \
+                '--enable-lapack2flame' \
+                '--enable-max-arg-list-hack'
+
+    make -j16
+    make install
+    cd $WD
+}
+
+
+
 # Install alglib, libxc, spglib and p4est using the typical route (cf. manual)
 fn install_alglib {
   cd $WD/src
@@ -54,8 +100,8 @@ fn install_dftd4 {
   mkdir build && cd build
   cmake '-DCMAKE_Fortran_COMPILER=ftn' \
         '-DCMAKE_C_COMPILER=cc' \
-        '-DBLAS_LIBRARIES='$OLCF_OPENBLAS_ROOT/lib/libopenblas.so \
-        '-DLAPACK_LIBRARIES='$OLCF_OPENBLAS_ROOT/lib/libopenblas.so \
+        '-DBLAS_LIBRARIES='$INST/lib/libblis.so \
+        '-DLAPACK_LIBRARIES='$INST/lib/libflame.so \
         '-DBUILD_SHARED_LIBS=ON' \
         '-DCMAKE_INSTALL_PREFIX='$INST \
         ..
@@ -115,6 +161,8 @@ fn install_scalapack {
     '-DCMAKE_C_FLAGS=-fPIC -march=znver3' \
     '-DCMAKE_Fortran_FLAGS=-fPIC -march=znver3 -fallow-argument-mismatch' \
     '-DUSE_OPTIMIZED_LAPACK_BLAS=ON' \
+    '-DBLAS_LIBRARIES='$INST'/lib/libblis.so' \
+    '-DLAPACK_LIBRARIES='$INST'/lib/libflame.so' \
     '-DCMAKE_INSTALL_PREFIX='$INST \
     ..
   make -j16
@@ -122,49 +170,7 @@ fn install_scalapack {
   cd $WD
 }
 
-# Install RCCL (https://github.com/ROCmSoftwarePlatform/rccl)
-#    cmake -DCMAKE_CXX_COMPILER=${ROCM_PATH}/bin/hipcc -DCMAKE_CXX_FLAGS="-I${MPICH_DIR}/include -I${ROCM_PATH}/include" -DCMAKE_SHARED_LINKER_FLAGS="-L${ROCM_PATH}/lib -lamdhip64 -L${MPICH_DIR}/lib -lmpi -L${CRAY_MPICH_ROOTDIR}/gtl/lib -lmpi_gtl_hsa" -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="$ROCM_PATH;${MPICH_DIR}" ../
-
-# Install RCCL OFI plugin
-fn install_ofi_rccl {
-  cd $WD/src
-  if(test ! -d aws-ofi-rccl) {
-    git clone https://github.com/ROCmSoftwarePlatform/aws-ofi-rccl
-    @ { cd aws-ofi-rccl
-        # git checkout cxi
-        module load libtool
-        bash ./autogen.sh
-      }
-  }
-  cd aws-ofi-rccl
-  rm -fr build
-  mkdir build && cd build
-
-  ROCM=$OLCF_ROCM_ROOT
-  libpre = (-L -Wl,-rpath-link,)
-  ldflags = ($libpre^$ROCM/lib $libpre^$CRAY_MPICH_ROOTDIR/gtl/lib -lmpi_gtl_hsa)
-  headers = (/opt/cray/libfabric/1.15.2.0 $ROCM/rccl $ROCM $MPICH_DIR)
-  cflags = -I ^ $headers ^ /include
-
-  GCC=hipcc \
-  CC=hipcc \
-  CXX=hipcc \
-  CFLAGS=$"cflags \
-  LDFLAGS=$"ldflags \
-    ../configure \
-      --with-libfabric=/opt/cray/libfabric/1.15.2.0 \
-      --with-hip=$ROCM/hip \
-      --with-rccl=$ROCM \
-      --with-mpi=$MPICH_DIR \
-      --prefix=$INST \
-      --build=amd64-linux-gnu \
-      --target=amd64-linux-gnu \
-      --host=amd64-linux-gnu
-  make -j8
-  make install
-}
-
-# Install ELPA latest version (elpa-2022.11.001) with AMD GPU support
+# Install ELPA latest version (elpa-2022.11.001) with NVIDIA GPU support
 fn install_elpa {
     cd $WD/src
     if(test ! -d elpa) {
@@ -173,33 +179,34 @@ fn install_elpa {
         tar xzf elpa-$ver.tar.gz
         mv elpa-$ver elpa
         rm -f elpa-$ver.tar.gz
-        rc -c 'cd elpa && patch -p1 <'$WD/src/elpa-$ver.patch
     }
     cd elpa
 
     LD_LIBRARY_PATH = $LD_LIBRARY_PATH:$INST/lib
     LD_LIBRARY_PATH = $LD_LIBRARY_PATH:$INST/lib64
-    LD_LIBRARY_PATH = $LD_LIBRARY_PATH:$ROCM_PATH/lib:$ROCM_PATH/hip/lib:$ROCM_PATH/lib:$ROCM_PATH/rocblas/lib
-
-    cflags = ('-march=znver3' -fPIC -O2 -I$ROCM_PATH/include -I$ROCM_PATH/hip/include -I$ROCM_PATH/hipcub/include -I$ROCM_PATH/rocblas/include '--amdgpu-target=gfx90a' -I$MPICH_DIR/include)
-    #libs = (-L$ROCM_PATH/lib -lamdhip64 -L$ROCM_PATH/rocblas/lib -lrocblas -L$MPICH_DIR/lib -lmpi -L$CRAY_MPICH_ROOTDIR/gtl/lib -lmpi_gtl_hsa -L$INST/lib -lscalapack -L$OLCF_OPENBLAS_ROOT/lib -lopenblas -L$INST/lib64 -llapack)
-    libs = (-L$ROCM_PATH/lib -lamdhip64 -L$ROCM_PATH/rocblas/lib -lrocblas -L$MPICH_DIR/lib -lmpi -L$CRAY_MPICH_ROOTDIR/gtl/lib -lmpi_gtl_hsa -L$INST/lib -lscalapack -L$OLCF_OPENBLAS_ROOT/lib -lopenblas -L$INST/lib64)
+    cflags = ('-march=znver3' -fPIC -O2 -target-accel=nvidia80 -I'$MPICH_DIR'/include)
+    libs = (-L$INST/lib -lscalapack -L$INST/lib -lblis -L$INST/lib -lflame)
     cflags=$"cflags
     libs=$"libs
     rm -fr build
     mkdir build && cd build
-    ../configure 'CXX=hipcc' 'CC=hipcc' 'FC=ftn' \
-               'FCFLAGS=-march=znver3 -O2 -fPIC' \
+    ../configure 'CXX=CC' 'CC=cc' 'FC=ftn' \
+               'FCFLAGS=-ffree-line-length-none '$cflags \
                'CFLAGS='$cflags \
                'CXXFLAGS=-std=c++14 '$cflags \
-               --enable-amd-gpu \
                '--prefix='$INST \
                'LIBS='$libs \
                --disable-sse --disable-sse-assembly --disable-avx \
                --disable-avx2 --disable-avx512 '--enable-c-tests=no' \
                '--enable-option-checking=fatal' --enable-shared \
-               '--enable-cpp-tests=no' --enable-hipcub
-#              '--enable-gpu-streams=amd'
+               '--enable-cpp-tests=no' '--enable-nvidia-gpu' \
+               '--enable-gpu-streams=nvidia' \
+               '--with-NVIDIA-GPU-compute-capability=sm_80'
+               '--with-cuda-path='$CUDA_HOME \
+               '--with-cuda-sdk-path='$CUDA_HOME
+               '--with-NVIDIA-gpu-support-only' \
+               '--enable-option-checking=fatal' \
+               '--without-threading-support-check-during-build'
     make -j16
     make install
     cd $WD
@@ -253,55 +260,6 @@ fn install_dealii {
 }
 
 
-fn enter_venv {
-  if(! test -d $INST/venv ) {
-    python3 -m venv $INST/venv
-  }
-  . $WD/bin/activate $INST/venv
-}
-
-fn install_torch {
-  PYTORCH_VERSION = 1.13.1
-  PYTORCH_URL = https://github.com/pytorch/pytorch
-
-  cd $WD/src
-  enter_venv
-  pip install pyyaml pandas matplotlib scikit-learn pybind11 \
-      typing_extensions six sympy filelock jinja2 networkx
-  if(! test -d pytorch) {
-      git clone --recursive $PYTORCH_URL
-      @ {cd pytorch && git checkout v$$PYTORCH_VERSION}
-  }
-  cd pytorch
-  CMAKE_PREFIX_PATH=$INST
-  CMAKE_CXX_FLAGS='-march=znver3'
-  CXX = `{which g++} # note: CC adds mpi linking info.
-  CC = `{which gcc}
-  BLAS = OpenBLAS
-  OpenBLAS_HOME = $OLCF_OPENBLAS_ROOT
-  USE_CUDA = 0
-  USE_ROCM = 0
-  USE_CUDNN = 0
-  USE_NCCL = 0
-  USE_RCCL = 0
-  USE_MKLDNN = 0
-  USE_DISTRIBUTED = 0
-  USE_OPENMP = 0
-  PYTORCH_BUILD_VERSION=$PYTORCH_VERSION # to prevent dependency issues
-  PYTORCH_BUILD_NUMBER=1
-  CMAKE_BUILD_TYPE=Release
-
-  python setup.py build -j16 --cmake-only
-  cd build
-  #cmake -DBUILD_CUSTOM_PROTOBUF=0 ..
-  cmake --build . -j16 --target install
-  cd ..
-  python3 setup.py install
-
-  cd $WD
-}
-
-
 fn compile_dftfe{
   cd $WD/src
   branch = publicGithubDevelop
@@ -326,15 +284,16 @@ fn compile_dftfe{
   xmlLibDir=/usr/lib64
 
   ELPA_PATH=$INST
-  DCCL_PATH=$ROCM_PATH/rccl
-  TORCH_PATH=$INST/venv/lib/python3.9/site-packages
+  DCCL_PATH=$NCCL_DIR
+  TORCH_PATH=''
 
   #Compiler options and flags
   cxx_compiler = CC
-  cxx_flags = '-march=znver3 -fPIC -I'$MPICH_DIR'/include -I'$ROCM_PATH/include
-  cxx_flagsRelease = -O2 #sets DCMAKE_CXX_FLAGS_RELEASE
-  device_flags = '-march=znver3 -O2 -munsafe-fp-atomics -I'$MPICH_DIR'/include -I'$ROCM_PATH/include
-  device_architectures = gfx90a
+  cxx_flags = '-march=znver3 -fPIC'
+  cxx_flagsRelease = '-fPIC -target-accel=nvidia80 -I'$MPICH_DIR'/include'
+  device_flags ='-I'$MPICH_DIR'/include -arch=sm_80'
+  device_architectures =80
+
 
   # HIGHERQUAD_PSP option compiles with default or higher order
   # quadrature for storing pseudopotential data
@@ -370,7 +329,6 @@ fn compile_dftfe{
       -DCMAKE_HIP_ARCHITECTURES=$device_architectures \
       -DWITH_TESTING=OFF \
       -DMINIMAL_COMPILE=OFF \
-      '-DCMAKE_SHARED_LINKER_FLAGS=-L'$ROCM_PATH'/lib -lamdhip64 -L'$MPICH_DIR'/lib -lmpi -L'$CRAY_MPICH_ROOTDIR'/gtl/lib -lmpi_gtl_hsa' \
       -DHIGHERQUAD_PSP=ON \
   )  
 

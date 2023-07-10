@@ -2,14 +2,15 @@
 
 These install scripts provide a set of executable
 functions that install the necessary dependencies
-of [DFT-FE](https://github.com/dftfeDevelopers/dftfe).
+of [DFT-FE](https://github.com/dftfeDevelopers/dftfe)
+on NERSC Perlmutter.
 
 To use these scripts, we assume you have cloned this
 repository onto a system where you intend to install DFT-FE.
-For example, I installed it into `/lustre/orion/[projid]/scratch/$USER/DFT-FE` after 
-cloning into the scatch directory
+For example, I installed it into `$PSCRATCH/DFT-FE` after 
+cloning into the scratch directory
 
-    cd /lustre/orion/[projid]/scratch/$USER
+    cd $PSCRATCH
     git clone https://github.com/dsambit/install_DFT-FE.git DFT-FE
     cd DFT-FE
 
@@ -50,14 +51,16 @@ Then source this script using
 and then run the functions listed in that file manually, in order.
 For example, 
 
+    install_blis
+    install_libflame
     install_alglib
     install_libxc
     install_spglib
     install_p4est
     install_scalapack
-    # install_ofi_rccl # (optional, skip this one for now)
-    install_elpa (press `y` when prompted to use patch)
+    install_elpa
     install_dealii
+    install_dftd4 #(optional)
     compile_dftfe
 
 Each function follows a standard pattern - download source into `$WD/src`,
@@ -72,32 +75,25 @@ DFT-FE is built in real and cplx versions, depending on whether you
 want to enable k-points (implemented in the cplx version only).
 
 Assuming you have already sourced `env2/env.rc`, an example
-batch script running GPU-enabled DFT-FE on 280 nodes is below:
+batch script running GPU-enabled DFT-FE on 2 nodes is below:
 
-    #!/usr/bin/env rc
-    #SBATCH -A spy007
-    #SBATCH -J dft14584
-    #SBATCH -t 00:25:00
-    #SBATCH -p batch
-    #SBATCH -N 280
-    #SBATCH --gpus-per-node 8
-    #SBATCH --ntasks-per-gpu 1
-    #SBATCH --gpu-bind closest
+ #!/usr/bin/env rc
+ #SBATCH -A m2360_g
+ #SBATCH -C gpu
+ #SBATCH -q regular
+ #SBATCH --job-name Be_test_dftfe
+ #SBATCH -t 00:10:00
+ #SBATCH -n 8
+ #SBATCH --ntasks-per-node=4
+ #SBATCH -c 32
+ #SBATCH --gpus-per-node=4
+ #SBATCH --gpu-bind=map_gpu:0,1,2,3
 
-    OMP_NUM_THREADS = 1
-    MPICH_OFI_NIC_POLICY = NUMA
-    HSA_FORCE_FINE_GRAIN_PCIE = 1 
-    LD_LIBRARY_PATH = $LD_LIBRARY_PATH:$WD/env2/lib
-    MPICH_GPU_SUPPORT_ENABLED=1
-    MPICH_SMP_SINGLE_COPY_MODE=NONE
+ SLURM_CPU_BIND='cores'
+ OMP_NUM_THREADS=1
 
-    BASE = $WD/src/dftfe/build/release/real
-    n=`{echo $SLURM_JOB_NUM_NODES '*' 8 | bc}
+ LD_LIBRARY_PATH = $LD_LIBRARY_PATH:$WD/env2/lib
+ LD_LIBRARY_PATH = $LD_LIBRARY_PATH:$WD/env2/lib64
+ BASE = $WD/src/dftfe/build/release/real
 
-    srun -n $n -c 7 --gpu-bind closest \
-              $BASE/dftfe parameterFileGPU.prm > output
-
-This uses `SLURM_JOB_NUM_NODES` to compute the number of MPI
-ranks to use as one per GCD (8 per node).  If you wish to run
-on a different number of nodes, only the `#SBATCH -N 280`
-needs to be changed.
+ srun  $BASE/dftfe parameterFile.prm > output
