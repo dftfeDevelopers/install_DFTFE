@@ -322,11 +322,11 @@ fn compile_dftfe{
       -DWITH_TORCH=OFF \
       -DCMAKE_PREFIX_PATH=$ELPA_PATH';'$DCCL_PATH';'$TORCH_PATH \
       -DWITH_GPU=ON \
-      -DGPU_LANG=hip \
-      -DGPU_VENDOR=amd \
+      -DGPU_LANG=cuda \
+      -DGPU_VENDOR=nvidia \
       -DWITH_GPU_AWARE_MPI=ON \
-      -DCMAKE_HIP_FLAGS=$device_flags \
-      -DCMAKE_HIP_ARCHITECTURES=$device_architectures \
+      -DCMAKE_CUDA_FLAGS=$device_flags \
+      -DCMAKE_CUDA_ARCHITECTURES=$device_architectures \
       -DWITH_TESTING=OFF \
       -DMINIMAL_COMPILE=OFF \
       -DHIGHERQUAD_PSP=ON \
