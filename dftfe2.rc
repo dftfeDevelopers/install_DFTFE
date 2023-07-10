@@ -247,7 +247,7 @@ fn install_dealii {
         '-DDEAL_II_WITH_LAPACK=ON' \
         '-DLAPACK_DIR='$OLCF_OPENBLAS_ROOT';'$INST \
         '-DLAPACK_FOUND=true' \
-        '-DLAPACK_LIBRARIES='$OLCF_OPENBLAS_ROOT/lib/libopenblas.so \
+        '-DLAPACK_LIBRARIES='$INST/lib/libblis.so';'$INST/lib/libflame.so\
         '-DSCALAPACK_DIR='$INST \
         '-DSCALAPACK_LIBRARIES='$INST/lib/libscalapack.so \
         '-DCMAKE_INSTALL_PREFIX='$INST \
