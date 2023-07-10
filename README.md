@@ -7,11 +7,11 @@ on NERSC Perlmutter.
 
 To use these scripts, we assume you have cloned this
 repository onto a system where you intend to install DFT-FE.
-For example, I installed it into `$PSCRATCH/DFT-FE` after 
+For example, I installed it into `$PSCRATCH/install_DFT-FE` after 
 cloning into the scratch directory
 
     cd $PSCRATCH
-    git clone https://github.com/dsambit/install_DFT-FE.git DFT-FE
+    git clone https://github.com/dsambit/install_DFT-FE.git install_DFT-FE
     cd DFT-FE
 
 ## Pre-requisites
