@@ -77,23 +77,23 @@ want to enable k-points (implemented in the cplx version only).
 Assuming you have already sourced `env2/env.rc`, an example
 batch script running GPU-enabled DFT-FE on 2 nodes is below:
 
-   #!/usr/bin/env rc
-   #SBATCH -A m2360_g
-   #SBATCH -C gpu
-   #SBATCH -q regular
-   #SBATCH --job-name test_dftfe
-   #SBATCH -t 00:10:00
-   #SBATCH -n 8
-   #SBATCH --ntasks-per-node=4
-   #SBATCH -c 32
-   #SBATCH --gpus-per-node=4
-   #SBATCH --gpu-bind=map_gpu:0,1,2,3
+    #!/usr/bin/env rc
+    #SBATCH -A m2360_g
+    #SBATCH -C gpu
+    #SBATCH -q regular
+    #SBATCH --job-name test_dftfe
+    #SBATCH -t 00:10:00
+    #SBATCH -n 8
+    #SBATCH --ntasks-per-node=4
+    #SBATCH -c 32
+    #SBATCH --gpus-per-node=4
+    #SBATCH --gpu-bind=map_gpu:0,1,2,3
 
-   SLURM_CPU_BIND='cores'
-   OMP_NUM_THREADS=1
+    SLURM_CPU_BIND='cores'
+    OMP_NUM_THREADS=1
 
-   LD_LIBRARY_PATH = $LD_LIBRARY_PATH:$WD/env2/lib
-   LD_LIBRARY_PATH = $LD_LIBRARY_PATH:$WD/env2/lib64
-   BASE = $WD/src/dftfe/build/release/real
+    LD_LIBRARY_PATH = $LD_LIBRARY_PATH:$WD/env2/lib
+    LD_LIBRARY_PATH = $LD_LIBRARY_PATH:$WD/env2/lib64
+    BASE = $WD/src/dftfe/build/release/real
 
-   srun  $BASE/dftfe parameterFile.prm > output
+    srun  $BASE/dftfe parameterFile.prm > output
