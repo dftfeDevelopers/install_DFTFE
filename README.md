@@ -77,7 +77,7 @@ want to enable k-points (implemented in the cplx version only).
 Assuming you have already sourced `env2/env.rc`, an example
 batch script running GPU-enabled DFT-FE on 2 nodes is below:
 
-    #!/ccs/home/dsambit/perlmutter/bin/rc
+    #!$HOME/$LMOD_SYSTEM_NAME/bin/rc
     #SBATCH -A m2360_g
     #SBATCH -C gpu
     #SBATCH -q regular
