@@ -324,7 +324,7 @@ fn compile_dftfe{
       -DWITH_GPU=ON \
       -DGPU_LANG=cuda \
       -DGPU_VENDOR=nvidia \
-      -DWITH_GPU_AWARE_MPI=ON \
+      -DWITH_GPU_AWARE_MPI=OFF \
       -DCMAKE_CUDA_FLAGS=$device_flags \
       -DCMAKE_CUDA_ARCHITECTURES=$device_architectures \
       -DWITH_TESTING=OFF \
