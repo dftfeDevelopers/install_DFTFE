@@ -24,7 +24,8 @@ shell language.  Install `rc` by running
     rc -l
 
 Note that getrc installs into the `$HOME/$LMOD_SYSTEM_NAME/bin`
-directory, and adds that to your PATH.
+directory, and adds that to your PATH. Also note that in rc shell, the 
+`export` keyword is not used when setting environment variables.
 
 Copying the rcrc startup file to your home directory provides
 the module command (in case your lmod version is old,
