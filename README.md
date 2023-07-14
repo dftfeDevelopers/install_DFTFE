@@ -56,8 +56,7 @@ For example,
     install_spglib
     install_p4est
     install_scalapack
-    # install_ofi_rccl # (optional, skip this one for now)
-    install_elpa (press `y` when prompted to use patch)
+    install_elpa
     install_dealii
     install_dftd4 (optional)
     compile_dftfe

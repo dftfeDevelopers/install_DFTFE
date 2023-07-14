@@ -110,10 +110,10 @@ fn install_scalapack {
     '-DBUILD_SHARED_LIBS=ON' \
     '-DBUILD_STATIC_LIBS=OFF' \
     '-DBUILD_TESTING=OFF' \
-    '-DCMAKE_C_COMPILER=gcc' \
-    '-DCMAKE_Fortran_COMPILER=gfortran' \
-    '-DCMAKE_C_FLAGS=-fPIC -march=znver3' \
-    '-DCMAKE_Fortran_FLAGS=-fPIC -march=znver3 -fallow-argument-mismatch' \
+    '-DCMAKE_C_COMPILER=mpicc' \
+    '-DCMAKE_Fortran_COMPILER=mpif90' \
+    '-DCMAKE_C_FLAGS=-fPIC -march=native' \
+    '-DCMAKE_Fortran_FLAGS=-fPIC -march=native -fallow-argument-mismatch' \
     '-DUSE_OPTIMIZED_LAPACK_BLAS=ON' \
     '-DCMAKE_INSTALL_PREFIX='$INST \
     ..
@@ -138,21 +138,21 @@ fn install_elpa {
     LD_LIBRARY_PATH = $LD_LIBRARY_PATH:$INST/lib
     LD_LIBRARY_PATH = $LD_LIBRARY_PATH:$INST/lib64
 
-    cflags = ('-march=znver3' -fPIC -O2 -I$ROCM_PATH/include -I$ROCM_PATH/hip/include -I$ROCM_PATH/hipcub/include -I$ROCM_PATH/rocblas/include '--amdgpu-target=gfx90a' -I$MPICH_DIR/include)
-    libs = (-L$ROCM_PATH/lib -lamdhip64 -L$ROCM_PATH/rocblas/lib -lrocblas -L$MPICH_DIR/lib -lmpi $CRAY_XPMEM_POST_LINK_OPTS -lxpmem $PE_MPICH_GTL_DIR_amd_gfx90a $PE_MPICH_GTL_LIBS_amd_gfx90a -L$INST/lib -lscalapack -L$OLCF_OPENBLAS_ROOT/lib -lopenblas -L$INST/lib64)
+
+    cflags = ('-march=native')
+    libs = ('-L'$MKLROOT'/lib/intel64 -Wl,--no-as-needed -lmkl_gf_lp64 -lmkl_gnu_thread -lmkl_core -lgomp -lpthread -lm -ldl')
     cflags=$"cflags
     libs=$"libs
     rm -fr build
     mkdir build && cd build
-    ../configure 'CXX=hipcc' 'CC=hipcc' 'FC=gfortran' \
-               'FCFLAGS=-march=znver3 -O2 -fPIC' \
+    ../configure 'CXX=mpic++' 'CC=mpicc' 'FC=mpif90' \
+               'FCFLAGS=-march=native -O2 -fPIC' \
                'CFLAGS='$cflags \
                'CXXFLAGS=-std=c++14 '$cflags \
                --enable-amd-gpu \
                '--prefix='$INST \
                'LIBS='$libs \
-               --disable-sse --disable-sse-assembly --disable-avx \
-               --disable-avx2 --disable-avx512 '--enable-c-tests=no' \
+               '--enable-c-tests=no' \
                '--enable-option-checking=fatal' --enable-shared \
                '--enable-cpp-tests=no'
     make -j16
@@ -208,55 +208,6 @@ fn install_dealii {
 }
 
 
-fn enter_venv {
-  if(! test -d $INST/venv ) {
-    python3 -m venv $INST/venv
-  }
-  . $WD/bin/activate $INST/venv
-}
-
-fn install_torch {
-  PYTORCH_VERSION = 1.13.1
-  PYTORCH_URL = https://github.com/pytorch/pytorch
-
-  cd $WD/src
-  enter_venv
-  pip install pyyaml pandas matplotlib scikit-learn pybind11 \
-      typing_extensions six sympy filelock jinja2 networkx
-  if(! test -d pytorch) {
-      git clone --recursive $PYTORCH_URL
-      @ {cd pytorch && git checkout v$$PYTORCH_VERSION}
-  }
-  cd pytorch
-  CMAKE_PREFIX_PATH=$INST
-  CMAKE_CXX_FLAGS='-march=znver3'
-  CXX = `{which g++} # note: CC adds mpi linking info.
-  CC = `{which gcc}
-  BLAS = OpenBLAS
-  OpenBLAS_HOME = $OLCF_OPENBLAS_ROOT
-  USE_CUDA = 0
-  USE_ROCM = 0
-  USE_CUDNN = 0
-  USE_NCCL = 0
-  USE_RCCL = 0
-  USE_MKLDNN = 0
-  USE_DISTRIBUTED = 0
-  USE_OPENMP = 0
-  PYTORCH_BUILD_VERSION=$PYTORCH_VERSION # to prevent dependency issues
-  PYTORCH_BUILD_NUMBER=1
-  CMAKE_BUILD_TYPE=Release
-
-  python setup.py build -j16 --cmake-only
-  cd build
-  #cmake -DBUILD_CUSTOM_PROTOBUF=0 ..
-  cmake --build . -j16 --target install
-  cd ..
-  python3 setup.py install
-
-  cd $WD
-}
-
-
 fn compile_dftfe{
   cd $WD/src
   branch = publicGithubDevelop
@@ -281,8 +232,7 @@ fn compile_dftfe{
   xmlLibDir=/usr/lib64
 
   ELPA_PATH=$INST
-  DCCL_PATH=
-  TORCH_PATH=
+  TORCH_PATH=''
 
   #Compiler options and flags
   cxx_compiler = mpic++
@@ -313,7 +263,7 @@ fn compile_dftfe{
       -DWITH_MDI=OFF \
       -DMDI_PATH= \
       -DWITH_TORCH=OFF \
-      -DCMAKE_PREFIX_PATH=$ELPA_PATH';'$DCCL_PATH';'$TORCH_PATH \
+      -DCMAKE_PREFIX_PATH=$ELPA_PATH';'$TORCH_PATH \
       -DWITH_TESTING=OFF \
       -DMINIMAL_COMPILE=OFF \
       -DHIGHERQUAD_PSP=ON \
