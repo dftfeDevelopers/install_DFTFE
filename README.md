@@ -44,8 +44,9 @@ phases of DFT-FE.
 The installation itself is contained within the functions in
 `dftfe2.rc`.  Edit this to define its WD and INST directories
 to reflect your own environment.
-Then first log into an *interactive 1 node job* on greatlakes 
-and source this script using
+Then first log into an **interactive 1 node job (CAUTION:without interactive job the
+compilation process will crash)**
+on greatlakes and source this script using
 
     . ./dftfe2.rc
 
