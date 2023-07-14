@@ -79,17 +79,15 @@ batch script running DFT-FE on 1 node is below:
 
     #!$HOME/$LMOD_SYSTEM_NAME/bin/rc
 
-    #SBATCH --job-name=example_job
-    #SBATCH --mail-user=uniqname@umich.edu
-    #SBATCH --mail-type=BEGIN,END
-    #SBATCH --cpus-per-task=1
+    #SBATCH --job-name testdftfe
     #SBATCH --nodes=1
-    #SBATCH --ntasks-per-node=1
-    #SBATCH --mem-per-cpu=1000m 
-    #SBATCH --time=10:00
-    #SBATCH --account=test
-    #SBATCH --partition=standard
-    #SBATCH --output=/home/%u/%x-%j.log
+    #SBATCH --ntasks-per-node=36
+    #SBATCH --mem-per-cpu=5g
+    #SBATCH --time=1:00:00
+    #SBATCH --account=vikramg1
+    
+    export OMP_NUM_THREADS=1
+    mpirun -n 36 dftfe parameters.prm > output
 
 
 
