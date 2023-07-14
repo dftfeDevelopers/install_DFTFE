@@ -32,7 +32,7 @@ fn install_libxc {
   cd libxc-6.2.2
   rm -fr build
   mkdir build && cd build
-  cmake '-DCMAKE_C_COMPILER=cc' \
+  cmake '-DCMAKE_C_COMPILER=gcc' \
         '-DCMAKE_C_FLAGS=-O2 -fPIC' \
         '-DCMAKE_INSTALL_PREFIX='$INST \
         ..
@@ -52,8 +52,8 @@ fn install_dftd4 {
   cd dftd4-3.4.0
   rm -fr build
   mkdir build && cd build
-  cmake '-DCMAKE_Fortran_COMPILER=ftn' \
-        '-DCMAKE_C_COMPILER=cc' \
+  cmake '-DCMAKE_Fortran_COMPILER=gfortran' \
+        '-DCMAKE_C_COMPILER=gcc' \
         '-DBLAS_LIBRARIES='$OLCF_OPENBLAS_ROOT/lib/libopenblas.so \
         '-DLAPACK_LIBRARIES='$OLCF_OPENBLAS_ROOT/lib/libopenblas.so \
         '-DBUILD_SHARED_LIBS=ON' \
@@ -73,8 +73,8 @@ fn install_spglib {
   cd spglib
   rm -fr build
   mkdir -p build && cd build
-  cmake '-DCMAKE_CXX_COMPILER=CC' \
-        '-DCMAKE_C_COMPILER=cc' \
+  cmake '-DCMAKE_CXX_COMPILER=g++' \
+        '-DCMAKE_C_COMPILER=gcc' \
         '-DCMAKE_INSTALL_PREFIX='$INST \
         ..
   make -j16
@@ -110,8 +110,8 @@ fn install_scalapack {
     '-DBUILD_SHARED_LIBS=ON' \
     '-DBUILD_STATIC_LIBS=OFF' \
     '-DBUILD_TESTING=OFF' \
-    '-DCMAKE_C_COMPILER=cc' \
-    '-DCMAKE_Fortran_COMPILER=ftn' \
+    '-DCMAKE_C_COMPILER=gcc' \
+    '-DCMAKE_Fortran_COMPILER=gfortran' \
     '-DCMAKE_C_FLAGS=-fPIC -march=znver3' \
     '-DCMAKE_Fortran_FLAGS=-fPIC -march=znver3 -fallow-argument-mismatch' \
     '-DUSE_OPTIMIZED_LAPACK_BLAS=ON' \
@@ -122,49 +122,8 @@ fn install_scalapack {
   cd $WD
 }
 
-# Install RCCL (https://github.com/ROCmSoftwarePlatform/rccl)
-#    cmake -DCMAKE_CXX_COMPILER=${ROCM_PATH}/bin/hipcc -DCMAKE_CXX_FLAGS="-I${MPICH_DIR}/include -I${ROCM_PATH}/include" -DCMAKE_SHARED_LINKER_FLAGS="-L${ROCM_PATH}/lib -lamdhip64 -L${MPICH_DIR}/lib -lmpi -L${CRAY_MPICH_ROOTDIR}/gtl/lib -lmpi_gtl_hsa" -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="$ROCM_PATH;${MPICH_DIR}" ../
 
-# Install RCCL OFI plugin
-fn install_ofi_rccl {
-  cd $WD/src
-  if(test ! -d aws-ofi-rccl) {
-    git clone https://github.com/ROCmSoftwarePlatform/aws-ofi-rccl
-    @ { cd aws-ofi-rccl
-        # git checkout cxi
-        module load libtool
-        bash ./autogen.sh
-      }
-  }
-  cd aws-ofi-rccl
-  rm -fr build
-  mkdir build && cd build
-
-  ROCM=$OLCF_ROCM_ROOT
-  libpre = (-L -Wl,-rpath-link,)
-  ldflags = ($libpre^$ROCM/lib $libpre^$CRAY_MPICH_ROOTDIR/gtl/lib -lmpi_gtl_hsa)
-  headers = (/opt/cray/libfabric/1.15.2.0 $ROCM/rccl $ROCM $MPICH_DIR)
-  cflags = -I ^ $headers ^ /include
-
-  GCC=hipcc \
-  CC=hipcc \
-  CXX=hipcc \
-  CFLAGS=$"cflags \
-  LDFLAGS=$"ldflags \
-    ../configure \
-      --with-libfabric=/opt/cray/libfabric/1.15.2.0 \
-      --with-hip=$ROCM/hip \
-      --with-rccl=$ROCM \
-      --with-mpi=$MPICH_DIR \
-      --prefix=$INST \
-      --build=amd64-linux-gnu \
-      --target=amd64-linux-gnu \
-      --host=amd64-linux-gnu
-  make -j8
-  make install
-}
-
-# Install ELPA latest version (elpa-2022.11.001) with AMD GPU support
+# Install ELPA latest version (elpa-2022.11.001)
 fn install_elpa {
     cd $WD/src
     if(test ! -d elpa) {
@@ -173,13 +132,11 @@ fn install_elpa {
         tar xzf elpa-$ver.tar.gz
         mv elpa-$ver elpa
         rm -f elpa-$ver.tar.gz
-        rc -c 'cd elpa && patch -p1 <'$WD/src/elpa-$ver.patch
     }
     cd elpa
 
     LD_LIBRARY_PATH = $LD_LIBRARY_PATH:$INST/lib
     LD_LIBRARY_PATH = $LD_LIBRARY_PATH:$INST/lib64
-    LD_LIBRARY_PATH = $LD_LIBRARY_PATH:$ROCM_PATH/lib:$ROCM_PATH/hip/lib:$ROCM_PATH/lib:$ROCM_PATH/rocblas/lib
 
     cflags = ('-march=znver3' -fPIC -O2 -I$ROCM_PATH/include -I$ROCM_PATH/hip/include -I$ROCM_PATH/hipcub/include -I$ROCM_PATH/rocblas/include '--amdgpu-target=gfx90a' -I$MPICH_DIR/include)
     libs = (-L$ROCM_PATH/lib -lamdhip64 -L$ROCM_PATH/rocblas/lib -lrocblas -L$MPICH_DIR/lib -lmpi $CRAY_XPMEM_POST_LINK_OPTS -lxpmem $PE_MPICH_GTL_DIR_amd_gfx90a $PE_MPICH_GTL_LIBS_amd_gfx90a -L$INST/lib -lscalapack -L$OLCF_OPENBLAS_ROOT/lib -lopenblas -L$INST/lib64)
@@ -187,7 +144,7 @@ fn install_elpa {
     libs=$"libs
     rm -fr build
     mkdir build && cd build
-    ../configure 'CXX=hipcc' 'CC=hipcc' 'FC=ftn' \
+    ../configure 'CXX=hipcc' 'CC=hipcc' 'FC=gfortran' \
                'FCFLAGS=-march=znver3 -O2 -fPIC' \
                'CFLAGS='$cflags \
                'CXXFLAGS=-std=c++14 '$cflags \
@@ -197,8 +154,7 @@ fn install_elpa {
                --disable-sse --disable-sse-assembly --disable-avx \
                --disable-avx2 --disable-avx512 '--enable-c-tests=no' \
                '--enable-option-checking=fatal' --enable-shared \
-               '--enable-cpp-tests=no' --enable-hipcub
-#              '--enable-gpu-streams=amd'
+               '--enable-cpp-tests=no'
     make -j16
     make install
     cd $WD
@@ -230,7 +186,7 @@ fn install_dealii {
         '-DDEAL_II_CXX_FLAGS_RELEASE=-O2' \
         '-DCMAKE_C_COMPILER=cc' \
         '-DCMAKE_CXX_COMPILER=CC' \
-        '-DCMAKE_Fortran_COMPILER=ftn' \
+        '-DCMAKE_Fortran_COMPILER=gfortran' \
         '-DDEAL_II_WITH_TBB=OFF' \
         '-DDEAL_II_COMPONENT_EXAMPLES=OFF' \
         '-DDEAL_II_WITH_MPI=ON' \
@@ -325,15 +281,13 @@ fn compile_dftfe{
   xmlLibDir=/usr/lib64
 
   ELPA_PATH=$INST
-  DCCL_PATH=$ROCM_PATH/rccl
-  TORCH_PATH=$INST/venv/lib/python3.9/site-packages
+  DCCL_PATH=
+  TORCH_PATH=
 
   #Compiler options and flags
-  cxx_compiler = CC
-  cxx_flags = '-march=znver3 -fPIC -I'$MPICH_DIR'/include -I'$ROCM_PATH/include
+  cxx_compiler = mpic++
+  cxx_flags = '-fPIC'
   cxx_flagsRelease = -O2 #sets DCMAKE_CXX_FLAGS_RELEASE
-  device_flags = '-march=znver3 -O2 -munsafe-fp-atomics -I'$MPICH_DIR'/include -I'$ROCM_PATH/include
-  device_architectures = gfx90a
 
   # HIGHERQUAD_PSP option compiles with default or higher order
   # quadrature for storing pseudopotential data
@@ -358,18 +312,10 @@ fn compile_dftfe{
       -DXML_INCLUDE_DIR=$xmlIncludeDir \
       -DWITH_MDI=OFF \
       -DMDI_PATH= \
-      -DWITH_DCCL=ON \
       -DWITH_TORCH=OFF \
       -DCMAKE_PREFIX_PATH=$ELPA_PATH';'$DCCL_PATH';'$TORCH_PATH \
-      -DWITH_GPU=ON \
-      -DGPU_LANG=hip \
-      -DGPU_VENDOR=amd \
-      -DWITH_GPU_AWARE_MPI=ON \
-      -DCMAKE_HIP_FLAGS=$device_flags \
-      -DCMAKE_HIP_ARCHITECTURES=$device_architectures \
       -DWITH_TESTING=OFF \
       -DMINIMAL_COMPILE=OFF \
-      '-DCMAKE_SHARED_LINKER_FLAGS=-L'$ROCM_PATH'/lib -lamdhip64 -L'$MPICH_DIR'/lib -lmpi -L'$CRAY_XPMEM_POST_LINK_OPTS' -lxpmem '$PE_MPICH_GTL_DIR_amd_gfx90a' '$PE_MPICH_GTL_LIBS_amd_gfx90a \      
       -DHIGHERQUAD_PSP=ON \
   )  
 
