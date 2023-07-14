@@ -36,7 +36,7 @@ and doesn't yet recognize the rc shell).
 The module environment intended to run DFT-FE has been extracted
 into `env2/env.rc`.  Edit this file before proceeding any further.
 Make sure that your module environment contains some version of the
-pre-requisites mentioned there (e.g. python3 and openblas).
+pre-requisites mentioned there.
 This environment file is used both by the install and run
 phases of DFT-FE.
 
@@ -44,7 +44,9 @@ phases of DFT-FE.
 The installation itself is contained within the functions in
 `dftfe2.rc`.  Edit this to define its WD and INST directories
 to reflect your own environment.
-Then source this script using
+Then first log into an **interactive 1 node job (CAUTION:without interactive job the
+compilation process will crash)**
+on greatlakes and source this script using
 
     . ./dftfe2.rc
 
@@ -73,31 +75,19 @@ DFT-FE is built in real and cplx versions, depending on whether you
 want to enable k-points (implemented in the cplx version only).
 
 Assuming you have already sourced `env2/env.rc`, an example
-batch script running GPU-enabled DFT-FE on 280 nodes is below:
+batch script running DFT-FE on 1 node is below:
 
     #!$HOME/$LMOD_SYSTEM_NAME/bin/rc
-    #SBATCH -A spy007
-    #SBATCH -J dft14584
-    #SBATCH -t 00:25:00
-    #SBATCH -p batch
-    #SBATCH -N 280
-    #SBATCH --gpus-per-node 8
-    #SBATCH --ntasks-per-gpu 1
-    #SBATCH --gpu-bind closest
 
-    OMP_NUM_THREADS = 1
-    MPICH_OFI_NIC_POLICY = NUMA 
-    LD_LIBRARY_PATH = $LD_LIBRARY_PATH:$WD/env2/lib
-    MPICH_GPU_SUPPORT_ENABLED=1
-    MPICH_SMP_SINGLE_COPY_MODE=NONE
+    #SBATCH --job-name testdftfe
+    #SBATCH --nodes=1
+    #SBATCH --ntasks-per-node=36
+    #SBATCH --mem-per-cpu=5g
+    #SBATCH --time=1:00:00
+    #SBATCH --account=vikramg1
+    
+    export OMP_NUM_THREADS=1
+    mpirun -n 36 dftfe parameters.prm > output
 
-    BASE = $WD/src/dftfe/build/release/real
-    n=`{echo $SLURM_JOB_NUM_NODES '*' 8 | bc}
 
-    srun -n $n -c 7 --gpu-bind closest \
-              $BASE/dftfe parameterFileGPU.prm > output
 
-This uses `SLURM_JOB_NUM_NODES` to compute the number of MPI
-ranks to use as one per GCD (8 per node).  If you wish to run
-on a different number of nodes, only the `#SBATCH -N 280`
-needs to be changed.
