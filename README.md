@@ -92,6 +92,8 @@ batch script running GPU-enabled DFT-FE on 2 nodes is below:
 
     SLURM_CPU_BIND='cores'
     OMP_NUM_THREADS=1
+    MPICH_GPU_SUPPORT_ENABLED=1
+
 
     LD_LIBRARY_PATH = $LD_LIBRARY_PATH:$WD/env2/lib
     LD_LIBRARY_PATH = $LD_LIBRARY_PATH:$WD/env2/lib64
