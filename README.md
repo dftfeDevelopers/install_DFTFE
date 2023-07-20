@@ -88,7 +88,9 @@ batch script running GPU-enabled DFT-FE on 2 nodes is below:
     #SBATCH --ntasks-per-node=4
     #SBATCH -c 32
     #SBATCH --gpus-per-node=4
-    #SBATCH --gpu-bind=map_gpu:0,1,2,3
+    #SBATCH --gpus-per-task=1
+    #SBATCH --gpu-bind=none
+
 
     SLURM_CPU_BIND='cores'
     OMP_NUM_THREADS=1
