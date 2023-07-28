@@ -115,6 +115,8 @@ fn install_scalapack {
     '-DCMAKE_C_FLAGS=-fPIC -march=native' \
     '-DCMAKE_Fortran_FLAGS=-fPIC -march=native -fallow-argument-mismatch' \
     '-DUSE_OPTIMIZED_LAPACK_BLAS=ON' \
+    '-DBLAS_LIBRARIES='-L${MKLROOT}/lib/intel64 -Wl,--no-as-needed -lmkl_intel_lp64 -lmkl_gnu_thread -lmkl_rt -lmkl_core -lgomp -lpthread -lm -ldl \
+    '-DLAPACK_LIBRARIES='-L${MKLROOT}/lib/intel64 -Wl,--no-as-needed -lmkl_intel_lp64 -lmkl_gnu_thread -lmkl_rt -lmkl_core -lgomp -lpthread -lm -ldl \
     '-DCMAKE_INSTALL_PREFIX='$INST \
     ..
   make -j16
