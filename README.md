@@ -12,7 +12,7 @@ cloning into the scratch directory
 
     cd $PSCRATCH
     git clone https://github.com/dsambit/install_DFT-FE.git install_DFT-FE
-    cd DFT-FE
+    cd install_DFT-FE
 
 ## Pre-requisites
 
