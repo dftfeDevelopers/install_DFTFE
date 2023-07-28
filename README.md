@@ -4,14 +4,14 @@ These install scripts provide a set of executable
 functions that install the necessary dependencies
 of [DFT-FE](https://github.com/dftfeDevelopers/dftfe) on UMICH Greatlakes.
 
-To use these scripts, we assume you have cloned this
-repository onto a system where you intend to install DFT-FE.
-For example, I installed it into `/lustre/orion/[projid]/scratch/$USER/install_DFT-FE` after 
+To use the script, we assume you have cloned this
+repository onto the system where you intend to install DFT-FE.
+For example, I installed it into `$myscratch/install_DFT-FE` after 
 cloning into the scatch directory
 
-    cd /lustre/orion/[projid]/scratch/$USER
+    cd $myscratch
     git clone https://github.com/dsambit/install_DFT-FE.git install_DFT-FE
-    cd DFT-FE
+    cd install_DFT-FE
 
 ## Pre-requisites
 
