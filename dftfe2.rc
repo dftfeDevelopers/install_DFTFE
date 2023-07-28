@@ -54,8 +54,8 @@ fn install_dftd4 {
   mkdir build && cd build
   cmake '-DCMAKE_Fortran_COMPILER=gfortran' \
         '-DCMAKE_C_COMPILER=gcc' \
-        '-DBLAS_LIBRARIES='$OLCF_OPENBLAS_ROOT/lib/libopenblas.so \
-        '-DLAPACK_LIBRARIES='$OLCF_OPENBLAS_ROOT/lib/libopenblas.so \
+        '-DBLAS_LIBRARIES='-L${MKLROOT}/lib/intel64 -Wl,--no-as-needed -lmkl_intel_lp64 -lmkl_gnu_thread -lmkl_rt -lmkl_core -lgomp -lpthread -lm -ldl \
+        '-DLAPACK_LIBRARIES='-L${MKLROOT}/lib/intel64 -Wl,--no-as-needed -lmkl_intel_lp64 -lmkl_gnu_thread -lmkl_rt -lmkl_core -lgomp -lpthread -lm -ldl \
         '-DBUILD_SHARED_LIBS=ON' \
         '-DCMAKE_INSTALL_PREFIX='$INST \
         ..
