@@ -10,7 +10,7 @@ For example, I installed it into `/lustre/orion/[projid]/scratch/$USER/install_D
 cloning into the scatch directory
 
     cd /lustre/orion/[projid]/scratch/$USER
-    git clone https://github.com/dsambit/install_DFT-FE.git install_DFT-FE
+    git clone https://github.com/dftfeDevelopers/install_DFTFE.git install_DFT-FE
     cd install_DFT-FE
 
 ## Pre-requisites
