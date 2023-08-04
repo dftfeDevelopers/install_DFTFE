@@ -202,8 +202,8 @@ fn install_elpa {
                '--enable-cpp-tests=no' '--enable-nvidia-gpu' \
                '--enable-gpu-streams=nvidia' \
                '--with-NVIDIA-GPU-compute-capability=sm_80'
-               '--with-cuda-path='$CUDA_HOME \
-               '--with-cuda-sdk-path='$CUDA_HOME
+               '--with-cuda-path='$CRAY_NVIDIA_PREFIX \
+               '--with-cuda-sdk-path='$CRAY_NVIDIA_PREFIX
                '--with-NVIDIA-gpu-support-only' \
                '--enable-option-checking=fatal' \
                '--without-threading-support-check-during-build'
