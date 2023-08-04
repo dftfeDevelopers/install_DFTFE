@@ -284,7 +284,7 @@ fn compile_dftfe{
   xmlLibDir=/usr/lib64
 
   ELPA_PATH=$INST
-  DCCL_PATH=$NCCL_DIR
+  DCCL_PATH=''
   TORCH_PATH=''
 
   #Compiler options and flags
@@ -318,7 +318,7 @@ fn compile_dftfe{
       -DXML_INCLUDE_DIR=$xmlIncludeDir \
       -DWITH_MDI=OFF \
       -DMDI_PATH= \
-      -DWITH_DCCL=ON \
+      -DWITH_DCCL=OFF \
       -DWITH_TORCH=OFF \
       -DCMAKE_PREFIX_PATH=$ELPA_PATH';'$DCCL_PATH';'$TORCH_PATH \
       -DWITH_GPU=ON \
