@@ -11,7 +11,7 @@ For example, I installed it into `$PSCRATCH/install_DFT-FE` after
 cloning into the scratch directory
 
     cd $PSCRATCH
-    git clone https://github.com/dsambit/install_DFT-FE.git install_DFT-FE
+    git clone https://github.com/dftfeDevelopers/install_DFTFE install_DFT-FE
     cd install_DFT-FE
 
 ## Pre-requisites
