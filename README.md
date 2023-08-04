@@ -11,8 +11,8 @@ cloning into the scatch directory
 
     cd /lustre/orion/[projid]/scratch/$USER
     git clone https://github.com/dftfeDevelopers/install_DFTFE.git install_DFT-FE
-    git checkout frontierScript
     cd install_DFT-FE
+    git checkout frontierScript
 
 ## Pre-requisites
 
