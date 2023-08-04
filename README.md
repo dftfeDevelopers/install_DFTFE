@@ -22,10 +22,10 @@ in the [rc](http://doc.cat-v.org/plan_9/4th_edition/papers/rc)
 shell language.  Install `rc` by running
 
     cp src/rcrc $HOME/.rcrc
-    . ./bin/getrc.sh $HOME/polaris
+    . ./bin/getrc.sh $HOME/$LMOD_SYSTEM_NAME
     rc -l
 
-Note that getrc installs into the `$HOME/polaris/bin`
+Note that getrc installs into the `$HOME/$LMOD_SYSTEM_NAME/bin`
 directory, and adds that to your PATH. Also note that in rc shell, the 
 `export` keyword is not used when setting environment variables.
 
