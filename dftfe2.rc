@@ -184,7 +184,7 @@ fn install_elpa {
 
     LD_LIBRARY_PATH = $LD_LIBRARY_PATH:$INST/lib
     LD_LIBRARY_PATH = $LD_LIBRARY_PATH:$INST/lib64
-    cflags = ('-march=znver3' -fPIC -O2 -target-accel=nvidia80 -I'$MPICH_DIR'/include)
+    cflags = ('-march=znver3' -fPIC -O2)
     libs = (-L$INST/lib -lscalapack -L$INST/lib -lblis -L$INST/lib -lflame)
     cflags=$"cflags
     libs=$"libs
@@ -290,8 +290,8 @@ fn compile_dftfe{
   #Compiler options and flags
   cxx_compiler = CC
   cxx_flags = '-march=znver3 -fPIC'
-  cxx_flagsRelease = '-fPIC -target-accel=nvidia80 -I'$MPICH_DIR'/include'
-  device_flags ='-I'$MPICH_DIR'/include -arch=sm_80'
+  cxx_flagsRelease = '-fPIC'
+  device_flags ='-arch=sm_80'
   device_architectures =80
 
 
