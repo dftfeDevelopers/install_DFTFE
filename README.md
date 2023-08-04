@@ -20,6 +20,7 @@ cloning into the $myprojectdir directory
 Because it's a better shell, the scripts are written
 in the [rc](http://doc.cat-v.org/plan_9/4th_edition/papers/rc)
 shell language.  Install `rc` by running
+
     module load PrgEnv-gnu
     module unload craype-accel-nvidia80
     cp src/rcrc $HOME/.rcrc
