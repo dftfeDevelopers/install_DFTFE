@@ -3,17 +3,17 @@
 These install scripts provide a set of executable
 functions that install the necessary dependencies
 of [DFT-FE](https://github.com/dftfeDevelopers/dftfe)
-on NERSC Perlmutter.
+on ALCF Polaris.
 
 To use these scripts, we assume you have cloned this
 repository onto a system where you intend to install DFT-FE.
-For example, I installed it into `$PSCRATCH/install_DFT-FE` after 
-cloning into the scratch directory
+For example, I installed it into `$myprojectdir/install_DFT-FE` after 
+cloning into the $myprojectdir directory
 
-    cd $PSCRATCH
+    cd $myprojectdir
     git clone https://github.com/dftfeDevelopers/install_DFTFE.git install_DFT-FE
     cd install_DFT-FE
-    git checkout perlmutterScript
+    git checkout polarisScript
 
 ## Pre-requisites
 
@@ -22,10 +22,10 @@ in the [rc](http://doc.cat-v.org/plan_9/4th_edition/papers/rc)
 shell language.  Install `rc` by running
 
     cp src/rcrc $HOME/.rcrc
-    . ./bin/getrc.sh $HOME/$LMOD_SYSTEM_NAME
+    . ./bin/getrc.sh $HOME/polaris
     rc -l
 
-Note that getrc installs into the `$HOME/$LMOD_SYSTEM_NAME/bin`
+Note that getrc installs into the `$HOME/polaris/bin`
 directory, and adds that to your PATH. Also note that in rc shell, the 
 `export` keyword is not used when setting environment variables.
 
