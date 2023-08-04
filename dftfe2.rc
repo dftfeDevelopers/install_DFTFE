@@ -196,15 +196,9 @@ fn install_elpa {
                'CXXFLAGS=-std=c++14 '$cflags \
                '--prefix='$INST \
                'LIBS='$libs \
-               --disable-sse --disable-sse-assembly --disable-avx \
-               --disable-avx2 --disable-avx512 '--enable-c-tests=no' \
+               --disable-avx512 '--enable-c-tests=no' \
                '--enable-option-checking=fatal' --enable-shared \
-               '--enable-cpp-tests=no' '--enable-nvidia-gpu' \
-               '--enable-gpu-streams=nvidia' \
-               '--with-NVIDIA-GPU-compute-capability=sm_80'
-               '--with-cuda-path='$CRAY_NVIDIA_PREFIX \
-               '--with-cuda-sdk-path='$CRAY_NVIDIA_PREFIX
-               '--with-NVIDIA-gpu-support-only' \
+               '--enable-cpp-tests=no'\
                '--enable-option-checking=fatal' \
                '--without-threading-support-check-during-build'
     make -j16
@@ -290,8 +284,8 @@ fn compile_dftfe{
   #Compiler options and flags
   cxx_compiler = CC
   cxx_flags = '-march=znver3 -fPIC'
-  cxx_flagsRelease = '-fPIC'
-  device_flags ='-arch=sm_80'
+  cxx_flagsRelease = '-fPIC -I'$MPICH_DIR'/include'
+  device_flags ='-I'$MPICH_DIR'/include -arch=sm_80'  
   device_architectures =80
 
 
