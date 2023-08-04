@@ -11,8 +11,8 @@ cloning into the scatch directory
 
     cd $myscratch
     git clone https://github.com/dftfeDevelopers/install_DFTFE.git install_DFT-FE
-    git checkout greatlakesScript
     cd install_DFT-FE
+    git checkout greatlakesScript
 
 ## Pre-requisites
 
