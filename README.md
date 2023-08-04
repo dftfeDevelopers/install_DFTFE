@@ -12,6 +12,7 @@ cloning into the scratch directory
 
     cd $PSCRATCH
     git clone https://github.com/dftfeDevelopers/install_DFTFE.git install_DFT-FE
+    git checkout perlmutterScript
     cd install_DFT-FE
 
 ## Pre-requisites
