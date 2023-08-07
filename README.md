@@ -111,3 +111,4 @@ An example batch script running GPU-enabled DFT-FE on 1 nodes is given below:
     mpiexec -n ${NTOTRANKS} --ppn ${NRANKS_PER_NODE} --depth=${NDEPTH} --cpu-bind depth --env OMP_NUM_THREADS=${NTHREADS} -env OMP_PLACES=threads ./dftfe parameterFile_a.prm > output
 
    
+dd
