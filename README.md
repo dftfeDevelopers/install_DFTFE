@@ -88,10 +88,16 @@ batch script running GPU-enabled DFT-FE on 280 nodes is below:
     #SBATCH --gpu-bind closest
 
     OMP_NUM_THREADS = 1
+    MPICH_VERSION_DISPLAY=1
+    MPICH_ENV_DISPLAY=1
     MPICH_OFI_NIC_POLICY = NUMA 
-    LD_LIBRARY_PATH = $LD_LIBRARY_PATH:$WD/env2/lib
     MPICH_GPU_SUPPORT_ENABLED=1
     MPICH_SMP_SINGLE_COPY_MODE=NONE
+
+    LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$INST/lib
+    LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$INST/lib/lib64
+    LD_LIBRARY_PATH=$CRAY_LD_LIBRARY_PATH:$LD_LIBRARY_PATH
+
 
     BASE = $WD/src/dftfe/build/release/real
     n=`{echo $SLURM_JOB_NUM_NODES '*' 8 | bc}
