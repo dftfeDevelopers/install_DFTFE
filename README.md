@@ -79,30 +79,33 @@ you have not ended up with broken packages.
 DFT-FE is built in real and cplx versions, depending on whether you
 want to enable k-points (implemented in the cplx version only).
 
-Assuming you have already sourced `env2/env.rc`, an example
-batch script running GPU-enabled DFT-FE on 2 nodes is below:
+An example batch script running GPU-enabled DFT-FE on 1 nodes is given below:
 
-    #!$HOME/$LMOD_SYSTEM_NAME/bin/rc
-    #SBATCH -A m2360_g
-    #SBATCH -C gpu
-    #SBATCH -q regular
-    #SBATCH --job-name test_dftfe
-    #SBATCH -t 00:10:00
-    #SBATCH -n 8
-    #SBATCH --ntasks-per-node=4
-    #SBATCH -c 32
-    #SBATCH --gpus-per-node=4
-    #SBATCH --gpus-per-task=1
-    #SBATCH --gpu-bind=none
+  #!/bin/bash -l
+  #PBS -l select=1:system=polaris
+  #PBS -l place=scatter
+  #PBS -l walltime=0:30:00
+  #PBS -l filesystems=home:grand
+  #PBS -q debug
+  #PBS -A QuantMatManufact
 
+  # Enable GPU-MPI (if supported by application) and load required modules (should be similar to env/env.rc)
+  #export MPICH_GPU_SUPPORT_ENABLED=1
+  module load PrgEnv-gnu
+  module load nvhpc-mixed
+  module unload cray-libsci
 
-    SLURM_CPU_BIND='cores'
-    OMP_NUM_THREADS=1
-    MPICH_GPU_SUPPORT_ENABLED=1
+  # Change to working directory
+  cd ${PBS_O_WORKDIR}
 
+  # MPI and OpenMP settings
+  NNODES=`wc -l < $PBS_NODEFILE`
+  NRANKS_PER_NODE=$(nvidia-smi -L | wc -l)
+  NDEPTH=8
+  NTHREADS=1
 
-    LD_LIBRARY_PATH = $LD_LIBRARY_PATH:$WD/env2/lib
-    LD_LIBRARY_PATH = $LD_LIBRARY_PATH:$WD/env2/lib64
-    BASE = $WD/src/dftfe/build/release/real
+  NTOTRANKS=$(( NNODES * NRANKS_PER_NODE ))
+  #echo "NUM_OF_NODES= ${NNODES} TOTAL_NUM_RANKS= ${NTOTRANKS} RANKS_PER_NODE= ${NRANKS_PER_NODE} THREADS_PER_RANK= ${NTHREADS}"
 
-    srun  $BASE/dftfe parameterFile.prm > output
+  # For applications that internally handle binding MPI/OpenMP processes to GPUs
+  mpiexec -n ${NTOTRANKS} --ppn ${NRANKS_PER_NODE} --depth=${NDEPTH} --cpu-bind depth --env OMP_NUM_THREADS=${NTHREADS} -env OMP_PLACES=threads ./dftfe parameterFile_a.prm > output
