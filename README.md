@@ -79,7 +79,8 @@ you have not ended up with broken packages.
 DFT-FE is built in real and cplx versions, depending on whether you
 want to enable k-points (implemented in the cplx version only).
 
-An example batch script running GPU-enabled DFT-FE on 1 nodes is given below:
+An example PBS job submission script running GPU-enabled DFT-FE on 1 nodes is given below after copying
+the appropriate:
 
     #!/bin/bash -l
     #PBS -l select=1:system=polaris
@@ -94,6 +95,8 @@ An example batch script running GPU-enabled DFT-FE on 1 nodes is given below:
     module load PrgEnv-gnu
     module load nvhpc-mixed
     module unload cray-libsci
+    export WD=/lus/grand/projects/QuantMatManufact/dsambit/install_DFTFE
+    export BASE = $WD/src/dftfe/build/release/real
 
     #Change to working directory
     cd ${PBS_O_WORKDIR}
@@ -108,7 +111,8 @@ An example batch script running GPU-enabled DFT-FE on 1 nodes is given below:
     #echo "NUM_OF_NODES= ${NNODES} TOTAL_NUM_RANKS= ${NTOTRANKS} RANKS_PER_NODE= ${NRANKS_PER_NODE} THREADS_PER_RANK= ${NTHREADS}"
 
     #For applications that internally handle binding MPI/OpenMP processes to GPUs
-    mpiexec -n ${NTOTRANKS} --ppn ${NRANKS_PER_NODE} --depth=${NDEPTH} --cpu-bind depth --env OMP_NUM_THREADS=${NTHREADS} -env OMP_PLACES=threads ./dftfe parameterFile_a.prm > output
+    mpiexec -n ${NTOTRANKS} --ppn ${NRANKS_PER_NODE} --depth=${NDEPTH} --cpu-bind depth --env OMP_NUM_THREADS=${NTHREADS} -env OMP_PLACES=threads $BASE/dftfe parameterFile_a.prm > output
 
    
-dd
+Note that the above job submission is performed in the default `bash` shell although the installation was performed using the `rc` shell.
+The correct `rc` shell enviroment from `env2/env.rc` is used in the above PBS script.
