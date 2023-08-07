@@ -96,7 +96,7 @@ the appropriate:
     module load nvhpc-mixed
     module unload cray-libsci
     WD=/lus/grand/projects/QuantMatManufact/dsambit/install_DFTFE
-    BASE = $WD/src/dftfe/build/release/real
+    BASE=$WD/src/dftfe/build/release/real
 
     #Change to working directory
     cd ${PBS_O_WORKDIR}
