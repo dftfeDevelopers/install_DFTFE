@@ -89,6 +89,7 @@ the appropriate:
     #PBS -l filesystems=home:grand
     #PBS -q debug
     #PBS -A QuantMatManufact
+    #PBS -N myjob
 
     #Enable GPU-MPI (if supported by application) and load required modules (should be similar to env2/env.rc)
     #export MPICH_GPU_SUPPORT_ENABLED=1
@@ -114,5 +115,4 @@ the appropriate:
     mpiexec -n ${NTOTRANKS} --ppn ${NRANKS_PER_NODE} --depth=${NDEPTH} --cpu-bind depth --env OMP_NUM_THREADS=${NTHREADS} -env OMP_PLACES=threads $BASE/dftfe parameterFile_a.prm > output
 
    
-Note that the above job submission is performed in the default `bash` shell although the installation was performed using the `rc` shell.
-The correct `rc` shell enviroment from `env2/env.rc` is used in the above PBS script.
+Note that the above job submission is performed in the default `bash` shell although the installation was performed using the `rc` shell. The correct `rc` shell enviroment from `env2/env.rc` is used in the above PBS script. To modify number of nodes change the option in `PBS -l select=1`.
