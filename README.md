@@ -95,8 +95,8 @@ the appropriate:
     module load PrgEnv-gnu
     module load nvhpc-mixed
     module unload cray-libsci
-    export WD=/lus/grand/projects/QuantMatManufact/dsambit/install_DFTFE
-    export BASE = $WD/src/dftfe/build/release/real
+    WD=/lus/grand/projects/QuantMatManufact/dsambit/install_DFTFE
+    BASE = $WD/src/dftfe/build/release/real
 
     #Change to working directory
     cd ${PBS_O_WORKDIR}
