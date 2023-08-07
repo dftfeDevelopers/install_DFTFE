@@ -89,16 +89,16 @@ An example batch script running GPU-enabled DFT-FE on 1 nodes is given below:
    #PBS -q debug
    #PBS -A QuantMatManufact
 
-   # Enable GPU-MPI (if supported by application) and load required modules (should be similar to env2/env.rc)
+   #Enable GPU-MPI (if supported by application) and load required modules (should be similar to env2/env.rc)
    #export MPICH_GPU_SUPPORT_ENABLED=1
    module load PrgEnv-gnu
    module load nvhpc-mixed
    module unload cray-libsci
 
-   # Change to working directory
+   #Change to working directory
    cd ${PBS_O_WORKDIR}
 
-   # MPI and OpenMP settings
+   #MPI and OpenMP settings
    NNODES=`wc -l < $PBS_NODEFILE`
    NRANKS_PER_NODE=$(nvidia-smi -L | wc -l)
    NDEPTH=8
@@ -107,5 +107,5 @@ An example batch script running GPU-enabled DFT-FE on 1 nodes is given below:
    NTOTRANKS=$(( NNODES * NRANKS_PER_NODE ))
    #echo "NUM_OF_NODES= ${NNODES} TOTAL_NUM_RANKS= ${NTOTRANKS} RANKS_PER_NODE= ${NRANKS_PER_NODE} THREADS_PER_RANK= ${NTHREADS}"
 
-   # For applications that internally handle binding MPI/OpenMP processes to GPUs
+   #For applications that internally handle binding MPI/OpenMP processes to GPUs
    mpiexec -n ${NTOTRANKS} --ppn ${NRANKS_PER_NODE} --depth=${NDEPTH} --cpu-bind depth --env OMP_NUM_THREADS=${NTHREADS} -env OMP_PLACES=threads ./dftfe parameterFile_a.prm > output
