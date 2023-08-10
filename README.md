@@ -43,9 +43,7 @@ phases of DFT-FE.
 
 ## Running the installation
 The installation itself is contained within the functions in
-`dftfe2.rc`.  Edit this to define its WD and INST directories
-to reflect your own environment.
-Then source this script using
+`dftfe2.rc`.  Source this script using
 
     . ./dftfe2.rc
 
