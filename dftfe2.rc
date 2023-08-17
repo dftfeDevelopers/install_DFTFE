@@ -105,6 +105,7 @@ fn install_dftd4 {
         '-DLAPACK_LIBRARIES='$INST/lib/libflame.so \
         '-DBUILD_SHARED_LIBS=ON' \
         '-DCMAKE_INSTALL_PREFIX='$INST \
+        '-DWITH_OpenMP=OFF' \
         ..
   make -j16
   make install
