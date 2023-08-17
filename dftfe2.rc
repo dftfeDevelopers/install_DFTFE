@@ -81,7 +81,7 @@ fn install_libxc {
   cmake '-DCMAKE_C_COMPILER=cc' \
         '-DCMAKE_C_FLAGS=-O2 -fPIC' \
         '-DCMAKE_INSTALL_PREFIX='$INST \
-        '-DCMAKE_BUILD_SHARED_LIBS=ON' \
+        '-DBUILD_SHARED_LIBS=ON' \
         ..
   make -j16
   make install
