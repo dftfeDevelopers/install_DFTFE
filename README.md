@@ -7,7 +7,7 @@ on ALCF Polaris.
 
 To use these scripts, we assume you have cloned this
 repository onto a system where you intend to install DFT-FE.
-For example, I installed it into `$myprojectdir/install_DFT-FE` after 
+For example, I installed it into `$myprojectdir/install_DFTFE` after 
 cloning into the $myprojectdir directory
 
     cd $myprojectdir
