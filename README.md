@@ -11,8 +11,8 @@ For example, I installed it into `$myprojectdir/install_DFT-FE` after
 cloning into the $myprojectdir directory
 
     cd $myprojectdir
-    git clone https://github.com/dftfeDevelopers/install_DFTFE.git install_DFT-FE
-    cd install_DFT-FE
+    git clone https://github.com/dftfeDevelopers/install_DFTFE.git install_DFTFE
+    cd install_DFTFE
     git checkout polarisScript
 
 ## Pre-requisites
