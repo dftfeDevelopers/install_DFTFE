@@ -45,12 +45,12 @@ fn install_libxc {
 
 fn install_dftd4 {
   cd $WD/src
-  if(test ! -d dftd4-3.4.0) {
-    wget 'https://github.com/dftd4/dftd4/archive/refs/tags/v3.4.0.tar.gz'
-    tar xzf v3.4.0.tar.gz
-    rm v3.4.0.tar.gz
+  if(test ! -d dftd4-3.6.0) {
+    wget 'https://github.com/dftd4/dftd4/archive/refs/tags/v3.6.0.tar.gz'
+    tar xzf v3.6.0.tar.gz
+    rm v3.6.0.tar.gz
   }
-  cd dftd4-3.4.0
+  cd dftd4-3.6.0
   rm -fr build
   mkdir build && cd build
   cmake '-DCMAKE_Fortran_COMPILER=gfortran' \
@@ -59,6 +59,7 @@ fn install_dftd4 {
         '-DLAPACK_LIBRARIES='-L${MKLROOT}/lib/intel64 -Wl,--no-as-needed -lmkl_intel_lp64 -lmkl_gnu_thread -lmkl_rt -lmkl_core -lgomp -lpthread -lm -ldl \
         '-DBUILD_SHARED_LIBS=ON' \
         '-DCMAKE_INSTALL_PREFIX='$INST \
+        '-DWITH_OpenMP=OFF' \
         ..
   make -j16
   make install
