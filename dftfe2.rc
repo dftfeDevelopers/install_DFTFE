@@ -81,6 +81,7 @@ fn install_libxc {
   cmake '-DCMAKE_C_COMPILER=cc' \
         '-DCMAKE_C_FLAGS=-O2 -fPIC' \
         '-DCMAKE_INSTALL_PREFIX='$INST \
+        '-DCMAKE_BUILD_SHARED_LIBS=ON' \
         ..
   make -j16
   make install
@@ -90,12 +91,12 @@ fn install_libxc {
 
 fn install_dftd4 {
   cd $WD/src
-  if(test ! -d dftd4-3.4.0) {
-    wget 'https://github.com/dftd4/dftd4/archive/refs/tags/v3.4.0.tar.gz'
-    tar xzf v3.4.0.tar.gz
-    rm v3.4.0.tar.gz
+  if(test ! -d dftd4-3.6.0) {
+    wget 'https://github.com/dftd4/dftd4/archive/refs/tags/v3.6.0.tar.gz'
+    tar xzf v3.6.0.tar.gz
+    rm v3.6.0.tar.gz
   }
-  cd dftd4-3.4.0
+  cd dftd4-3.6.0
   rm -fr build
   mkdir build && cd build
   cmake '-DCMAKE_Fortran_COMPILER=ftn' \
@@ -104,6 +105,7 @@ fn install_dftd4 {
         '-DLAPACK_LIBRARIES='$INST/lib/libflame.so \
         '-DBUILD_SHARED_LIBS=ON' \
         '-DCMAKE_INSTALL_PREFIX='$INST \
+        '-DWITH_OpenMP=OFF'\
         ..
   make -j16
   make install
@@ -248,8 +250,6 @@ fn install_dealii {
         '-DLAPACK_DIR='$OLCF_OPENBLAS_ROOT';'$INST \
         '-DLAPACK_FOUND=true' \
         '-DLAPACK_LIBRARIES='$INST/lib/libblis.so';'$INST/lib/libflame.so\
-        '-DSCALAPACK_DIR='$INST \
-        '-DSCALAPACK_LIBRARIES='$INST/lib/libscalapack.so \
         '-DCMAKE_INSTALL_PREFIX='$INST \
         ..
   # may add to lapack libraries ';'$INST/lib64/liblapack.so \
