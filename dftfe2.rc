@@ -35,6 +35,7 @@ fn install_libxc {
   cmake '-DCMAKE_C_COMPILER=cc' \
         '-DCMAKE_C_FLAGS=-O2 -fPIC' \
         '-DCMAKE_INSTALL_PREFIX='$INST \
+        '-DBUILD_SHARED_LIBS=ON' \
         ..
   make -j16
   make install
@@ -240,8 +241,6 @@ fn install_dealii {
         '-DLAPACK_DIR='$OLCF_OPENBLAS_ROOT';'$INST \
         '-DLAPACK_FOUND=true' \
         '-DLAPACK_LIBRARIES='$OLCF_OPENBLAS_ROOT/lib/libopenblas.so \
-        '-DSCALAPACK_DIR='$INST \
-        '-DSCALAPACK_LIBRARIES='$INST/lib/libscalapack.so \
         '-DCMAKE_INSTALL_PREFIX='$INST \
         ..
   # may add to lapack libraries ';'$INST/lib64/liblapack.so \
