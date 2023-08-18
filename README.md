@@ -44,11 +44,15 @@ phases of DFT-FE.
 ## Running the installation
 The installation itself is contained within the functions in
 `dftfe2.rc`.  Log into an **interactive 1 node job (CAUTION:without interactive job the
-compilation process will crash)** on greatlakes and source this script using
+compilation process will crash)** on greatlakes 
+
+    salloc --nodes=1 --time=4:00:00 --account=(accountname) --ntasks-per-node=36 --mem-per-cpu=5GB
+
+and source the `dftfe2.rc` script inside `install_DFTFE` folder using
 
     . ./dftfe2.rc
 
-and then run the functions listed in that file manually, in order.
+Next run the functions listed in that file manually, in order.
 For example, 
 
     install_alglib
