@@ -43,14 +43,14 @@ into `env2/env.rc`.  Edit this file before proceeding any further.
 Make sure that your module environment contains some version of the
 pre-requisites mentioned there.
 
-   $vim env2/env.rc 
-   module load gcc/10.3.0  (update any modules as necessary)
-   module load mkl/2022.0.2
-   module load openmpi/4.1.4
-   module load cmake/3.22.2
+    $vim env2/env.rc 
+    module load gcc/10.3.0  (update any modules as necessary)
+    module load mkl/2022.0.2
+    module load openmpi/4.1.4
+    module load cmake/3.22.2
 
-   WD=$myscratch/install_DFTFE (definitely change this path)
-   INST=$WD/env2
+    WD=$myscratch/install_DFTFE (definitely change this path)
+    INST=$WD/env2
 
 The above environment file is used both by the install and run
 phases of DFT-FE.
