@@ -45,6 +45,16 @@ pre-requisites mentioned there.
 This environment file is used both by the install and run
 phases of DFT-FE.
 
+   $vim env2/env.rc 
+   module load gcc/10.3.0  (update any modules as necessary)
+   module load mkl/2022.0.2
+   module load openmpi/4.1.4
+   module load cmake/3.22.2
+
+   WD=$myscratch/install_DFTFE (definitely change this path)
+   INST=$WD/env2
+
+
 ## Running the installation
 The installation itself is contained within the functions in
 `dftfe2.rc`. Source the `dftfe2.rc` script inside `install_DFTFE` folder using
