@@ -15,6 +15,10 @@ cloning into the scatch directory
     git checkout greatlakesScript
 
 ## Pre-requisites
+Log into an **interactive 1 node job (CAUTION:without interactive job the
+installation process may crash on the login node)** on greatlakes 
+
+    salloc --nodes=1 --time=4:00:00 --account=(accountname) --ntasks-per-node=36 --mem-per-cpu=5GB
 
 Because it's a better shell, the scripts are written
 in the [rc](http://doc.cat-v.org/plan_9/4th_edition/papers/rc)
@@ -43,12 +47,7 @@ phases of DFT-FE.
 
 ## Running the installation
 The installation itself is contained within the functions in
-`dftfe2.rc`.  Log into an **interactive 1 node job (CAUTION:without interactive job the
-compilation process will crash)** on greatlakes 
-
-    salloc --nodes=1 --time=4:00:00 --account=(accountname) --ntasks-per-node=36 --mem-per-cpu=5GB
-
-and source the `dftfe2.rc` script inside `install_DFTFE` folder using
+`dftfe2.rc`. Source the `dftfe2.rc` script inside `install_DFTFE` folder using
 
     . ./dftfe2.rc
 
