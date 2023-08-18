@@ -42,8 +42,6 @@ The module environment intended to run DFT-FE has been extracted
 into `env2/env.rc`.  Edit this file before proceeding any further.
 Make sure that your module environment contains some version of the
 pre-requisites mentioned there.
-This environment file is used both by the install and run
-phases of DFT-FE.
 
    $vim env2/env.rc 
    module load gcc/10.3.0  (update any modules as necessary)
@@ -54,7 +52,8 @@ phases of DFT-FE.
    WD=$myscratch/install_DFTFE (definitely change this path)
    INST=$WD/env2
 
-
+The above environment file is used both by the install and run
+phases of DFT-FE.
 ## Running the installation
 The installation itself is contained within the functions in
 `dftfe2.rc`. Source the `dftfe2.rc` script inside `install_DFTFE` folder using
