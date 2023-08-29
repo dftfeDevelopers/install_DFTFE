@@ -294,6 +294,15 @@ fn compile_dftfe_develop{
   device_flags ='-I'$MPICH_DIR'/include -arch=sm_80'
   device_architectures =80
 
+  # HIGHERQUAD_PSP option compiles with default or higher order
+  # quadrature for storing pseudopotential data
+  # ON is recommended for MD simulations with hard pseudopotentials
+
+  # build type: "Release" or "Debug"
+  build_type=Release
+  out=`{echo $build_type | tr '[:upper:]' '[:lower:]'}
+
+
   # Note: MDI_PATH is not used by project.
   cmake_flags = ( \
       -DCMAKE_CXX_STANDARD=14 \
