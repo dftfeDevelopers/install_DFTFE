@@ -39,7 +39,22 @@ The module environment intended to run DFT-FE has been extracted
 into `env2/env.rc`.  Edit this file before proceeding any further.
 Make sure that your module environment contains some version of the
 pre-requisites mentioned there.
-This environment file is used both by the install and run
+
+
+    $vim env2/env.rc 
+    module load PrgEnv-gnu (update any modules as necessary)
+    module load craype-accel-nvidia80
+    module load cudatoolkit
+    module unload cray-libsci/23.02.1.1
+    module load cmake
+    module load nccl
+    module load cudnn
+
+    WD=$PSCRATCH/install_DFTFE (you can also update this path)
+    INST=$WD/env2
+
+
+The above environment file is used both by the install and run
 phases of DFT-FE.
 
 ## Running the installation
