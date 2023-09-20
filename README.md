@@ -44,7 +44,7 @@ pre-requisites mentioned there.
     $vim env2/env.rc 
     module load PrgEnv-gnu (update any modules as necessary)
     module load craype-accel-nvidia80
-    module load cudatoolkit
+    module load cudatoolkit/11.7
     module unload cray-libsci/23.02.1.1
     module load cmake
     module load nccl
