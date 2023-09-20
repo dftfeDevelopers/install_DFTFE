@@ -48,7 +48,6 @@ pre-requisites mentioned there.
     module unload cray-libsci/23.02.1.1
     module load cmake
     module load nccl
-    module load cudnn
 
     WD=$PSCRATCH/install_DFTFE (you can also update this path)
     INST=$WD/env2
