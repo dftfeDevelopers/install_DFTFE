@@ -144,7 +144,7 @@ fn install_elpa {
 
 
     cflags = ('-march=native')
-    libs = ('-L'$MKLROOT'/lib/intel64 -Wl,--no-as-needed -lmkl_gf_lp64 -lmkl_gnu_thread -lmkl_core -lgomp -lpthread -lm -ldl')
+    libs = (-L$INST/lib -lscalapack -L$MKLROOT/lib/intel64 -Wl,--no-as-needed -lmkl_gf_lp64 -lmkl_gnu_thread -lmkl_core -lgomp -lpthread -lm -ldl)
     cflags=$"cflags
     libs=$"libs
     rm -fr build
@@ -153,7 +153,6 @@ fn install_elpa {
                'FCFLAGS=-march=native -O2 -fPIC' \
                'CFLAGS='$cflags \
                'CXXFLAGS=-std=c++14 '$cflags \
-               --enable-amd-gpu \
                '--prefix='$INST \
                'LIBS='$libs \
                '--enable-c-tests=no' \
