@@ -59,7 +59,7 @@ For example,
     install_elpa (press `y` when prompted to use patch)
     install_dealii
     install_dftd4 (optional)
-    compile_dftfe
+    compile_dftfe_debug
 
 Each function follows a standard pattern - download source into `$WD/src`,
 patch, compile, and install into `$INST`.  It is HIGHLY recommended
