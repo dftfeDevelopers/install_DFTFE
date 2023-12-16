@@ -232,8 +232,9 @@ fn install_dealii {
   rm -fr build
   mkdir build && cd build
   cmake '-DCMAKE_CXX_STANDARD=14' \
-        '-DCMAKE_CXX_FLAGS=-march=native -std=c++14' \
-        '-DCMAKE_C_FLAGS=-march=native -std=c++14' \
+        '-DCMAKE_CXX_FLAGS=-std=c++14' \
+        '-DCMAKE_C_FLAGS=-std=c++14' \
+        '-DDEAL_II_FORCE_BUNDLED_BOOST=ON' \
         '-DDEAL_II_ALLOW_PLATFORM_INTROSPECTION=OFF' \
         '-DDEAL_II_WITH_TASKFLOW=OFF' \
         '-DCMAKE_BUILD_TYPE=Release' \
