@@ -97,7 +97,7 @@ batch script running DFT-FE on 1 node is below:
     #SBATCH --account=vikramg1
     
     export OMP_NUM_THREADS=1
-    mpirun -n 36 dftfe parameters.prm > output
+    srun dftfe parameters.prm > output
 
 
 
