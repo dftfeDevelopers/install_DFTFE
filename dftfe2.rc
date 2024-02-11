@@ -225,9 +225,9 @@ fn install_dealii {
   cd dealii
   rm -fr build
   mkdir build && cd build
-  cmake '-DCMAKE_CXX_STANDARD=14' \
-        '-DCMAKE_CXX_FLAGS=-march=native -std=c++14' \
-        '-DCMAKE_C_FLAGS=-march=native -std=c++14' \
+  cmake '-DCMAKE_CXX_STANDARD=17' \
+        '-DCMAKE_CXX_FLAGS=-march=native -std=c++17' \
+        '-DCMAKE_C_FLAGS=-march=native -std=c++17' \
         '-DDEAL_II_ALLOW_PLATFORM_INTROSPECTION=OFF' \
         '-DDEAL_II_WITH_TASKFLOW=OFF' \
         '-DCMAKE_BUILD_TYPE=Release' \
@@ -299,7 +299,7 @@ fn compile_dftfe{
 
   # Note: MDI_PATH is not used by project.
   cmake_flags = ( \
-      -DCMAKE_CXX_STANDARD=14 \
+      -DCMAKE_CXX_STANDARD=17 \
       -DCMAKE_CXX_COMPILER=$cxx_compiler \
       -DCMAKE_CXX_FLAGS=$cxx_flags \
       -DCMAKE_CXX_FLAGS_RELEASE=$cxx_flagsRelease \
