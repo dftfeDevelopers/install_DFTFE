@@ -25,9 +25,9 @@ fn install_alglib {
 fn install_libxc {
   cd $WD/src
   if(test ! -d libxc-6.2.2) {
-    wget 'http://www.tddft.org/programs/libxc/down.php?file=6.2.2/libxc-6.2.2.tar.gz'
-    tar xzf 'down.php?file=6.2.2%2Flibxc-6.2.2.tar.gz'
-    rm 'down.php?file=6.2.2%2Flibxc-6.2.2.tar.gz'
+    wget 'https://gitlab.com/libxc/libxc/-/archive/6.2.2/libxc-6.2.2.tar.gz'
+    tar xzf 'libxc-6.2.2.tar.gz'
+    rm 'libxc-6.2.2.tar.gz'
   }
   cd libxc-6.2.2
   rm -fr build
@@ -167,6 +167,44 @@ fn install_ofi_rccl {
 }
 
 # Install ELPA latest version (elpa-2022.11.001) with AMD GPU support
+fn install_elpa_cpu {
+    cd $WD/src
+    if(test ! -d elpa) {
+        ver=2022.11.001
+        wget https://elpa.mpcdf.mpg.de/software/tarball-archive/Releases/$ver/elpa-$ver.tar.gz
+        tar xzf elpa-$ver.tar.gz
+        mv elpa-$ver elpa
+        rm -f elpa-$ver.tar.gz
+        rc -c 'cd elpa && patch -p1 <'$WD/src/elpa-$ver.patch
+    }
+    cd elpa
+  
+    LD_LIBRARY_PATH = $LD_LIBRARY_PATH:$INST/lib
+    LD_LIBRARY_PATH = $LD_LIBRARY_PATH:$INST/lib64
+
+    cflags = ('-march=znver3' -fPIC -O2 -I$MPICH_DIR/include)
+    libs = (-L$MPICH_DIR/lib -lmpi $CRAY_XPMEM_POST_LINK_OPTS -lxpmem $PE_MPICH_GTL_DIR_amd_gfx90a $PE_MPICH_GTL_LIBS_amd_gfx90a -L$INST/lib -lscalapack -L$OLCF_OPENBLAS_ROOT/lib -lopenblas -L$INST/lib64)
+    cflags=$"cflags
+    libs=$"libs
+    rm -fr build
+    mkdir build && cd build
+    ../configure 'CXX=hipcc' 'CC=hipcc' 'FC=ftn' \
+               'FCFLAGS=-march=znver3 -O2 -fPIC' \
+               'CFLAGS='$cflags \
+               'CXXFLAGS=-std=c++14 '$cflags \
+               '--prefix='$INST \
+               'LIBS='$libs \
+               --disable-avx512 '--enable-c-tests=no' \
+               '--enable-option-checking=fatal' --enable-shared \
+               '--enable-cpp-tests=no'
+    make -j16
+    make install
+    cd $WD
+}
+
+
+
+# Install ELPA latest version (elpa-2022.11.001) with AMD GPU support
 fn install_elpa {
     cd $WD/src
     if(test ! -d elpa) {
@@ -300,22 +338,22 @@ fn install_torch {
   cd $WD
 }
 
-
-fn compile_dftfe{
+fn compile_dftfe_debug{
+  branch = HXOptims
   cd $WD/src
-  branch = publicGithubDevelop
-  if(! test -d dftfe) {
-    git clone -b $branch https://github.com/dftfeDevelopers/dftfe.git dftfe
+  if(! test -d dftfeDebug) {
+    git clone -b $branch https://dsambit@bitbucket.org/dftfedevelopers/dftfe.git dftfeDebug
   } if not {
-    cd dftfe
+    cd dftfeDebug
     git fetch
     git checkout $branch
     git pull
   }
-  cd dftfe
+  cd dftfeDebug
   rm -fr build
   SRC = `{pwd}
   mkdir build && cd build
+  #cd build
 
   dealiiDir=$INST
   alglibDir=$INST/lib/alglib
@@ -325,14 +363,120 @@ fn compile_dftfe{
   xmlLibDir=/usr/lib64
 
   ELPA_PATH=$INST
-  DCCL_PATH=$ROCM_PATH/rccl
+  DCCL_PATH=$ROCM_PATH/include/rccl
   TORCH_PATH=$INST/venv/lib/python3.9/site-packages
 
   #Compiler options and flags
   cxx_compiler = CC
-  cxx_flags = '-march=znver3 -fPIC -I'$MPICH_DIR'/include -I'$ROCM_PATH/include
+  cxx_flags = '-march=znver3 -fPIC -I'$MPICH_DIR'/include -I'$ROCM_PATH'/include -I'$ROCM_PATH'/include/hipblas'
   cxx_flagsRelease = -O2 #sets DCMAKE_CXX_FLAGS_RELEASE
-  device_flags = '-march=znver3 -O2 -munsafe-fp-atomics -I'$MPICH_DIR'/include -I'$ROCM_PATH/include
+  device_flags = '-march=znver3 -O2 -munsafe-fp-atomics -I'$MPICH_DIR'/include -I'$ROCM_PATH'/include -I'$ROCM_PATH'/include/hipblas -I'$ROCM_PATH'/include/rocblas'
+  device_architectures = gfx90a
+
+  # HIGHERQUAD_PSP option compiles with default or higher order
+  # quadrature for storing pseudopotential data
+  # ON is recommended for MD simulations with hard pseudopotentials
+
+  # build type: "Release" or "Debug"
+  build_type=Release
+  out=`{echo $build_type | tr '[:upper:]' '[:lower:]'}
+
+  # Note: MDI_PATH is not used by project.
+  cmake_flags = ( \
+      -DCMAKE_CXX_STANDARD=17 \
+      -DCMAKE_CXX_COMPILER=$cxx_compiler \
+      -DCMAKE_CXX_FLAGS=$cxx_flags \
+      -DCMAKE_CXX_FLAGS_RELEASE=$cxx_flagsRelease \
+      -DCMAKE_BUILD_TYPE=$build_type \
+      -DDEAL_II_DIR=$dealiiDir \
+      -DALGLIB_DIR=$alglibDir \
+      -DLIBXC_DIR=$libxcDir \
+      -DSPGLIB_DIR=$spglibDir \
+      -DXML_LIB_DIR=$xmlLibDir \
+      -DXML_INCLUDE_DIR=$xmlIncludeDir \
+      -DWITH_MDI=OFF \
+      -DMDI_PATH= \
+      -DWITH_DCCL=ON \
+      -DWITH_TORCH=OFF \
+      -DCMAKE_PREFIX_PATH=$ELPA_PATH';'$DCCL_PATH';'$TORCH_PATH \
+      -DWITH_GPU=ON \
+      -DGPU_LANG=hip \
+      -DGPU_VENDOR=amd \
+      -DWITH_GPU_AWARE_MPI=ON \
+      -DCMAKE_HIP_FLAGS=$device_flags \
+      -DCMAKE_HIP_ARCHITECTURES=$device_architectures \
+      -DWITH_TESTING=OFF \
+      -DMINIMAL_COMPILE=OFF \
+      '-DCMAKE_SHARED_LINKER_FLAGS=-L'$ROCM_PATH'/lib -lamdhip64 -L'$MPICH_DIR'/lib -lmpi -L'$CRAY_XPMEM_POST_LINK_OPTS' -lxpmem '$PE_MPICH_GTL_DIR_amd_gfx90a' '$PE_MPICH_GTL_LIBS_amd_gfx90a \
+      -DHIGHERQUAD_PSP=OFF \
+  )
+
+  fn cmake_real {
+    mkdir -p real && cd real
+    cmake $cmake_flags \
+      -DWITH_COMPLEX=OFF \
+      $1
+    make -j8
+    cd ..
+  }
+
+  fn cmake_cplx {
+    mkdir -p complex && cd complex
+    cmake $cmake_flags \
+      -DWITH_COMPLEX=ON \
+      $1
+    make -j8
+    cd ..
+  }
+
+  mkdir -p $out
+  cd $out
+
+  echo 'Building Real executable in $build_type mode...'
+  cmake_real $SRC
+
+  echo 'Building Complex executable in $build_type mode...'
+  cmake_cplx $SRC
+
+  echo 'Build complete.'
+  cd $WD
+}
+
+
+
+fn compile_dftfe{
+  cd $WD/src
+  branch = publicGithubDevelop
+  if(! test -d dftfe) {
+    git clone -b $branch https://dsambit@bitbucket.org/dftfedevelopers/dftfe.git dftfe
+  } if not {
+    cd dftfe
+    git fetch
+    git checkout $branch
+    git pull
+  }
+  cd dftfe
+  #rm -fr build
+  SRC = `{pwd}
+  #mkdir build && cd build
+  cd build
+
+  dealiiDir=$INST
+  alglibDir=$INST/lib/alglib
+  libxcDir=$INST
+  spglibDir=$INST
+  xmlIncludeDir=/usr/include/libxml2
+  xmlLibDir=/usr/lib64
+
+  ELPA_PATH=$INST
+  DCCL_PATH=$ROCM_PATH/include/rccl
+  TORCH_PATH=$INST/venv/lib/python3.9/site-packages
+
+  #Compiler options and flags
+  cxx_compiler = CC
+  cxx_flags = '-march=znver3 -fPIC -I'$MPICH_DIR'/include -I'$ROCM_PATH'/include -I'$ROCM_PATH'/include/hipblas'
+  cxx_flagsRelease = -O2 #sets DCMAKE_CXX_FLAGS_RELEASE
+  device_flags = '-march=znver3 -O2 -munsafe-fp-atomics -I'$MPICH_DIR'/include -I'$ROCM_PATH'/include -I'$ROCM_PATH'/include/hipblas -I'$ROCM_PATH'/include/rocblas'
   device_architectures = gfx90a
 
   # HIGHERQUAD_PSP option compiles with default or higher order
