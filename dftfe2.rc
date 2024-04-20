@@ -168,6 +168,40 @@ fn install_ofi_rccl {
   make install
 }
 
+# Install ELPA latest version (elpa-2024.03.001)
+fn install_elpa_cpu {
+    cd $WD/src
+    if(test ! -d elpa) {
+        ver=2024.03.001
+        wget https://elpa.mpcdf.mpg.de/software/tarball-archive/Releases/$ver/elpa-$ver.tar.gz
+        tar xzf elpa-$ver.tar.gz
+        mv elpa-$ver elpa
+        rm -f elpa-$ver.tar.gz
+    }
+    cd elpa
+  
+    LD_LIBRARY_PATH = $LD_LIBRARY_PATH:$INST/lib
+    LD_LIBRARY_PATH = $LD_LIBRARY_PATH:$INST/lib64
+
+    cflags = ('-march=znver3' -fPIC -O2 -I$MPICH_DIR/include)
+    libs = (-L$MPICH_DIR/lib -lmpi $CRAY_XPMEM_POST_LINK_OPTS -lxpmem $PE_MPICH_GTL_DIR_amd_gfx90a $PE_MPICH_GTL_LIBS_amd_gfx90a -L$INST/lib -lscalapack -L$OLCF_OPENBLAS_ROOT/lib -lopenblas -L$INST/lib64)
+    cflags=$"cflags
+    libs=$"libs
+    rm -fr build
+    mkdir build && cd build
+    ../configure 'CXX=CC' 'CC=cc' 'FC=ftn' \
+               'FCFLAGS=-march=znver3 -O2 -fPIC' \
+               'CFLAGS='$cflags \
+               'CXXFLAGS=-std=c++17 '$cflags \
+               '--prefix='$INST \
+               'LIBS='$libs \
+               --disable-avx512 '--enable-c-tests=no' \
+               '--enable-option-checking=fatal' --enable-shared \
+               '--enable-cpp-tests=no'
+    make -j16
+    make install
+    cd $WD
+}
 
 # Install ELPA latest version (elpa-2024.03.001) with AMD GPU support
 fn install_elpa {

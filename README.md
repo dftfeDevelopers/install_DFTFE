@@ -56,7 +56,7 @@ For example,
     install_p4est
     install_scalapack
     install_ofi_rccl (optional)
-    install_elpa
+    install_elpa_cpu
     install_dealii
     install_dftd4 (optional)
     compile_dftfe
