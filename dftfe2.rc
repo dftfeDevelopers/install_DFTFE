@@ -71,9 +71,9 @@ fn install_alglib {
 fn install_libxc {
   cd $WD/src
   if(test ! -d libxc-6.2.2) {
-    wget 'http://www.tddft.org/programs/libxc/down.php?file=6.2.2/libxc-6.2.2.tar.gz'
-    tar xzf 'down.php?file=6.2.2%2Flibxc-6.2.2.tar.gz'
-    rm 'down.php?file=6.2.2%2Flibxc-6.2.2.tar.gz'
+    wget 'https://gitlab.com/libxc/libxc/-/archive/6.2.2/libxc-6.2.2.tar.gz'
+    tar xzf 'libxc-6.2.2.tar.gz'
+    rm 'libxc-6.2.2.tar.gz'
   }
   cd libxc-6.2.2
   rm -fr build
@@ -172,11 +172,11 @@ fn install_scalapack {
   cd $WD
 }
 
-# Install ELPA latest version (elpa-2022.11.001) with NVIDIA GPU support
+# Install ELPA latest version (elpa-2024.03.001) with NVIDIA GPU support
 fn install_elpa {
     cd $WD/src
     if(test ! -d elpa) {
-        ver=2022.11.001
+        ver=2024.03.001
         wget https://elpa.mpcdf.mpg.de/software/tarball-archive/Releases/$ver/elpa-$ver.tar.gz
         tar xzf elpa-$ver.tar.gz
         mv elpa-$ver elpa
@@ -195,7 +195,7 @@ fn install_elpa {
     ../configure 'CXX=CC' 'CC=cc' 'FC=ftn' \
                'FCFLAGS=-ffree-line-length-none '$cflags \
                'CFLAGS='$cflags \
-               'CXXFLAGS=-std=c++14 '$cflags \
+               'CXXFLAGS=-std=c++17 '$cflags \
                '--prefix='$INST \
                'LIBS='$libs \
                --disable-sse --disable-sse-assembly --disable-avx \
@@ -263,7 +263,7 @@ fn install_dealii {
 
 fn compile_dftfe_develop{
   cd $WD/src
-  branch = publicGithubDevelop
+  branch = migrateLatestELPA
   if(! test -d dftfeDevelop) {
     git clone -b $branch https://dsambit@bitbucket.org/dftfedevelopers/dftfe.git dftfeDevelop
   } if not {
