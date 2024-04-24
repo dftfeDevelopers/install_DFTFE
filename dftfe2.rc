@@ -205,8 +205,7 @@ fn install_elpa {
                '--enable-gpu-streams=nvidia' \
                '--with-NVIDIA-GPU-compute-capability=sm_80'
                '--with-cuda-path='$CUDA_HOME \
-               '--with-cuda-sdk-path='$CUDA_HOME
-               '--with-NVIDIA-gpu-support-only' \
+               '--with-cuda-sdk-path='$CUDA_HOME \
                '--enable-option-checking=fatal' \
                '--without-threading-support-check-during-build'
     make -j16
