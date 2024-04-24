@@ -38,6 +38,7 @@ fn install_libxc {
         '-DCMAKE_CXX_FLAGS=-O2 -fPIC' \
         '-DCMAKE_INSTALL_PREFIX='$INST \
         '-DBUILD_SHARED_LIBS=ON' \
+        '-DBUILD_TESTING=OFF' \
         ..
   make -j16
   make install
@@ -242,21 +243,21 @@ fn install_elpa {
     cd $WD
 }
 
-# Install dealii from https://github.com/dftfeDevelopers/dealii using the dealiiCustomizedCUDARelease branch.
+
+# Install latest release dealii from https://github.com/dealii/dealii
 
 fn install_dealii {
   cd $WD/src
-  #ver=9.3.3
-  #if(test ! -d dealii-$ver) {
-  #    wget https://github.com/dealii/dealii/releases/download/v$ver/dealii-$ver.tar.gz
-  #    tar xzf dealii-$ver.tar.gz 
-  #}
-  #cd dealii-$ver
-  if(test ! -d dealii) {
-    git clone --depth 1 --recurse-submodules -b dealiiCustomizedCUDARelease \
-        https://github.com/dftfeDevelopers/dealii.git
+  ver=9.5.2
+  if(test ! -d dealii-$ver) {
+      wget https://github.com/dealii/dealii/releases/download/v$ver/dealii-$ver.tar.gz
+      tar xzf dealii-$ver.tar.gz 
   }
-  cd dealii
+  #if(test ! -d dealii) {
+  #  git clone https://github.com/dealii/dealii.git
+  #}
+  cd dealii-$ver
+  #cd dealii
   rm -fr build
   mkdir build && cd build
   cmake '-DCMAKE_CXX_STANDARD=17' \
@@ -284,6 +285,7 @@ fn install_dealii {
   make -j16 || echo 1
   make install
   mv $INST/ ^ (detailed.log summary.log README.md LICENSE.md) $INST/share/deal.II/
+  cp -r ../bundled/kokkos-3.7.00/tpls/desul/include/desul/atomics $INST/include/deal.II/bundled/desul/
   cd $WD
 }
 
@@ -337,7 +339,7 @@ fn install_torch {
 }
 
 fn compile_dftfe_debug{
-  branch = migrateLatestELPA
+  branch = migrateLatestDealii
   cd $WD/src
   if(! test -d dftfeDebug) {
     git clone -b $branch https://dsambit@bitbucket.org/dftfedevelopers/dftfe.git dftfeDebug
