@@ -213,6 +213,28 @@ fn install_elpa {
     cd $WD
 }
 
+fn install_kokkos {
+  cd $WD/src
+  if(test ! -d kokkos-4.3.00) {
+    wget 'https://github.com/kokkos/kokkos/archive/refs/tags/4.3.00.tar.gz'
+    tar xzvf '4.3.00.tar.gz'
+    rm '4.3.00.tar.gz'
+  } 
+  cd kokkos-4.3.00
+  rm -fr build
+  mkdir build && cd build
+  cmake '-DCMAKE_C_COMPILER=cc' \
+        '-DCMAKE_C_FLAGS=-O2 -fPIC' \
+        '-DCMAKE_CXX_COMPILER=CC' \
+        '-DCMAKE_CXX_FLAGS=-O2 -fPIC' \
+        '-DCMAKE_INSTALL_PREFIX='$INST \
+        ..
+  make -j16
+  make install
+  cd $WD
+} 
+
+
 # Install latest release dealii from https://github.com/dealii/dealii
 
 fn install_dealii {
@@ -234,7 +256,7 @@ fn install_dealii {
         '-DCMAKE_C_FLAGS=-std=c++17' \
         '-DDEAL_II_FORCE_BUNDLED_BOOST=ON' \
         '-DDEAL_II_ALLOW_PLATFORM_INTROSPECTION=OFF' \
-        '-DDEAL_II_WITH_KOKKOS=ON' \
+        '-DKOKKOS_DIR='$INST \
         '-DDEAL_II_WITH_TASKFLOW=OFF' \
         '-DCMAKE_BUILD_TYPE=Release' \
         '-DDEAL_II_CXX_FLAGS_RELEASE=-O2' \
@@ -256,7 +278,6 @@ fn install_dealii {
   make -j16 || echo 1
   make install
   mv $INST/ ^ (detailed.log summary.log README.md LICENSE.md) $INST/share/deal.II/
-  cp -r ../bundled/kokkos-3.7.00/tpls/desul/include/desul/atomics $INST/include/deal.II/bundled/desul/
   cd $WD
 }
 
