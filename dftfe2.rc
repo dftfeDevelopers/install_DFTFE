@@ -524,13 +524,13 @@ fn compile_dftfe{
       -DXML_INCLUDE_DIR=$xmlIncludeDir \
       -DWITH_MDI=OFF \
       -DMDI_PATH= \
-      -DWITH_DCCL=ON \
+      -DWITH_DCCL=OFF \
       -DWITH_TORCH=OFF \
       -DCMAKE_PREFIX_PATH=$ELPA_PATH';'$DCCL_PATH';'$TORCH_PATH \
       -DWITH_GPU=ON \
       -DGPU_LANG=hip \
       -DGPU_VENDOR=amd \
-      -DWITH_GPU_AWARE_MPI=ON \
+      -DWITH_GPU_AWARE_MPI=OFF \
       -DCMAKE_HIP_FLAGS=$device_flags \
       -DCMAKE_HIP_ARCHITECTURES=$device_architectures \
       -DWITH_TESTING=OFF \
