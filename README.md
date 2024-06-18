@@ -57,6 +57,7 @@ For example,
     install_scalapack
     install_ofi_rccl (optional)
     install_elpa_cpu
+    install_kokkos
     install_dealii
     install_dftd4 (optional)
     compile_dftfe
