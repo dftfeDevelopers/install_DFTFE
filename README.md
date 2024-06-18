@@ -73,6 +73,7 @@ For example,
     install_p4est
     install_scalapack
     install_elpa
+    install_kokkos
     install_dealii
     install_dftd4 #(optional)
     compile_dftfe
