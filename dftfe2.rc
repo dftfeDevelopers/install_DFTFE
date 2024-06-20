@@ -92,12 +92,25 @@ fn install_p4est{
   rm -rf p4est
   mkdir p4est
   cd p4est
-  wget 'https://github.com/p4est/p4est.github.io/raw/master/release/p4est-2.2.tar.gz'
-  wget 'https://raw.githubusercontent.com/dftfeDevelopers/dftfe/manual/p4est-setup.sh'
-  chmod u+x p4est-setup.sh
-  ./p4est-setup.sh p4est-2.2.tar.gz $INST
+  wget 'https://p4est.github.io/release/p4est-2.8.6.tar.gz'
+  wget 'https://raw.githubusercontent.com/dftfeDevelopers/dftfe/manual/p4est-setup-craycompiler.sh'
+  chmod u+x p4est-setup-craycompiler.sh
+  ./p4est-setup-craycompiler.sh p4est-2.8.6.tar.gz $INST
   cd $WD
  }
+
+
+#fn install_p4est{
+#  cd $WD/src
+#  rm -rf p4est
+#  mkdir p4est
+#  cd p4est
+#  wget 'https://github.com/p4est/p4est.github.io/raw/master/release/p4est-2.2.tar.gz'
+#  wget 'https://raw.githubusercontent.com/dftfeDevelopers/dftfe/manual/p4est-setup.sh'
+#  chmod u+x p4est-setup.sh
+#  ./p4est-setup.sh p4est-2.2.tar.gz $INST
+#  cd $WD
+# }
 
 # Install netlib-scalapack 2.2.0 version linking to openblas
 # note that the openblas (sourced via module) provides lapack
