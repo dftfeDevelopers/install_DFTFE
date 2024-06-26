@@ -1,0 +1,129 @@
+diff --git a/src/GPU/ROCm/elpa_explicit_name_amd_gpu.cpp b/src/GPU/ROCm/elpa_explicit_name_amd_gpu.cpp
+index b8810bc1..830a6139 100644
+--- a/src/GPU/ROCm/elpa_explicit_name_amd_gpu.cpp
++++ b/src/GPU/ROCm/elpa_explicit_name_amd_gpu.cpp
+@@ -62,7 +62,7 @@ extern "C" {
+         return 0;
+ 		  }
+     
+-    if (attributes.memoryType==hipMemoryTypeDevice) return 1;
++    if (attributes.type==hipMemoryTypeDevice) return 1;
+     else return 0;
+   }
+   
+diff --git a/src/GPU/ROCm/rocmFunctions.cpp b/src/GPU/ROCm/rocmFunctions.cpp
+index 3b2a7791..382e3cba 100644
+--- a/src/GPU/ROCm/rocmFunctions.cpp
++++ b/src/GPU/ROCm/rocmFunctions.cpp
+@@ -305,7 +305,7 @@
+ #else /* HIPBLAS */
+ #include "rocblas/rocblas.h"
+ #ifdef WITH_AMD_ROCSOLVER
+-#include <rocsolver.h>
++#include <rocsolver/rocsolver.h>
+ #endif
+ #endif /* HIPBLAS */
+ #include "hip/hip_runtime_api.h"
+@@ -325,4 +325,4 @@
+ 
+ #ifdef WITH_AMD_ROCSOLVER
+ #include "./rocsolverFunctions_template.h"
+-#endif
+\ No newline at end of file
++#endif
+diff --git a/src/GPU/check_for_gpu_template.F90 b/src/GPU/check_for_gpu_template.F90
+index 384dac2e..d0e90d78 100644
+--- a/src/GPU/check_for_gpu_template.F90
++++ b/src/GPU/check_for_gpu_template.F90
+@@ -72,17 +72,17 @@
+ #ifdef WITH_AMD_GPU_VERSION
+ #ifndef WITH_GPU_STREAMS
+ #ifdef ADDITIONAL_OBJECT_CODE
+-        write(error_unit,*) "You use the AMD-GPUs without enabling amd-gpu streams at build time!"
+-        write(error_unit,*) "This does mean reduced performace!"
+-        write(*,*) "You use the AMD-GPUs without enabling amd-gpu streams at build time!"
+-        write(*,*) "This does mean reduced performace!"
++!        write(error_unit,*) "You use the AMD-GPUs without enabling amd-gpu streams at build time!"
++!        write(error_unit,*) "This does mean reduced performace!"
++!        write(*,*) "You use the AMD-GPUs without enabling amd-gpu streams at build time!"
++!        write(*,*) "This does mean reduced performace!"
+ #else /* ADDITIONAL_OBJECT_CODE */
+         ! myid is given as argument
+         if (myid .eq. 0) then
+-          write(error_unit,*) "You use the AMD-GPUs without enabling amd-gpu streams at build time!"
+-          write(error_unit,*) "This does mean reduced performace!"
+-          write(*,*) "You use the AMD-GPUs without enabling amd-gpu streams at build time!"
+-          write(*,*) "This does mean reduced performace!"
++!          write(error_unit,*) "You use the AMD-GPUs without enabling amd-gpu streams at build time!"
++!          write(error_unit,*) "This does mean reduced performace!"
++!          write(*,*) "You use the AMD-GPUs without enabling amd-gpu streams at build time!"
++!          write(*,*) "This does mean reduced performace!"
+         endif
+ #endif /* ADDITIONAL_OBJECT_CODE */
+ #endif /* WITH_GPU_STREAMS */
+@@ -668,17 +668,17 @@
+ #ifdef WITH_AMD_GPU_VERSION
+ #ifndef WITH_GPU_STREAMS
+ #ifdef ADDITIONAL_OBJECT_CODE
+-        write(error_unit,*) "You use the AMD-GPUs without enabling amd-gpu streams at build time!"
+-        write(error_unit,*) "This does mean reduced performace!"
+-        write(*,*) "You use the AMD-GPUs without enabling amd-gpu streams at build time!"
+-        write(*,*) "This does mean reduced performace!"
++!        write(error_unit,*) "You use the AMD-GPUs without enabling amd-gpu streams at build time!"
++!        write(error_unit,*) "This does mean reduced performace!"
++!        write(*,*) "You use the AMD-GPUs without enabling amd-gpu streams at build time!"
++!        write(*,*) "This does mean reduced performace!"
+ #else /* ADDITIONAL_OBJECT_CODE */
+         ! myid is given as argument
+         if (myid .eq. 0) then
+-          write(error_unit,*) "You use the AMD-GPUs without enabling amd-gpu streams at build time!"
+-          write(error_unit,*) "This does mean reduced performace!"
+-          write(*,*) "You use the AMD-GPUs without enabling amd-gpu streams at build time!"
+-          write(*,*) "This does mean reduced performace!"
++!          write(error_unit,*) "You use the AMD-GPUs without enabling amd-gpu streams at build time!"
++!          write(error_unit,*) "This does mean reduced performace!"
++!          write(*,*) "You use the AMD-GPUs without enabling amd-gpu streams at build time!"
++!          write(*,*) "This does mean reduced performace!"
+         endif
+ #endif /* ADDITIONAL_OBJECT_CODE */
+ #endif /* WITH_GPU_STREAMS */
+diff --git a/src/elpa1/GPU/ROCm/tridiag_hip.cpp b/src/elpa1/GPU/ROCm/tridiag_hip.cpp
+index 12282a48..0af61f65 100644
+--- a/src/elpa1/GPU/ROCm/tridiag_hip.cpp
++++ b/src/elpa1/GPU/ROCm/tridiag_hip.cpp
+@@ -528,7 +528,7 @@ void hip_set_e_vec_scale_set_one_store_v_row_FromC(T_real *e_vec_dev, T *vrl_dev
+ 
+   if (error == hipSuccess) 
+     {
+-    if (attributes.memoryType == hipMemoryTypeHost) 
++    if (attributes.type == hipMemoryTypeHost) 
+       {
+       T xf_host_value = *xf_host_or_dev;
+ #ifdef WITH_GPU_STREAMS
+@@ -544,7 +544,7 @@ void hip_set_e_vec_scale_set_one_store_v_row_FromC(T_real *e_vec_dev, T *vrl_dev
+         if (hiperr != hipSuccess) printf("Error in executing hip_set_e_vec_scale_set_one_store_v_row_kernel: %s\n",hipGetErrorString(hiperr));
+         }
+       }
+-    else if (attributes.memoryType == hipMemoryTypeDevice) 
++    else if (attributes.type == hipMemoryTypeDevice) 
+       {
+ #ifdef WITH_GPU_STREAMS
+       hip_set_e_vec_scale_set_one_store_v_row_kernel<<<blocks,threadsPerBlock,0,my_stream>>>(e_vec_dev, vrl_dev, a_dev, v_row_dev, tau_dev, xf_host_or_dev,
+@@ -697,7 +697,7 @@ void hip_store_u_v_in_uv_vu_FromC(T *vu_stored_rows_dev, T *uv_stored_cols_dev,
+ 
+   if (error == hipSuccess) 
+     {
+-    if (attributes.memoryType == hipMemoryTypeHost) 
++    if (attributes.type == hipMemoryTypeHost) 
+       {
+       T vav_host_value = *vav_host_or_dev;
+       T tau_host_value = *tau_host_or_dev;
+@@ -717,7 +717,7 @@ void hip_store_u_v_in_uv_vu_FromC(T *vu_stored_rows_dev, T *uv_stored_cols_dev,
+         }
+       } 
+     
+-    else if (attributes.memoryType == hipMemoryTypeDevice) 
++    else if (attributes.type == hipMemoryTypeDevice) 
+       {
+ #ifdef WITH_GPU_STREAMS
+       hip_store_u_v_in_uv_vu_kernel<<<blocks,threadsPerBlock,0,my_stream>>>(vu_stored_rows_dev, uv_stored_cols_dev, v_row_dev, u_row_dev, 
