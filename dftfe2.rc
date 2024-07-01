@@ -492,10 +492,10 @@ fn compile_dftfe{
     git pull
   }
   cd dftfe
-  #rm -fr build
+  rm -fr build
   SRC = `{pwd}
-  #mkdir build && cd build
-  cd build
+  mkdir build && cd build
+  #cd build
 
   dealiiDir=$INST
   alglibDir=$INST/lib/alglib
