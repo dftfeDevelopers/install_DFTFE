@@ -143,7 +143,7 @@ fn install_elpa {
 
     LD_LIBRARY_PATH = $LD_LIBRARY_PATH:$INST/lib
     LD_LIBRARY_PATH = $LD_LIBRARY_PATH:$INST/lib64
-
+    LD_LIBRARY_PATH = /usr/local/lib64:$LD_LIBRARY_PATH
 
     cflags = ('-march=native')
     libs = (-L$INST/lib -lscalapack -L$MKLROOT/lib/intel64 -Wl,--no-as-needed -lmkl_gf_lp64 -lmkl_gnu_thread -lmkl_core -lgomp -lpthread -lm -ldl)
@@ -252,7 +252,7 @@ fn install_dealii_real {
         '-DCMAKE_C_FLAGS=-march=native -std=c++17' \
         '-DDEAL_II_ALLOW_PLATFORM_INTROSPECTION=OFF' \
         '-DDEAL_II_WITH_TASKFLOW=OFF' \
-        '-DDEAL_II_FORCE_BUNDLED_BOOST=OFF' \
+        '-DDEAL_II_FORCE_BUNDLED_BOOST=ON' \
         '-DKOKKOS_DIR='$INST \
         '-DCMAKE_BUILD_TYPE=Release' \
         '-DDEAL_II_CXX_FLAGS_RELEASE=-O2' \
@@ -303,6 +303,7 @@ fn install_dealii_complex {
         '-DCMAKE_C_FLAGS=-march=native -std=c++17' \
         '-DDEAL_II_ALLOW_PLATFORM_INTROSPECTION=OFF' \
         '-DDEAL_II_WITH_TASKFLOW=OFF' \
+        '-DDEAL_II_FORCE_BUNDLED_BOOST=ON' \
         '-DKOKKOS_DIR='$INST \
         '-DCMAKE_BUILD_TYPE=Release' \
         '-DDEAL_II_CXX_FLAGS_RELEASE=-O2' \
@@ -394,89 +395,7 @@ fn compile_dftfe{
       -DCMAKE_PREFIX_PATH=$ELPA_PATH';'$TORCH_PATH \
       -DWITH_TESTING=ON \
       -DMINIMAL_COMPILE=OFF \
-      -DHIGHERQUAD_PSP=ON \
-  )  
-
-  fn cmake_real {
-    mkdir -p real && cd real
-    cmake $cmake_flags -DDEAL_II_DIR=$dealiiDirReal\
-      -DWITH_COMPLEX=OFF \
-      $1
-    make -j8
-    cd ..
-  }
-
-  fn cmake_cplx {
-    mkdir -p complex && cd complex
-    cmake $cmake_flags -DDEAL_II_DIR=$dealiiDirComplex\
-      -DWITH_COMPLEX=ON \
-      $1
-    make -j8
-    cd ..
-  }
-
-  mkdir -p $out
-  cd $out
-
-  echo 'Building Real executable in $build_type mode...'
-  cmake_real $SRC
-
-  echo 'Building Complex executable in $build_type mode...'
-  cmake_cplx $SRC
-
-  echo 'Build complete.'
-  cd $WD
-}
-
-fn compile_dftfe_multiVecOps{
-  cd /home/vishalsu/softwares/dftfe_invDFT_new_clone/dftfe
-  rm -fr build
-  SRC = `{pwd}
-  mkdir build && cd build
-
-  dealiiDirReal=$INST/dealii_real
-  dealiiDirComplex=$INST/dealii_complex
-  alglibDir=$INST/lib/alglib
-  libxcDir=$INST
-  spglibDir=$INST
-  xmlIncludeDir=/usr/include/libxml2
-  xmlLibDir=/usr/lib64
-
-  ELPA_PATH=$INST
-  TORCH_PATH=''
-
-  #Compiler options and flags
-  cxx_compiler = mpic++
-  cxx_flags = '-fPIC'
-  cxx_flagsRelease = -O2 #sets DCMAKE_CXX_FLAGS_RELEASE
-
-  # HIGHERQUAD_PSP option compiles with default or higher order
-  # quadrature for storing pseudopotential data
-  # ON is recommended for MD simulations with hard pseudopotentials
-
-  # build type: "Release" or "Debug"
-  build_type=Release
-  out=`{echo $build_type | tr '[:upper:]' '[:lower:]'}
-
-  # Note: MDI_PATH is not used by project.
-  cmake_flags = ( \
-      -DCMAKE_CXX_STANDARD=17 \
-      -DCMAKE_CXX_COMPILER=$cxx_compiler \
-      -DCMAKE_CXX_FLAGS=$cxx_flags \
-      -DCMAKE_CXX_FLAGS_RELEASE=$cxx_flagsRelease \
-      -DCMAKE_BUILD_TYPE=$build_type \
-      -DALGLIB_DIR=$alglibDir \
-      -DLIBXC_DIR=$libxcDir \
-      -DSPGLIB_DIR=$spglibDir \
-      -DXML_LIB_DIR=$xmlLibDir \
-      -DXML_INCLUDE_DIR=$xmlIncludeDir \
-      -DWITH_MDI=OFF \
-      -DMDI_PATH= \
-      -DWITH_TORCH=OFF \
-      -DCMAKE_PREFIX_PATH=$ELPA_PATH';'$TORCH_PATH \
-      -DWITH_TESTING=ON \
-      -DMINIMAL_COMPILE=OFF \
-      -DHIGHERQUAD_PSP=ON \
+      -DHIGHERQUAD_PSP=OFF \
   )  
 
   fn cmake_real {
