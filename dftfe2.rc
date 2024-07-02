@@ -153,7 +153,8 @@ fn install_scalapack {
   }
   cd scalapack-2.2.0
   
-  mkdir build && cd build
+  mkdir build
+  cd build
   cmake \
     '-DBUILD_SHARED_LIBS=ON' \
     '-DBUILD_STATIC_LIBS=OFF' \
@@ -235,22 +236,92 @@ fn install_kokkos {
 } 
 
 
+fn install_petsc {
+   cd $WD/src
+   if(test ! -d petsc-3.21.1) {
+        wget https://web.cels.anl.gov/projects/petsc/download/release-snapshots/petsc-3.21.1.tar.gz
+        tar xf petsc-3.21.1.tar.gz
+        rm -f petsc-3.21.1.tar.gz
+        }
+   cd petsc-3.21.1
+   rm -fr build_real
+   mkdir build_real
+   PETSC_DIR=$WD/src/petsc-3.21.1
+   PETSC_ARCH=()
+   LD_LIBRARY_PATH = $LD_LIBRARY_PATH:$INST/lib
+   LD_LIBRARY_PATH = $LD_LIBRARY_PATH:$INST/lib64
+   ./configure '--prefix='$WD'/src/petsc-3.21.1/build_real/' \
+               '--with-debugging=no' \
+               '--with-64-bit-indices=true' \
+               '--with-cc=cc' '--with-cxx=CC' '--with-fc=ftn' \
+               '--with-fortran-kernels=true' '--with-scalar-type=real' \
+               '--with-blas-lapack-lib='$INST/lib/libblis.so \
+               'CFLAGS=-O2' 'CXXFLAGS=-O2' 'FFLAGS=-O2' \
+               'CXXOPTFLAGS=-O2' 'COPTFLAGS=-O2' 'FOPTFLAGS=-O2'    
+
+#';'$INST/lib/libflame.so
+   make PETSC_DIR=$WD/src/petsc-3.21.1 PETSC_ARCH=arch-linux-c-opt all
+   make PETSC_DIR=$WD/src/petsc-3.21.1 PETSC_ARCH=arch-linux-c-opt install
+   cd $WD/src/petsc-3.21.1
+   rm -fr build_complex
+   mkdir build_complex
+   PETSC_DIR=$WD/src/petsc-3.21.1
+   PETSC_ARCH=()
+   ./configure '--prefix='$WD'/src/petsc-3.21.1/build_complex/' \
+               '--with-debugging=no' \
+               '--with-64-bit-indices=true' \
+               '--with-cc=cc' '--with-cxx=CC' '--with-fc=ftn' \
+               '--with-fortran-kernels=true' '--with-scalar-type=complex' \
+               '--with-blas-lapack-lib='$INST/lib/libblis.so\
+               'CFLAGS=-O2' 'CXXFLAGS=-O2' 'FFLAGS=-O2' \
+               'CXXOPTFLAGS=-O2' 'COPTFLAGS=-O2' 'FOPTFLAGS=-O2'
+
+  make PETSC_DIR=$WD/src/petsc-3.21.1 PETSC_ARCH=arch-linux-c-opt all
+  make PETSC_DIR=$WD/src/petsc-3.21.1 PETSC_ARCH=arch-linux-c-opt install
+  cd $WD
+ }
+
+fn install_slepc {
+  cd $WD/src
+  if(test ! -d slpec-3.21.1) {
+   wget https://slepc.upv.es/download/distrib/slepc-3.21.1.tar.gz
+   tar xf slepc-3.21.1.tar.gz
+   rm -f slepc-3.21.1.tar.gz
+  }
+  cd slepc-3.21.1
+  rm -rf build_real
+  mkdir build_real
+  PETSC_DIR=$WD/src/petsc-3.21.1/build_real
+  PETSC_ARCH=()
+  ./configure '--prefix='$WD'/src/slepc-3.21.1/build_real'
+  make SLEPC_DIR=$WD/src/slepc-3.21.1/ PETSC_DIR=$WD/src/petsc-3.21.1/build_real 
+  make SLEPC_DIR=$WD/src/slepc-3.21.1/ PETSC_DIR=$WD/src/petsc-3.21.1/build_real install
+
+
+ cd $WD/src/slepc-3.21.1
+ rm -rf build_complex
+ mkdir build_complex
+ PETSC_DIR=$WD/src/petsc-3.21.1/build_complex
+ PETSC_ARCH=()
+ ./configure '--prefix='$WD'/src/slepc-3.21.1/build_complex'
+ make SLEPC_DIR=$WD/src/slepc-3.21.1 PETSC_DIR=$WD/src/petsc-3.21.1/build_complex
+ make SLEPC_DIR=$WD/src/slepc-3.21.1 PETSC_DIR=$WD/src/petsc-3.21.1/build_complex install
+ cd $WD
+}
+
 # Install latest release dealii from https://github.com/dealii/dealii
 
-fn install_dealii {
+fn install_dealii_real {
   cd $WD/src
   ver=9.5.2
   if(test ! -d dealii-$ver) {
       wget https://github.com/dealii/dealii/releases/download/v$ver/dealii-$ver.tar.gz
       tar xzf dealii-$ver.tar.gz 
   }
-  #if(test ! -d dealii) {
-  #  git clone https://github.com/dealii/dealii.git
-  #}
   cd dealii-$ver
-  #cd dealii
-  rm -fr build
-  mkdir build && cd build
+  rm -fr build_real
+  mkdir build_real
+  cd build_real
   cmake '-DCMAKE_CXX_STANDARD=17' \
         '-DCMAKE_CXX_FLAGS=-std=c++17' \
         '-DCMAKE_C_FLAGS=-std=c++17' \
@@ -267,17 +338,66 @@ fn install_dealii {
         '-DDEAL_II_COMPONENT_EXAMPLES=OFF' \
         '-DDEAL_II_WITH_MPI=ON' \
         '-DDEAL_II_WITH_64BIT_INDICES=ON' \
+        '-DDEAL_II_WITH_PETSC=ON' \
+        '-DPETSC_DIR='$WD'/src/petsc-3.21.1/build_real' \
+        '-DDEAL_II_WITH_SLEPC=ON' \
+        '-DSLEPC_DIR='$WD'/src/slepc-3.21.1/build_real' \
         '-DP4EST_DIR='$INST \
         '-DDEAL_II_WITH_LAPACK=ON' \
         '-DLAPACK_DIR='$OLCF_OPENBLAS_ROOT';'$INST \
         '-DLAPACK_FOUND=true' \
         '-DLAPACK_LIBRARIES='$INST/lib/libblis.so';'$INST/lib/libflame.so\
-        '-DCMAKE_INSTALL_PREFIX='$INST \
+        '-DCMAKE_INSTALL_PREFIX='$INST/dealii_real \
         ..
   # may add to lapack libraries ';'$INST/lib64/liblapack.so \
   make -j16 || echo 1
   make install
-  mv $INST/ ^ (detailed.log summary.log README.md LICENSE.md) $INST/share/deal.II/
+  mv $INST/dealii_real/ ^ (detailed.log summary.log README.md LICENSE.md) $INST/dealii_real/share/deal.II/
+  cd $WD
+}
+
+fn install_dealii_complex {
+  cd $WD/src
+  ver=9.5.2
+  if(test ! -d dealii-$ver) {
+      wget https://github.com/dealii/dealii/releases/download/v$ver/dealii-$ver.tar.gz
+      tar xzf dealii-$ver.tar.gz 
+  }
+  cd dealii-$ver
+  rm -fr build_complex
+  mkdir build_complex
+  cd build_complex
+  cmake '-DCMAKE_CXX_STANDARD=17' \
+        '-DCMAKE_CXX_FLAGS=-std=c++17' \
+        '-DCMAKE_C_FLAGS=-std=c++17' \
+        '-DDEAL_II_FORCE_BUNDLED_BOOST=ON' \
+        '-DDEAL_II_ALLOW_PLATFORM_INTROSPECTION=OFF' \
+        '-DKOKKOS_DIR='$INST \
+        '-DDEAL_II_WITH_TASKFLOW=OFF' \
+        '-DCMAKE_BUILD_TYPE=Release' \
+        '-DDEAL_II_CXX_FLAGS_RELEASE=-O2' \
+        '-DCMAKE_C_COMPILER=cc' \
+        '-DCMAKE_CXX_COMPILER=CC' \
+        '-DCMAKE_Fortran_COMPILER=ftn' \
+        '-DDEAL_II_WITH_TBB=OFF' \
+        '-DDEAL_II_COMPONENT_EXAMPLES=OFF' \
+        '-DDEAL_II_WITH_MPI=ON' \
+        '-DDEAL_II_WITH_64BIT_INDICES=ON' \
+        '-DDEAL_II_WITH_PETSC=ON' \
+        '-DPETSC_DIR='$WD'/src/petsc-3.21.1/build_complex' \
+        '-DDEAL_II_WITH_SLEPC=ON' \
+        '-DSLEPC_DIR='$WD'/src/slepc-3.21.1/build_complex' \
+        '-DP4EST_DIR='$INST \
+        '-DDEAL_II_WITH_LAPACK=ON' \
+        '-DLAPACK_DIR='$OLCF_OPENBLAS_ROOT';'$INST \
+        '-DLAPACK_FOUND=true' \
+        '-DLAPACK_LIBRARIES='$INST/lib/libblis.so';'$INST/lib/libflame.so\
+        '-DCMAKE_INSTALL_PREFIX='$INST/dealii_complex \
+        ..
+  # may add to lapack libraries ';'$INST/lib64/liblapack.so \
+  make -j16 || echo 1
+  make install
+  mv $INST/dealii_complex/ ^ (detailed.log summary.log README.md LICENSE.md) $INST/dealii_complex/share/deal.II/
   cd $WD
 }
 
@@ -299,7 +419,6 @@ fn compile_dftfe_develop{
   mkdir build && cd build
   #cd build
 
-  dealiiDir=$INST
   alglibDir=$INST/lib/alglib
   libxcDir=$INST
   spglibDir=$INST
@@ -333,7 +452,6 @@ fn compile_dftfe_develop{
       -DCMAKE_CXX_FLAGS=$cxx_flags \
       -DCMAKE_CXX_FLAGS_RELEASE=$cxx_flagsRelease \
       -DCMAKE_BUILD_TYPE=$build_type \
-      -DDEAL_II_DIR=$dealiiDir \
       -DALGLIB_DIR=$alglibDir \
       -DLIBXC_DIR=$libxcDir \
       -DSPGLIB_DIR=$spglibDir \
@@ -358,7 +476,7 @@ fn compile_dftfe_develop{
   fn cmake_real {
     mkdir -p real && cd real
     cmake $cmake_flags \
-      -DWITH_COMPLEX=OFF \
+      -DWITH_COMPLEX=OFF -DDEAL_II_DIR=$INST/dealii_real\
       $1
     make -j8
     cd ..
@@ -367,7 +485,7 @@ fn compile_dftfe_develop{
   fn cmake_cplx {
     mkdir -p complex && cd complex
     cmake $cmake_flags \
-      -DWITH_COMPLEX=ON \
+      -DWITH_COMPLEX=ON -DDEAL_II_DIR=$INST/dealii_complex\
       $1
     make -j8
     cd ..
@@ -387,6 +505,21 @@ fn compile_dftfe_develop{
 }
 
 
+fn install_numdiff {
+  cd $WD/src
+  if (! test -d numdiff-5.9.0)
+  {
+    wget http://nongnu.askapache.com/numdiff/numdiff-5.9.0.tar.gz
+    tar xvzf numdiff-5.9.0.tar.gz
+    rm numdiff-5.9.0.tar.gz
+  }
+  cd numdiff-5.9.0
+
+  ./configure '--prefix='$INST/numdiff_install
+  make 
+  make install
+}
+
 fn compile_dftfe{
   cd $WD/src
   branch = publicGithubDevelop
@@ -403,7 +536,9 @@ fn compile_dftfe{
   SRC = `{pwd}
   mkdir build && cd build
 
-  dealiiDir=$INST
+  LD_LIBRARY_PATH = $LD_LIBRARY_PATH:$INST/lib
+  LD_LIBRARY_PATH = $LD_LIBRARY_PATH:$INST/lib64
+  LD_LIBRARY_PATH = $LD_LIBRARY_PATH:$INST/numdiff_install
   alglibDir=$INST/lib/alglib
   libxcDir=$INST
   spglibDir=$INST
@@ -437,7 +572,6 @@ fn compile_dftfe{
       -DCMAKE_CXX_FLAGS=$cxx_flags \
       -DCMAKE_CXX_FLAGS_RELEASE=$cxx_flagsRelease \
       -DCMAKE_BUILD_TYPE=$build_type \
-      -DDEAL_II_DIR=$dealiiDir \
       -DALGLIB_DIR=$alglibDir \
       -DLIBXC_DIR=$libxcDir \
       -DSPGLIB_DIR=$spglibDir \
@@ -454,15 +588,16 @@ fn compile_dftfe{
       -DWITH_GPU_AWARE_MPI=OFF \
       -DCMAKE_CUDA_FLAGS=$device_flags \
       -DCMAKE_CUDA_ARCHITECTURES=$device_architectures \
-      -DWITH_TESTING=OFF \
+      -DWITH_TESTING=ON \
+      -DNUMDIFF_EXECUTABLE=$INST/numdiff_install/bin/numdiff\
       -DMINIMAL_COMPILE=OFF \
-      -DHIGHERQUAD_PSP=ON \
+      -DHIGHERQUAD_PSP=OFF \
   )  
 
   fn cmake_real {
     mkdir -p real && cd real
     cmake $cmake_flags \
-      -DWITH_COMPLEX=OFF \
+      -DWITH_COMPLEX=OFF -DDEAL_II_DIR=$INST/dealii_real \
       $1
     make -j8
     cd ..
@@ -471,7 +606,7 @@ fn compile_dftfe{
   fn cmake_cplx {
     mkdir -p complex && cd complex
     cmake $cmake_flags \
-      -DWITH_COMPLEX=ON \
+      -DWITH_COMPLEX=ON -DDEAL_II_DIR=$INST/dealii_complex \
       $1
     make -j8
     cd ..
