@@ -78,6 +78,7 @@ fn install_spglib {
   cmake '-DCMAKE_CXX_COMPILER=g++' \
         '-DCMAKE_C_COMPILER=gcc' \
         '-DCMAKE_INSTALL_PREFIX='$INST \
+        '-DSPGLIB_WITH_TESTS=OFF' \
         ..
   make -j16
   make install
