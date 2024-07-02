@@ -74,7 +74,11 @@ For example,
     install_scalapack
     install_elpa
     install_kokkos
-    install_dealii
+    install_petsc
+    install_slepc
+    install_numdiff
+    install_dealii_real
+    install_dealii_complex
     install_dftd4 #(optional)
     compile_dftfe
 
