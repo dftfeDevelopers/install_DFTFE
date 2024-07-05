@@ -284,7 +284,7 @@ fn install_dealii {
 
 fn compile_dftfe_develop{
   cd $WD/src
-  branch = migrateLatestDealii
+  branch = mlffDataGeneration
   if(! test -d dftfeDevelop) {
     git clone -b $branch https://dsambit@bitbucket.org/dftfedevelopers/dftfe.git dftfeDevelop
   } if not {
@@ -352,7 +352,7 @@ fn compile_dftfe_develop{
       -DCMAKE_CUDA_ARCHITECTURES=$device_architectures \
       -DWITH_TESTING=OFF \
       -DMINIMAL_COMPILE=OFF \
-      -DHIGHERQUAD_PSP=OFF \
+      -DHIGHERQUAD_PSP=ON \
   )
 
   fn cmake_real {
