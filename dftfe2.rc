@@ -253,7 +253,7 @@ fn install_dealii_real {
         '-DCMAKE_C_FLAGS=-march=native -std=c++17' \
         '-DDEAL_II_ALLOW_PLATFORM_INTROSPECTION=OFF' \
         '-DDEAL_II_WITH_TASKFLOW=OFF' \
-        '-DDEAL_II_FORCE_BUNDLED_BOOST=ON' \
+        '-DDEAL_II_FORCE_BUNDLED_BOOST=OFF' \
         '-DKOKKOS_DIR='$INST \
         '-DCMAKE_BUILD_TYPE=Release' \
         '-DDEAL_II_CXX_FLAGS_RELEASE=-O2' \
@@ -304,7 +304,7 @@ fn install_dealii_complex {
         '-DCMAKE_C_FLAGS=-march=native -std=c++17' \
         '-DDEAL_II_ALLOW_PLATFORM_INTROSPECTION=OFF' \
         '-DDEAL_II_WITH_TASKFLOW=OFF' \
-        '-DDEAL_II_FORCE_BUNDLED_BOOST=ON' \
+        '-DDEAL_II_FORCE_BUNDLED_BOOST=OFF' \
         '-DKOKKOS_DIR='$INST \
         '-DCMAKE_BUILD_TYPE=Release' \
         '-DDEAL_II_CXX_FLAGS_RELEASE=-O2' \
