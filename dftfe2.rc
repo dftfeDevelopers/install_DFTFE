@@ -300,6 +300,7 @@ fn install_dealii {
         '-DCMAKE_CXX_FLAGS=-march=native -std=c++17' \
         '-DCMAKE_C_FLAGS=-march=native' \
         '-DDEAL_II_ALLOW_PLATFORM_INTROSPECTION=OFF' \
+        '-DDEAL_II_FORCE_BUNDLED_BOOST=ON' \
         '-DDEAL_II_WITH_TASKFLOW=OFF' \
         '-DKOKKOS_DIR='$INST \
         '-DCMAKE_BUILD_TYPE=Release' \
