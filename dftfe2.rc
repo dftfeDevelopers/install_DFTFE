@@ -254,7 +254,7 @@ fn install_dealii {
   cmake '-DCMAKE_CXX_STANDARD=17' \
         '-DCMAKE_CXX_FLAGS=-std=c++17' \
         '-DCMAKE_C_FLAGS=-std=c++17' \
-        '-DDEAL_II_FORCE_BUNDLED_BOOST=ON' \
+        '-DDEAL_II_FORCE_BUNDLED_BOOST=OFF' \
         '-DDEAL_II_ALLOW_PLATFORM_INTROSPECTION=OFF' \
         '-DKOKKOS_DIR='$INST \
         '-DDEAL_II_WITH_TASKFLOW=OFF' \
