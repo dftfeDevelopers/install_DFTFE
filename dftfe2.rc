@@ -375,7 +375,7 @@ fn install_torch {
 }
 
 fn compile_dftfe_debug{
-  branch = migrateLatestDealii
+  branch = multiVecOps
   cd $WD/src
   if(! test -d dftfeDebug) {
     git clone -b $branch https://dsambit@bitbucket.org/dftfedevelopers/dftfe.git dftfeDebug
@@ -423,6 +423,7 @@ fn compile_dftfe_debug{
       -DCMAKE_CXX_COMPILER=$cxx_compiler \
       -DCMAKE_CXX_FLAGS=$cxx_flags \
       -DCMAKE_CXX_FLAGS_RELEASE=$cxx_flagsRelease \
+      -DDEAL_II_FORCE_BUNDLED_BOOST=OFF \
       -DCMAKE_BUILD_TYPE=$build_type \
       -DDEAL_II_DIR=$dealiiDir \
       -DALGLIB_DIR=$alglibDir \
@@ -492,10 +493,10 @@ fn compile_dftfe{
     git pull
   }
   cd dftfe
-  #rm -fr build
+  rm -fr build
   SRC = `{pwd}
-  #mkdir build && cd build
-  cd build
+  mkdir build && cd build
+  #cd build
 
   dealiiDir=$INST
   alglibDir=$INST/lib/alglib
