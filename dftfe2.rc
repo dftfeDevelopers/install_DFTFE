@@ -396,7 +396,7 @@ fn compile_dftfe{
       -DCMAKE_PREFIX_PATH=$ELPA_PATH';'$TORCH_PATH \
       -DWITH_TESTING=ON \
       -DMINIMAL_COMPILE=OFF \
-      -DHIGHERQUAD_PSP=OFF \
+      -DHIGHERQUAD_PSP=ON \
   )  
 
   fn cmake_real {
