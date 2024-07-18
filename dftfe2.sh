@@ -316,12 +316,12 @@ function compile_dftfe {
   fi
   if [ ! -d dftfe_$branch ]; then
     git clone -b $branch https://knikhil1995@bitbucket.org/dftfedevelopers/dftfe.git dftfe_$branch
+    cd dftfe_$branch
   else
     cd dftfe_$branch
     git checkout $branch
     git pull
   fi
-  cd dftfe_$branch
   rm -fr build
   SRC=$PWD
   mkdir build && cd build
@@ -339,9 +339,9 @@ function compile_dftfe {
 
   #Compiler options and flags
   cxx_compiler=CC
-  cxx_flags="-march=znver3 -fPIC -I$MPICH_DIR/include -I$ROCM_PATH/include"
-  cxx_flagsRelease="-O2" #sets DCMAKE_CXX_FLAGS_RELEASE
-  device_flags="-march=znver3 -O2 -munsafe-fp-atomics -I$MPICH_DIR/include -I$ROCM_PATH/include"
+  cxx_flags="-march=znver3 -fPIC -I$MPICH_DIR/include -I$ROCM_PATH/include -I$ROCM_PATH/include/hip -I$ROCM_PATH/include/hipblas"
+  cxx_flagsRelease=-O2 #sets DCMAKE_CXX_FLAGS_RELEASE
+  device_flags="-march=znver3 -O2 -munsafe-fp-atomics -I$MPICH_DIR/include -I$ROCM_PATH/include -I$ROCM_PATH/include/hip -I$ROCM_PATH/include/hipblas"
   device_architectures=gfx90a
 
   # HIGHERQUAD_PSP option compiles with default or higher order
