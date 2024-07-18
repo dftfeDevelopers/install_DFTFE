@@ -94,7 +94,7 @@ function install_scalapack {
   cd scalapack-2.2.0
   
   mkdir build && cd build
-  cmake -DBUILD_SHARED_LIBS=ON -DBUILD_STATIC_LIBS=OFF -DBUILD_TESTING=OFF -DCMAKE_C_COMPILER=cc -DCMAKE_Fortran_COMPILER=ftn -DCMAKE_C_FLAGS="-fPIC -march=znver3 -DCMAKE_Fortran_FLAGS=-fPIC -march=znver3 -fallow-argument-mismatch" -DUSE_OPTIMIZED_LAPACK_BLAS=ON -DCMAKE_INSTALL_PREFIX=$INST ..
+  cmake -DBUILD_SHARED_LIBS=ON -DBUILD_STATIC_LIBS=OFF -DBUILD_TESTING=OFF -DCMAKE_C_COMPILER=cc -DCMAKE_Fortran_COMPILER=ftn -DCMAKE_C_FLAGS="-fPIC -march=znver3" -DCMAKE_Fortran_FLAGS="-fPIC -march=znver3 -fallow-argument-mismatch" -DUSE_OPTIMIZED_LAPACK_BLAS=ON -DCMAKE_INSTALL_PREFIX=$INST ..
   make -j16
   make install
   cd $WD
