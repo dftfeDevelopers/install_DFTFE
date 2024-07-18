@@ -140,11 +140,9 @@ function install_elpa {
     LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$INST/lib64
     LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$ROCM_PATH/lib
 
-    CFLAGS="-march=znver3 -fPIC -O2 -I$ROCM_PATH/include --amdgpu-target=gfx90a -I$MPICH_DIR/include"
-    LIBS="-L$ROCM_PATH/lib -lamdhip64 -lrocblas -L$MPICH_DIR/lib -lmpi $CRAY_XPMEM_POST_LINK_OPTS -lxpmem $PE_MPICH_GTL_DIR_amd_gfx90a $PE_MPICH_GTL_LIBS_amd_gfx90a -L$INST/lib -lscalapack -L$OLCF_OPENBLAS_ROOT/lib -lopenblas -L$INST/lib64"
     rm -fr build
     mkdir build && cd build
-    ../configure CXX=hipcc CC=hipcc FC=ftn FCFLAGS="-march=znver3 -O2 -fPIC" CXXFLAGS="-std=c++17 $CFLAGS" --enable-amd-gpu --prefix=$INST --disable-sse -disable-sse-assembly --disable-avx --disable-avx2 --disable-avx512 --enable-c-tests=no --enable-option-checking=fatal --enable-shared                --enable-cpp-tests=no --enable-hipcub
+    ../configure CXX=hipcc CC=hipcc FC=ftn CFLAGS="-march=znver3 -fPIC -O2 -I$ROCM_PATH/include --amdgpu-target=gfx90a -I$MPICH_DIR/include" FCFLAGS="-march=znver3 -O2 -fPIC" CXXFLAGS="-std=c++17 -march=znver3 -fPIC -O2 -I$ROCM_PATH/include --amdgpu-target=gfx90a -I$MPICH_DIR/include" LIBS="-L$ROCM_PATH/lib -lamdhip64 -lrocblas -L$MPICH_DIR/lib -lmpi $CRAY_XPMEM_POST_LINK_OPTS -lxpmem $PE_MPICH_GTL_DIR_amd_gfx90a $PE_MPICH_GTL_LIBS_amd_gfx90a -L$INST/lib -lscalapack -L$OLCF_OPENBLAS_ROOT/lib -lopenblas -L$INST/lib64" --enable-amd-gpu --prefix=$INST --disable-sse -disable-sse-assembly --disable-avx --disable-avx2 --disable-avx512 --enable-c-tests=no --enable-option-checking=fatal --enable-shared --enable-cpp-tests=no --enable-hipcub
 #              --enable-gpu-streams=amd
     make -j16
     make install
