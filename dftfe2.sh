@@ -132,6 +132,7 @@ function install_elpa {
         mv elpa-$ver elpa
         rm -f elpa-$ver.tar.gz
         cd elpa && patch -p1 <$WD/src/elpa-$ver.patch
+        cd ..
     fi
     cd elpa
 
