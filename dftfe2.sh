@@ -309,7 +309,7 @@ function compile_dftfe_debug {
 
 function compile_dftfe {
   cd $WD/src
-  if [ -z $1 ]; then
+  if [ ! -z $1 ]; then
     branch=$1
   else
     branch=publicGithubDevelop
