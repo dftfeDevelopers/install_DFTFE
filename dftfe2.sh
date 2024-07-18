@@ -357,7 +357,7 @@ function compile_dftfe {
 
   function cmake_real {
     mkdir -p real && cd real
-    cmake $cmake_flags \
+    cmake "$cmake_flags" \
       -DWITH_COMPLEX=OFF \
       $1
     make -j8
@@ -366,7 +366,7 @@ function compile_dftfe {
 
   function cmake_cplx {
     mkdir -p complex && cd complex
-    cmake $cmake_flags \
+    cmake "$cmake_flags" \
       -DWITH_COMPLEX=ON \
       $1
     make -j8
