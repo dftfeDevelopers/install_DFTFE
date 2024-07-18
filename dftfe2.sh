@@ -258,9 +258,9 @@ function compile_dftfe_debug {
 
   #Compiler options and flags
   cxx_compiler=CC
-  cxx_flags="-march=znver3 -fPIC -I$MPICH_DIR/include -I$ROCM_PATH/include"
+  cxx_flags="-march=znver3 -fPIC -I$MPICH_DIR/include -I$ROCM_PATH/include -I$ROCM_PATH/include/hip -I$ROCM_PATH/include/hipblas"
   cxx_flagsRelease=-O2 #sets DCMAKE_CXX_FLAGS_RELEASE
-  device_flags="-march=znver3 -O2 -munsafe-fp-atomics -I$MPICH_DIR/include -I$ROCM_PATH/include"
+  device_flags="-march=znver3 -O2 -munsafe-fp-atomics -I$MPICH_DIR/include -I$ROCM_PATH/include -I$ROCM_PATH/include/hip -I$ROCM_PATH/include/hipblas"
   device_architectures=gfx90a
 
   # HIGHERQUAD_PSP option compiles with default or higher order
