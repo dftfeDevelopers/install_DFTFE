@@ -14,23 +14,7 @@ cloning into the scatch directory
     cd install_DFTFE
     git checkout frontierScriptROCM6Dealii9.5.2
 
-## Pre-requisites
 
-Because it's a better shell, the scripts are written
-in the [rc](http://doc.cat-v.org/plan_9/4th_edition/papers/rc)
-shell language.  Install `rc` by running
-
-    cp src/rcrc $HOME/.rcrc
-    . ./bin/getrc.sh $HOME/$LMOD_SYSTEM_NAME
-    rc -l
-
-Note that getrc installs into the `$HOME/$LMOD_SYSTEM_NAME/bin`
-directory, and adds that to your PATH. Also note that in rc shell, the 
-`export` keyword is not used when setting environment variables.
-
-Copying the rcrc startup file to your home directory provides
-the module command (in case your lmod version is old,
-and doesn't yet recognize the rc shell).
 
 ## Module Environment
 
