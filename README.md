@@ -14,28 +14,12 @@ cloning into the scatch directory
     cd install_DFTFE
     git checkout frontierScriptROCM6Dealii9.5.2
 
-## Pre-requisites
 
-Because it's a better shell, the scripts are written
-in the [rc](http://doc.cat-v.org/plan_9/4th_edition/papers/rc)
-shell language.  Install `rc` by running
-
-    cp src/rcrc $HOME/.rcrc
-    . ./bin/getrc.sh $HOME/$LMOD_SYSTEM_NAME
-    rc -l
-
-Note that getrc installs into the `$HOME/$LMOD_SYSTEM_NAME/bin`
-directory, and adds that to your PATH. Also note that in rc shell, the 
-`export` keyword is not used when setting environment variables.
-
-Copying the rcrc startup file to your home directory provides
-the module command (in case your lmod version is old,
-and doesn't yet recognize the rc shell).
 
 ## Module Environment
 
 The module environment intended to run DFT-FE has been extracted
-into `env2/env.rc`.  Edit this file before proceeding any further.
+into `env2/env.sh`.  Edit this file before proceeding any further.
 Make sure that your module environment contains some version of the
 pre-requisites mentioned there (e.g. python3 and openblas).
 This environment file is used both by the install and run
@@ -43,9 +27,9 @@ phases of DFT-FE.
 
 ## Running the installation
 The installation itself is contained within the functions in
-`dftfe2.rc`.  Source this script using
+`dftfe2.sh`.  Source this script using
 
-    . ./dftfe2.rc
+    . ./dftfe2.sh
 
 and then run the functions listed in that file manually, in order.
 For example, 
@@ -73,10 +57,9 @@ you have not ended up with broken packages.
 DFT-FE is built in real and cplx versions, depending on whether you
 want to enable k-points (implemented in the cplx version only).
 
-Assuming you have already sourced `env2/env.rc`, an example
-batch script running GPU-enabled DFT-FE on 280 nodes is below:
+An example batch script running GPU-enabled DFT-FE on 280 nodes is below:
 
-    #!$HOME/$LMOD_SYSTEM_NAME/bin/rc
+    ##!/bin/bash
     #SBATCH -A spy007
     #SBATCH -J dft14584
     #SBATCH -t 00:25:00
@@ -86,20 +69,20 @@ batch script running GPU-enabled DFT-FE on 280 nodes is below:
     #SBATCH --ntasks-per-gpu 1
     #SBATCH --gpu-bind closest
 
-    OMP_NUM_THREADS = 1
-    MPICH_VERSION_DISPLAY=1
-    MPICH_ENV_DISPLAY=1
-    MPICH_OFI_NIC_POLICY = NUMA 
-    MPICH_GPU_SUPPORT_ENABLED=1
-    MPICH_SMP_SINGLE_COPY_MODE=NONE
+    export OMP_NUM_THREADS = 1
+    export MPICH_VERSION_DISPLAY=1
+    export MPICH_ENV_DISPLAY=1
+    export MPICH_OFI_NIC_POLICY = NUMA 
+    export MPICH_GPU_SUPPORT_ENABLED=1
+    export MPICH_SMP_SINGLE_COPY_MODE=NONE
 
-    LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$INST/lib
-    LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$INST/lib/lib64
-    LD_LIBRARY_PATH=$CRAY_LD_LIBRARY_PATH:$LD_LIBRARY_PATH
+    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$INST/lib
+    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$INST/lib/lib64
+    export LD_LIBRARY_PATH=$CRAY_LD_LIBRARY_PATH:$LD_LIBRARY_PATH
 
 
-    BASE = $WD/src/dftfe/build/release/real
-    n=`{echo $SLURM_JOB_NUM_NODES '*' 8 | bc}
+    export BASE = $WD/src/dftfe/build/release/real
+    export n=`{echo $SLURM_JOB_NUM_NODES '*' 8 | bc}
 
     srun -n $n -c 7 --gpu-bind closest \
               $BASE/dftfe parameterFileGPU.prm > output
