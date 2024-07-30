@@ -8,7 +8,7 @@ module unload cray-libsci
 
 export MPICH_GPU_SUPPORT_ENABLED=1
 
-export WD=/home/nikhilk/insttallDFTFE/install_DFTFE
+export WD=/lustre/orion/mat295/scratch/dsambit/install_DFTFE
 export INST=$WD/env2
 
 export LD_LIBRARY_PATH=$CRAY_LD_LIBRARY_PATH:$LD_LIBRARY_PATH
