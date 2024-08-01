@@ -59,29 +59,29 @@ want to enable k-points (implemented in the cplx version only).
 
 An example batch script running GPU-enabled DFT-FE on 280 nodes is below:
 
-   #!/bin/bash
-   #SBATCH -A mat295
-   #SBATCH -J Cu6shell
-   #SBATCH -t 00:30:00
-   #SBATCH -p batch
-   #SBATCH -N 100
-   #SBATCH --gpus-per-node 8
-   #SBATCH --ntasks-per-gpu 1
-   #SBATCH --gpu-bind closest
+    #!/bin/bash
+    #SBATCH -A mat295
+    #SBATCH -J Cu6shell
+    #SBATCH -t 00:30:00
+    #SBATCH -p batch
+    #SBATCH -N 100
+    #SBATCH --gpus-per-node 8
+    #SBATCH --ntasks-per-gpu 1
+    #SBATCH --gpu-bind closest
 
-   export OMP_NUM_THREADS=1
-   export MPICH_VERSION_DISPLAY=1
-   export MPICH_ENV_DISPLAY=1
-   export MPICH_OFI_NIC_POLICY=NUMA
+    export OMP_NUM_THREADS=1
+    export MPICH_VERSION_DISPLAY=1
+    export MPICH_ENV_DISPLAY=1
+    export MPICH_OFI_NIC_POLICY=NUMA
 
-   export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$INST/lib
-   export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$INST/lib/lib64
-   export LD_LIBRARY_PATH=$CRAY_LD_LIBRARY_PATH:$LD_LIBRARY_PATH
+    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$INST/lib
+    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$INST/lib/lib64
+    export LD_LIBRARY_PATH=$CRAY_LD_LIBRARY_PATH:$LD_LIBRARY_PATH
 
 
-   export BASE=$WD/src/dftfe_publicGithubDevelop/build/release/real
+    export BASE=$WD/src/dftfe_publicGithubDevelop/build/release/real
 
-   srun -n 800 -c 7 --gpu-bind=closest $BASE/dftfe parameters.prm > output
+    srun -n 800 -c 7 --gpu-bind=closest $BASE/dftfe parameters.prm > output
 
 This uses `SLURM_JOB_NUM_NODES` to compute the number of MPI
 ranks to use as one per GCD (8 per node).  If you wish to run
