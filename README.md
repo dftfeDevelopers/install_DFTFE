@@ -57,7 +57,7 @@ you have not ended up with broken packages.
 DFT-FE is built in real and cplx versions, depending on whether you
 want to enable k-points (implemented in the cplx version only).
 
-An example batch script running GPU-enabled DFT-FE on 280 nodes is below:
+An example batch script running GPU-enabled DFT-FE on 100 nodes is below:
 
     #!/bin/bash
     #SBATCH -A mat295
@@ -85,5 +85,5 @@ An example batch script running GPU-enabled DFT-FE on 280 nodes is below:
 
 This uses `SLURM_JOB_NUM_NODES` to compute the number of MPI
 ranks to use as one per GCD (8 per node).  If you wish to run
-on a different number of nodes, only the `#SBATCH -N 280`
+on a different number of nodes, only the `#SBATCH -N 100`
 needs to be changed.
