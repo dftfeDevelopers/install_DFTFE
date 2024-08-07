@@ -229,21 +229,23 @@ function install_torch {
 }
 
 function compile_dftfe_debug {
-  branch=multiVecOps
   cd $WD/src
-  if [ ! test -d dftfeDebug ]; then
-    git clone -b $branch https://dsambit@bitbucket.org/dftfedevelopers/dftfe.git dftfeDebug
+  if [ ! -z $1 ]; then
+    branch=$1
   else
-    cd dftfeDebug
-    git fetch
+    branch=KerkerTesting
+  fi
+  if [ ! -d dftfe_$branch ]; then
+    git clone -b $branch https://dsambit@bitbucket.org/dftfedevelopers/dftfe.git dftfe_$branch
+    cd dftfe_$branch
+  else
+    cd dftfe_$branch
     git checkout $branch
     git pull
   fi
-  cd dftfeDebug
   rm -fr build
   SRC=$PWD
   mkdir build && cd build
-  #cd build
 
   dealiiDir=$INST
   alglibDir=$INST/lib/alglib
@@ -263,6 +265,7 @@ function compile_dftfe_debug {
   device_flags="-march=znver3 -O2 -munsafe-fp-atomics -I$MPICH_DIR/include -I$ROCM_PATH/include -I$ROCM_PATH/include/hip -I$ROCM_PATH/include/hipblas -I$ROCM_PATH/include/rocblas"
   device_architectures=gfx90a
 
+
   # HIGHERQUAD_PSP option compiles with default or higher order
   # quadrature for storing pseudopotential data
   # ON is recommended for MD simulations with hard pseudopotentials
@@ -271,24 +274,17 @@ function compile_dftfe_debug {
   build_type=Release
   out=`echo "$build_type" | tr '[:upper:]' '[:lower:]'`
 
-  # Note: MDI_PATH is not used by project.
-  cmake_flags="-DCMAKE_CXX_STANDARD=17 -DCMAKE_CXX_COMPILER=$cxx_compiler -DCMAKE_CXX_FLAGS=$cxx_flags -DCMAKE_CXX_FLAGS_RELEASE=$cxx_flagsRelease -DCMAKE_BUILD_TYPE=$build_type -DDEAL_II_DIR=$dealiiDir -DALGLIB_DIR=$alglibDir -DLIBXC_DIR=$libxcDir -DSPGLIB_DIR=$spglibDir -DXML_LIB_DIR=$xmlLibDir -DXML_INCLUDE_DIR=$xmlIncludeDir -DWITH_MDI=OFF -DMDI_PATH= -DWITH_DCCL=ON -DWITH_TORCH=OFF -DCMAKE_PREFIX_PATH=$ELPA_PATH;$DCCL_PATH;$TORCH_PATH -DWITH_GPU=ON -DGPU_LANG=hip -DGPU_VENDOR=amd -DWITH_GPU_AWARE_MPI=ON -DCMAKE_HIP_FLAGS=$device_flags -DCMAKE_HIP_ARCHITECTURES=$device_architectures -DWITH_TESTING=OFF -DMINIMAL_COMPILE=OFF -DCMAKE_SHARED_LINKER_FLAGS='-L$ROCM_PATH/lib -lamdhip64 -L$MPICH_DIR/lib -lmpi -L$CRAY_XPMEM_POST_LINK_OPTS -lxpmem $PE_MPICH_GTL_DIR_amd_gfx90a $PE_MPICH_GTL_LIBS_amd_gfx90a' -DHIGHERQUAD_PSP=OFF"
-
   function cmake_real {
     mkdir -p real && cd real
-    cmake $cmake_flags \
-      -DWITH_COMPLEX=OFF \
-      $1
-    make -j8
+    cmake -DCMAKE_CXX_STANDARD=17 -DCMAKE_CXX_COMPILER=$cxx_compiler -DCMAKE_CXX_FLAGS="$cxx_flags" -DCMAKE_CXX_FLAGS_RELEASE="$cxx_flagsRelease" -DCMAKE_BUILD_TYPE=$build_type -DDEAL_II_DIR=$dealiiDir -DALGLIB_DIR=$alglibDir -DLIBXC_DIR=$libxcDir -DSPGLIB_DIR=$spglibDir -DXML_LIB_DIR=$xmlLibDir -DXML_INCLUDE_DIR=$xmlIncludeDir -DWITH_MDI=OFF -DMDI_PATH= -DWITH_DCCL=OFF -DWITH_TORCH=OFF -DCMAKE_PREFIX_PATH="$ELPA_PATH;$DCCL_PATH;$TORCH_PATH" -DWITH_GPU=ON -DGPU_LANG=hip -DGPU_VENDOR=amd -DWITH_GPU_AWARE_MPI=OFF -DCMAKE_HIP_FLAGS="$device_flags" -DCMAKE_HIP_ARCHITECTURES=$device_architectures -DWITH_TESTING=OFF -DMINIMAL_COMPILE=OFF -DCMAKE_SHARED_LINKER_FLAGS="-L$ROCM_PATH/lib -lamdhip64 -L$MPICH_DIR/lib -lmpi $CRAY_XPMEM_POST_LINK_OPTS -lxpmem $PE_MPICH_GTL_DIR_amd_gfx90a $PE_MPICH_GTL_LIBS_amd_gfx90a" -DHIGHERQUAD_PSP=ON -DWITH_COMPLEX=OFF $1
+    make -j16
     cd ..
   }
 
   function cmake_cplx {
     mkdir -p complex && cd complex
-    cmake $cmake_flags \
-      -DWITH_COMPLEX=ON \
-      $1
-    make -j8
+    cmake -DCMAKE_CXX_STANDARD=17 -DCMAKE_CXX_COMPILER=$cxx_compiler -DCMAKE_CXX_FLAGS="$cxx_flags" -DCMAKE_CXX_FLAGS_RELEASE="$cxx_flagsRelease" -DCMAKE_BUILD_TYPE=$build_type -DDEAL_II_DIR=$dealiiDir -DALGLIB_DIR=$alglibDir -DLIBXC_DIR=$libxcDir -DSPGLIB_DIR=$spglibDir -DXML_LIB_DIR=$xmlLibDir -DXML_INCLUDE_DIR=$xmlIncludeDir -DWITH_MDI=OFF -DMDI_PATH= -DWITH_DCCL=OFF -DWITH_TORCH=OFF -DCMAKE_PREFIX_PATH="$ELPA_PATH;$DCCL_PATH;$TORCH_PATH" -DWITH_GPU=ON -DGPU_LANG=hip -DGPU_VENDOR=amd -DWITH_GPU_AWARE_MPI=OFF -DCMAKE_HIP_FLAGS="$device_flags" -DCMAKE_HIP_ARCHITECTURES=$device_architectures -DWITH_TESTING=OFF -DMINIMAL_COMPILE=OFF -DCMAKE_SHARED_LINKER_FLAGS="-L$ROCM_PATH/lib -lamdhip64 -L$MPICH_DIR/lib -lmpi $CRAY_XPMEM_POST_LINK_OPTS -lxpmem $PE_MPICH_GTL_DIR_amd_gfx90a $PE_MPICH_GTL_LIBS_amd_gfx90a" -DHIGHERQUAD_PSP=ON -DWITH_COMPLEX=ON $1
+    make -j16
     cd ..
   }
 
