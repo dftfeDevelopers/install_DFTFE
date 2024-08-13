@@ -69,6 +69,18 @@ function install_spglib {
   cd $WD
 }
 
+function install_p4est_old {
+  cd $WD/src
+  rm -rf p4est
+  mkdir p4est
+  cd p4est
+  wget 'https://github.com/p4est/p4est.github.io/raw/master/release/p4est-2.2.tar.gz'
+  wget 'https://raw.githubusercontent.com/dftfeDevelopers/dftfe/manual/p4est-setup.sh'
+  chmod u+x p4est-setup.sh
+  ./p4est-setup.sh p4est-2.2.tar.gz $INST
+  cd $WD
+}
+
 function install_p4est {
   cd $WD/src
   rm -rf p4est
@@ -166,6 +178,25 @@ function install_kokkos {
   cd $WD
 }
 
+# Install dealii from https://github.com/dftfeDevelopers/dealii using the dealiiCustomizedCUDARelease branch.
+
+function install_dealii_old {
+  cd $WD/src
+  if [! -d dealii]; then 
+    git clone --depth 1 --recurse-submodules -b dealiiCustomizedCUDARelease https://github.com/dftfeDevelopers/dealii.git
+  fi
+  cd dealii  
+  cd dealii-$ver
+  rm -fr build
+  mkdir build && cd build
+  cmake -DCMAKE_CXX_STANDARD=17 -DCMAKE_CXX_FLAGS="-march=native -std=c++17" -DCMAKE_C_FLAGS="-march=native" -DDEAL_II_ALLOW_PLATFORM_INTROSPECTION=OFF         -DDEAL_II_FORCE_BUNDLED_BOOST=ON -DDEAL_II_WITH_TASKFLOW=OFF -DCMAKE_BUILD_TYPE=Release -DDEAL_II_CXX_FLAGS_RELEASE=-O2 -DCMAKE_C_COMPILER=cc -DCMAKE_CXX_COMPILER=CC -DCMAKE_Fortran_COMPILER=ftn -DDEAL_II_WITH_TBB=OFF -DDEAL_II_COMPONENT_EXAMPLES=OFF -DDEAL_II_WITH_MPI=ON -DDEAL_II_WITH_64BIT_INDICES=ON -DP4EST_DIR=$INST -DDEAL_II_WITH_LAPACK=ON -DLAPACK_DIR="$OLCF_OPENBLAS_ROOT;$INST" -DLAPACK_FOUND=true -DLAPACK_LIBRARIES="$OLCF_OPENBLAS_ROOT/lib/libopenblas.so" -DCMAKE_INSTALL_PREFIX=$INST ..
+  make -j16
+  make install
+  mv $INST/*.log $INST/share/deal.II/
+  mv $INST/*.md $INST/share/deal.II/
+  cd $WD
+}
+
 
 # Install latest release dealii from https://github.com/dealii/dealii
 
@@ -233,7 +264,7 @@ function compile_dftfe_debug {
   if [ ! -z $1 ]; then
     branch=$1
   else
-    branch=KerkerTesting
+    branch=deltaEDebugging
   fi
   if [ ! -d dftfe_$branch ]; then
     git clone -b $branch https://dsambit@bitbucket.org/dftfedevelopers/dftfe.git dftfe_$branch
