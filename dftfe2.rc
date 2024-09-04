@@ -135,12 +135,12 @@ fn install_p4est{
   rm -rf p4est
   mkdir p4est
   cd p4est
-  wget 'https://p4est.github.io/release/p4est-2.8.6.tar.gz'
-  wget 'https://raw.githubusercontent.com/dftfeDevelopers/dftfe/manual/p4est-setup-craycompiler.sh'
-  chmod u+x p4est-setup-craycompiler.sh
-  ./p4est-setup-craycompiler.sh p4est-2.8.6.tar.gz $INST
-  cd $WD
- }
+  wget 'https://github.com/p4est/p4est.github.io/raw/master/release/p4est-2.2.tar.gz'
+  wget 'https://raw.githubusercontent.com/dftfeDevelopers/dftfe/manual/p4est-setup.sh'
+  chmod u+x p4est-setup.sh
+  ./p4est-setup.sh p4est-2.2.tar.gz $INST
+  cd $WD 
+}
 
 # Install netlib-scalapack 2.2.0 version linking to openblas
 # note that the openblas (sourced via module) provides lapack
@@ -172,11 +172,11 @@ fn install_scalapack {
   cd $WD
 }
 
-# Install ELPA latest version (elpa-2024.03.001) with NVIDIA GPU support
+# Install ELPA latest version (elpa-2021.05.002) with NVIDIA GPU support
 fn install_elpa {
     cd $WD/src
     if(test ! -d elpa) {
-        ver=2024.03.001
+        ver=2021.05.002
         wget https://elpa.mpcdf.mpg.de/software/tarball-archive/Releases/$ver/elpa-$ver.tar.gz
         tar xzf elpa-$ver.tar.gz
         mv elpa-$ver elpa
@@ -186,7 +186,7 @@ fn install_elpa {
 
     LD_LIBRARY_PATH = $LD_LIBRARY_PATH:$INST/lib
     LD_LIBRARY_PATH = $LD_LIBRARY_PATH:$INST/lib64
-    cflags = ('-march=znver3' -fPIC -O2 -target-accel=nvidia80 -I'$MPICH_DIR'/include)
+    cflags = ('-march=znver3' -fPIC -O2 -I'$MPICH_DIR'/include)
     libs = (-L$INST/lib -lscalapack -L$INST/lib -lblis -L$INST/lib -lflame)
     cflags=$"cflags
     libs=$"libs
@@ -195,19 +195,12 @@ fn install_elpa {
     ../configure 'CXX=CC' 'CC=cc' 'FC=ftn' \
                'FCFLAGS=-ffree-line-length-none '$cflags \
                'CFLAGS='$cflags \
-               'CXXFLAGS=-std=c++17 '$cflags \
+               'CXXFLAGS='$cflags \
                '--prefix='$INST \
                'LIBS='$libs \
-               --disable-sse --disable-sse-assembly --disable-avx \
-               --disable-avx2 --disable-avx512 '--enable-c-tests=no' \
-               '--enable-option-checking=fatal' --enable-shared \
-               '--enable-cpp-tests=no' '--enable-nvidia-gpu' \
-               '--enable-gpu-streams=nvidia' \
-               '--with-NVIDIA-GPU-compute-capability=sm_80'
-               '--with-cuda-path='$CUDA_HOME \
-               '--with-cuda-sdk-path='$CUDA_HOME \
-               '--enable-option-checking=fatal' \
-               '--without-threading-support-check-during-build'
+               '--enable-c-tests=no' \
+               '--disable-avx512' \
+               '--enable-option-checking=fatal --enable-shared'
     make -j16
     make install
     cd $WD
@@ -239,24 +232,18 @@ fn install_kokkos {
 
 fn install_dealii {
   cd $WD/src
-  ver=9.5.2
-  if(test ! -d dealii-$ver) {
-      wget https://github.com/dealii/dealii/releases/download/v$ver/dealii-$ver.tar.gz
-      tar xzf dealii-$ver.tar.gz 
+  if(test ! -d dealii) {
+    git clone --depth 1 --recurse-submodules -b dealiiCustomizedCUDAReleaseA100 https://github.com/dftfeDevelopers/dealii.git  
   }
-  #if(test ! -d dealii) {
-  #  git clone https://github.com/dealii/dealii.git
-  #}
-  cd dealii-$ver
-  #cd dealii
-  rm -fr build
+  cd dealii
+  #cd build
+  #rm -fr build
   mkdir build && cd build
-  cmake '-DCMAKE_CXX_STANDARD=17' \
-        '-DCMAKE_CXX_FLAGS=-std=c++17' \
-        '-DCMAKE_C_FLAGS=-std=c++17' \
-        '-DDEAL_II_FORCE_BUNDLED_BOOST=OFF' \
+  cmake '-DCMAKE_CXX_STANDARD=14' \
+        '-DCMAKE_CXX_FLAGS=-std=c++14' \
+        '-DCMAKE_C_FLAGS=-std=c++14' \
+        '-DDEAL_II_FORCE_BUNDLED_BOOST=ON' \
         '-DDEAL_II_ALLOW_PLATFORM_INTROSPECTION=OFF' \
-        '-DKOKKOS_DIR='$INST \
         '-DDEAL_II_WITH_TASKFLOW=OFF' \
         '-DCMAKE_BUILD_TYPE=Release' \
         '-DDEAL_II_CXX_FLAGS_RELEASE=-O2' \
@@ -272,6 +259,11 @@ fn install_dealii {
         '-DLAPACK_DIR='$OLCF_OPENBLAS_ROOT';'$INST \
         '-DLAPACK_FOUND=true' \
         '-DLAPACK_LIBRARIES='$INST/lib/libblis.so';'$INST/lib/libflame.so\
+        '-DDEAL_II_WITH_SCALAPACK=ON' \
+        '-DSCALAPACK_LIBRARIES='$INST/lib/libscalapack.so \
+        '-DDEAL_II_CUDA_FLAGS=-arch=sm_80' \
+        '-DDEAL_II_WITH_CUDA=ON' \
+        '-DDEAL_II_MPI_WITH_CUDA_SUPPORT=ON' \
         '-DCMAKE_INSTALL_PREFIX='$INST \
         ..
   # may add to lapack libraries ';'$INST/lib64/liblapack.so \
@@ -389,19 +381,15 @@ fn compile_dftfe_develop{
 
 fn compile_dftfe{
   cd $WD/src
-  branch = publicGithubDevelop
+  branch = 'release1.0'
   if(! test -d dftfe) {
     git clone -b $branch https://github.com/dftfeDevelopers/dftfe.git dftfe
-  } if not {
-    cd dftfe
-    git fetch
-    git checkout $branch
-    git pull
   }
   cd dftfe
-  rm -fr build
-  SRC = `{pwd}
-  mkdir build && cd build
+  cd build
+  #rm -fr build
+  #SRC = `{pwd}
+  #mkdir build && cd build
 
   dealiiDir=$INST
   alglibDir=$INST/lib/alglib
@@ -411,13 +399,11 @@ fn compile_dftfe{
   xmlLibDir=/usr/lib64
 
   ELPA_PATH=$INST
-  DCCL_PATH=$NCCL_DIR
-  TORCH_PATH=''
 
   #Compiler options and flags
   cxx_compiler = CC
   cxx_flags = '-march=znver3 -fPIC'
-  cxx_flagsRelease = '-fPIC -target-accel=nvidia80 -I'$MPICH_DIR'/include'
+  cxx_flagsRelease = '-O2 -fPIC -I'$MPICH_DIR'/include'
   device_flags ='-I'$MPICH_DIR'/include -arch=sm_80'
   device_architectures =80
 
@@ -432,7 +418,7 @@ fn compile_dftfe{
 
   # Note: MDI_PATH is not used by project.
   cmake_flags = ( \
-      -DCMAKE_CXX_STANDARD=17 \
+      -DCMAKE_CXX_STANDARD=14 \
       -DCMAKE_CXX_COMPILER=$cxx_compiler \
       -DCMAKE_CXX_FLAGS=$cxx_flags \
       -DCMAKE_CXX_FLAGS_RELEASE=$cxx_flagsRelease \
@@ -443,15 +429,8 @@ fn compile_dftfe{
       -DSPGLIB_DIR=$spglibDir \
       -DXML_LIB_DIR=$xmlLibDir \
       -DXML_INCLUDE_DIR=$xmlIncludeDir \
-      -DWITH_MDI=OFF \
-      -DMDI_PATH= \
-      -DWITH_DCCL=OFF \
-      -DWITH_TORCH=OFF \
-      -DCMAKE_PREFIX_PATH=$ELPA_PATH';'$DCCL_PATH';'$TORCH_PATH \
+      -DCMAKE_PREFIX_PATH=$ELPA_PATH \
       -DWITH_GPU=ON \
-      -DGPU_LANG=cuda \
-      -DGPU_VENDOR=nvidia \
-      -DWITH_GPU_AWARE_MPI=OFF \
       -DCMAKE_CUDA_FLAGS=$device_flags \
       -DCMAKE_CUDA_ARCHITECTURES=$device_architectures \
       -DWITH_TESTING=OFF \
