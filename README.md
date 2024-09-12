@@ -1,4 +1,4 @@
-# Install DFT-FE
+# Install DFT-FE dependencies
     install_alglib
     install_libxc
     install_spglib
@@ -8,6 +8,8 @@
     install_kokkos
     install_dealii
     install_dftd4 (optional)
+
+# Install DFT-FE
     compile_dftfe
 
 ## Running DFT-FE
