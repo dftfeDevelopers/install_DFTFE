@@ -14,3 +14,5 @@
 
 DFT-FE is built in real and cplx versions, depending on whether you
 want to enable k-points (implemented in the cplx version only).
+real executable: $WD/src/dftfe\_"branchname"/build/release/real/dftfe
+complex executable: $WD/src/dftfe\_"branchname"/build/release/complex/dftfe
