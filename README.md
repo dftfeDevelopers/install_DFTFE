@@ -1,3 +1,5 @@
+Set environment variables for WD (work directory where build happens)
+and INST (installation directory) 
 # Install DFT-FE dependencies
     install_alglib
     install_libxc
