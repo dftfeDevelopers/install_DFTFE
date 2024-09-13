@@ -46,7 +46,7 @@ function install_dftd4 {
   cd dftd4-3.6.0
   rm -fr build
   mkdir build && cd build
-  cmake -DCMAKE_Fortran_COMPILER=gfortran -DCMAKE_C_COMPILER=gcc -DBLAS_LIBRARIES=usr/lib/libopenblas.so -DLAPACK_LIBRARIES=usr/lib/libopenblas.so -DBUILD_SHARED_LIBS=ON -DCMAKE_INSTALL_PREFIX=$INST -DWITH_OpenMP=OFF ..
+  cmake -DCMAKE_Fortran_COMPILER=gfortran -DCMAKE_C_COMPILER=gcc -DBLAS_LIBRARIES=usr/lib/libopenblas.so -DLAPACK_LIBRARIES=/usr/lib/libopenblas.so -DBUILD_SHARED_LIBS=ON -DCMAKE_INSTALL_PREFIX=$INST -DWITH_OpenMP=OFF ..
   make -j16
   make install
   cd $WD
@@ -142,7 +142,6 @@ function install_kokkos {
 
 
 # Install latest release dealii from https://github.com/dealii/dealii
-
 function install_dealii {
   cd $WD/src
   ver=9.5.2
