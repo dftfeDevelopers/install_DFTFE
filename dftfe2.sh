@@ -40,12 +40,28 @@ function install_libxc {
 
 function install_dftd4 {
   cd $WD/src
-  if [ ! -d dftd4-3.6.0 ]; then
-    wget https://github.com/dftd4/dftd4/archive/refs/tags/v3.6.0.tar.gz
-    tar xzf v3.6.0.tar.gz
-    rm v3.6.0.tar.gz
+  if [ ! -d dftd4-3.7.0 ]; then
+    wget https://github.com/dftd4/dftd4/archive/refs/tags/v3.7.0.tar.gz
+    tar xzf v3.7.0.tar.gz
+    rm v3.7.0.tar.gz
   fi
-  cd dftd4-3.6.0
+  cd dftd4-3.7.0
+  rm -fr build
+  mkdir build && cd build
+  cmake -DCMAKE_Fortran_COMPILER=ftn -DCMAKE_C_COMPILER=cc -DBLAS_LIBRARIES=$OLCF_OPENBLAS_ROOT/lib/libopenblas.so -DLAPACK_LIBRARIES=$OLCF_OPENBLAS_ROOT/lib/libopenblas.so -DBUILD_SHARED_LIBS=ON -DCMAKE_INSTALL_PREFIX=$INST -DWITH_OpenMP=OFF ..
+  make -j16
+  make install
+  cd $WD
+}
+
+function install_dftd3 {
+  cd $WD/src
+  if [ ! -d dftd3-1.1.0 ]; then
+    wget https://github.com/dftd3/simple-dftd3/archive/refs/tags/v1.1.0.tar.gz
+    tar xzf v1.1.0.tar.gz
+    rm v1.1.0.tar.gz
+  fi
+  cd simple-dftd3-1.1.0
   rm -fr build
   mkdir build && cd build
   cmake -DCMAKE_Fortran_COMPILER=ftn -DCMAKE_C_COMPILER=cc -DBLAS_LIBRARIES=$OLCF_OPENBLAS_ROOT/lib/libopenblas.so -DLAPACK_LIBRARIES=$OLCF_OPENBLAS_ROOT/lib/libopenblas.so -DBUILD_SHARED_LIBS=ON -DCMAKE_INSTALL_PREFIX=$INST -DWITH_OpenMP=OFF ..
@@ -116,7 +132,7 @@ function install_ofi_rccl {
   rm -fr build
   mkdir build && cd build
 
-  CC=cc ../configure --with-libfabric=/opt/cray/libfabric/1.15.2.0 --with-hip=$CRAY_ROCM_PREFIX --with-rccl=$CRAY_ROCM_PREFIX --with-mpi=$MPICH_DIR --prefix=$INST --build=amd64-linux-gnu --target=amd64-linux-gnu --host=amd64-linux-gnu
+  CC=cc ../configure --with-libfabric=/opt/cray --with-hip=$CRAY_ROCM_PREFIX --with-rccl=$CRAY_ROCM_PREFIX --with-mpi=$MPICH_DIR --prefix=$INST --build=amd64-linux-gnu --target=amd64-linux-gnu --host=amd64-linux-gnu
   make -j8
   make install
   cd $WD
@@ -126,13 +142,11 @@ function install_ofi_rccl {
 function install_elpa {
     cd $WD/src
     if [ ! -d elpa ]; then
-        ver=2024.03.001
+        ver=2024.05.001
         wget https://elpa.mpcdf.mpg.de/software/tarball-archive/Releases/$ver/elpa-$ver.tar.gz
         tar xzf elpa-$ver.tar.gz
         mv elpa-$ver elpa
         rm -f elpa-$ver.tar.gz
-        cd elpa && patch -p1 <$WD/src/elpa-$ver.patch
-        cd ..
     fi
     cd elpa
 
@@ -330,7 +344,7 @@ function compile_dftfe {
   xmlLibDir=/usr/lib64
 
   ELPA_PATH=$INST
-  DCCL_PATH=$ROCM_PATH/include/rccl
+  DCCL_PATH=$ROCM_PATH/include/rccl;$ROCM_PATH
   TORCH_PATH=$INST/venv/lib/python3.9/site-packages
 
   #Compiler options and flags

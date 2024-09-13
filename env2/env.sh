@@ -1,9 +1,10 @@
+module load cpe/24.07
 module load PrgEnv-gnu/8.5.0
 module load craype-accel-amd-gfx90a
-module load rocm/6.0.0
+module load rocm
 module load openblas
 module load cmake
-module load boost/1.79.0
+module load boost/1.85.0
 module unload cray-libsci
 
 export MPICH_GPU_SUPPORT_ENABLED=1
