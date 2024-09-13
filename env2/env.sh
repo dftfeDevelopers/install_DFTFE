@@ -1,4 +1,5 @@
 module load cpe/24.07
+module load Core/24.07
 module load PrgEnv-gnu/8.5.0
 module load craype-accel-amd-gfx90a
 module load rocm
