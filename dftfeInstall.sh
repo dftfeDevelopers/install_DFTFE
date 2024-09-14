@@ -213,7 +213,7 @@ function compile_dftfe {
   libxcDir=$INST
   spglibDir=$INST
   xmlIncludeDir=/usr/include/libxml2
-  xmlLibDir=/usr/lib64
+  xmlLibDir=/usr/lib
 
   ELPA_PATH=$INST
 
