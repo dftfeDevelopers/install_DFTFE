@@ -1,6 +1,8 @@
 Set environment variables for WD (work directory where build happens)
 and INST (installation directory) 
 # Install DFT-FE dependencies
+    source ./dftfeInstall.sh
+    install_openblas
     install_alglib
     install_libxc
     install_spglib
