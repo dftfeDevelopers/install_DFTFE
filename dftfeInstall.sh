@@ -9,7 +9,7 @@ function install_openblas {
       rm -f v0.3.27.tar.gz
     fi
     cd OpenBLAS-0.3.27
-    make CC=gcc FC=gfortran CXX=g++ PREFIX=$INST -j16
+    make CC=gcc FC=gfortran CXX=g++ CFLAGS="-O2 -march=native" CXXFLAGS="-O2 -march=native" FCFLAGS="-O2 -march=native"  PREFIX=$INST -j16
     make install
     cd $WD
 }
