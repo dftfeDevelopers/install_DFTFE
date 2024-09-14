@@ -1,7 +1,36 @@
 #!/bin/bash
 # Installation script for DFT-FE and its dependencies
 
-# Install alglib, libxc, spglib and p4est using the typical route (cf. manual)
+fn install_openblas {
+    cd $WD/src
+    if(test ! -d OpenBLAS-v0.3.27) {
+      wget https://github.com/OpenMathLib/OpenBLAS/archive/refs/tags/v0.3.27.tar.gz
+      tar xzf v0.3.27.tar.gz
+      rm -f v0.3.27.tar.gz
+    }
+    cd OpenBLAS-0.3.27
+    make CC=gcc FC=gfortran CXX=g++ PREFIX=$INST -j16
+    make install
+    cd $WD
+}
+
+function install_netlib_lapack {
+  cd $WD
+  if [ ! -d lapack-3.12.0]; then 
+    wget https://github.com/Reference-LAPACK/lapack/archive/refs/tags/v3.12.0.tar.gz
+    tar xzf v3.12.0.tar.gz
+    rm v3.12.0.tar.gz
+  fi
+  cd lapack-3.12.0
+  rm -fr build
+  mkdir build && cd build
+  cmake -DCMAKE_C_COMPILER=gcc -DCMAKE_C_FLAGS="-O2 -fPIC" -DCMAKE_CXX_COMPILER=g++ -DCMAKE_CXX_FLAGS="-O2 -fPIC" -DCMAKE_INSTALL_PREFIX=$INST -DBUILD_SHARED_LIBS=ON -DBUILD_TESTING=OFF ..
+  make -j16
+  make install
+  cd $WD
+}
+
+
 function install_alglib {
   cd $WD
   if [ ! -d alglib-cpp ]; then 
@@ -92,7 +121,7 @@ function install_scalapack {
   cd scalapack-2.2.0
   
   mkdir build && cd build
-  cmake -DBUILD_SHARED_LIBS=ON -DBUILD_STATIC_LIBS=OFF -DBUILD_TESTING=OFF -DCMAKE_C_COMPILER=mpicc -DCMAKE_Fortran_COMPILER=mpif90 -DCMAKE_C_FLAGS="-fPIC -march=native" -DCMAKE_Fortran_FLAGS="-fPIC -march=native -fallow-argument-mismatch" -DUSE_OPTIMIZED_LAPACK_BLAS=ON -DCMAKE_INSTALL_PREFIX=$INST ..
+  cmake -DBUILD_SHARED_LIBS=ON -DBUILD_STATIC_LIBS=OFF -DBUILD_TESTING=OFF -DCMAKE_C_COMPILER=mpicc -DCMAKE_Fortran_COMPILER=mpif90 -DCMAKE_C_FLAGS="-fPIC -march=native" -DCMAKE_Fortran_FLAGS="-fPIC -march=native -fallow-argument-mismatch" -DUSE_OPTIMIZED_LAPACK_BLAS=ON  -DBLAS_LIBRARIES=$INST/lib/libopenblas.so -DLAPACK_LIBRARIES=$INST/lib/liblapack.so -DCMAKE_INSTALL_PREFIX=$INST ..
   make -j16
   make install
   cd $WD
@@ -116,7 +145,7 @@ function install_elpa {
 
     rm -fr build
     mkdir build && cd build
-    ../configure CXX=mpic++ CC=mpicc FC=mpif90 CFLAGS="-march=native -fPIC -O2" FCFLAGS="-march=native -O2 -fPIC" CXXFLAGS="-std=c++17 -march=native -fPIC -O2" LIBS="-L$INST/lib -lscalapack -L/usr/lib -lopenblas -L$INST/lib64" -prefix=$INST --disable-avx512 --enable-c-tests=no --enable-option-checking=fatal --enable-shared --enable-cpp-tests=no
+    ../configure CXX=mpic++ CC=mpicc FC=mpif90 CFLAGS="-march=native -fPIC -O2" FCFLAGS="-march=native -O2 -fPIC" CXXFLAGS="-std=c++17 -march=native -fPIC -O2" LIBS="-L$INST/lib -lscalapack -lopenblas -L$INST/lib64" -prefix=$INST --disable-avx512 --enable-c-tests=no --enable-option-checking=fatal --enable-shared --enable-cpp-tests=no
     make -j16
     make install
     cd $WD
@@ -151,7 +180,7 @@ function install_dealii {
   cd dealii-$ver
   rm -fr build
   mkdir build && cd build
-  cmake -DCMAKE_CXX_STANDARD=17 -DCMAKE_CXX_FLAGS="-march=native -std=c++17" -DCMAKE_C_FLAGS=-march=native -DDEAL_II_ALLOW_PLATFORM_INTROSPECTION=OFF -DDEAL_II_FORCE_BUNDLED_BOOST=OFF -DDEAL_II_WITH_TASKFLOW=OFF -DKOKKOS_DIR=$INST -DCMAKE_BUILD_TYPE=Release -DDEAL_II_CXX_FLAGS_RELEASE=-O2 -DCMAKE_C_COMPILER=mpicc -DCMAKE_CXX_COMPILER=mpic++ -DCMAKE_Fortran_COMPILER=mpif90 -DDEAL_II_WITH_TBB=OFF -DDEAL_II_COMPONENT_EXAMPLES=OFF -DDEAL_II_WITH_MPI=ON -DDEAL_II_WITH_64BIT_INDICES=ON -DP4EST_DIR=$INST -DDEAL_II_WITH_LAPACK=ON -DLAPACK_DIR="usr/;$INST" -DLAPACK_FOUND=true -DLAPACK_LIBRARIES="/usr/lib/libopenblas.so" -DCMAKE_INSTALL_PREFIX=$INST ..
+  cmake -DCMAKE_CXX_STANDARD=17 -DCMAKE_CXX_FLAGS="-march=native -std=c++17" -DCMAKE_C_FLAGS=-march=native -DDEAL_II_ALLOW_PLATFORM_INTROSPECTION=OFF -DDEAL_II_FORCE_BUNDLED_BOOST=OFF -DDEAL_II_WITH_TASKFLOW=OFF -DKOKKOS_DIR=$INST -DCMAKE_BUILD_TYPE=Release -DDEAL_II_CXX_FLAGS_RELEASE=-O2 -DCMAKE_C_COMPILER=mpicc -DCMAKE_CXX_COMPILER=mpic++ -DCMAKE_Fortran_COMPILER=mpif90 -DDEAL_II_WITH_TBB=OFF -DDEAL_II_COMPONENT_EXAMPLES=OFF -DDEAL_II_WITH_MPI=ON -DDEAL_II_WITH_64BIT_INDICES=ON -DP4EST_DIR=$INST -DDEAL_II_WITH_LAPACK=ON -DLAPACK_DIR=$INST -DLAPACK_FOUND=true -DLAPACK_LIBRARIES=$INST/lib/libopenblas.so;$INST/lib/liblapack.so -DCMAKE_INSTALL_PREFIX=$INST ..
   make -j16 
   make install
   mv $INST/*.log $INST/share/deal.II/
