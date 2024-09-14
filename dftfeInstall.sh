@@ -1,7 +1,7 @@
 #!/bin/bash
 # Installation script for DFT-FE and its dependencies
 
-fn install_openblas {
+function install_openblas {
     cd $WD/src
     if(test ! -d OpenBLAS-v0.3.27) {
       wget https://github.com/OpenMathLib/OpenBLAS/archive/refs/tags/v0.3.27.tar.gz
