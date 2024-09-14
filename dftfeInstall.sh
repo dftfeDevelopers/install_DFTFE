@@ -3,7 +3,7 @@
 
 # Install alglib, libxc, spglib and p4est using the typical route (cf. manual)
 function install_alglib {
-  cd $WD/src
+  cd $WD
   if [ ! -d alglib-cpp ]; then 
     wget https://www.alglib.net/translator/re/alglib-3.20.0.cpp.gpl.tgz
     tar xzf alglib-3.20.0.cpp.gpl.tgz
@@ -20,7 +20,7 @@ function install_alglib {
 }
 
 function install_libxc {
-  cd $WD/src
+  cd $WD
   if [ ! -d libxc-6.2.2 ]; then 
     wget https://gitlab.com/libxc/libxc/-/archive/6.2.2/libxc-6.2.2.tar.gz
     tar xzf libxc-6.2.2.tar.gz
@@ -37,7 +37,7 @@ function install_libxc {
 
 
 function install_dftd4 {
-  cd $WD/src
+  cd $WD
   if [ ! -d dftd4-3.6.0 ]; then
     wget https://github.com/dftd4/dftd4/archive/refs/tags/v3.6.0.tar.gz
     tar xzf v3.6.0.tar.gz
@@ -68,7 +68,7 @@ function install_spglib {
 }
 
 function install_p4est {
-  cd $WD/src
+  cd $WD
   rm -rf p4est
   mkdir p4est
   cd p4est
@@ -83,7 +83,7 @@ function install_p4est {
 # Install netlib-scalapack 2.2.0 version linking to openblas
 # note that the openblas (sourced via module) provides lapack
 function install_scalapack {
-  cd $WD/src
+  cd $WD
   if [ ! -d scalapack-2.2.0 ]; then
     wget https://github.com/Reference-ScaLAPACK/scalapack/archive/refs/tags/v2.2.0.tar.gz
     tar xzf v2.2.0.tar.gz
@@ -101,7 +101,7 @@ function install_scalapack {
 
 # Install ELPA latest version (elpa-2024.03.001)
 function install_elpa {
-    cd $WD/src
+    cd $WD
     if [ ! -d elpa ]; then
         ver=2024.03.001
         wget https://elpa.mpcdf.mpg.de/software/tarball-archive/Releases/$ver/elpa-$ver.tar.gz
@@ -125,7 +125,7 @@ function install_elpa {
 
 
 function install_kokkos {
-  cd $WD/src
+  cd $WD
   if [ ! -d kokkos-4.3.00 ]; then 
     wget https://github.com/kokkos/kokkos/archive/refs/tags/4.3.00.tar.gz
     tar xzvf 4.3.00.tar.gz
@@ -143,7 +143,7 @@ function install_kokkos {
 
 # Install latest release dealii from https://github.com/dealii/dealii
 function install_dealii {
-  cd $WD/src
+  cd $WD
   ver=9.5.2
   if [ ! -d dealii-$ver ]; then
       wget https://github.com/dealii/dealii/releases/download/v$ver/dealii-$ver.tar.gz
@@ -162,7 +162,7 @@ function install_dealii {
 
 
 function compile_dftfe {
-  cd $WD/src
+  cd $WD
   if [ ! -z $1 ]; then
     branch=$1
   else
