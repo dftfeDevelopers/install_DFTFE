@@ -3,7 +3,7 @@
 
 function install_openblas {
     cd $WD
-    if [ ! -d OpenBLAS-0.3.27]; then
+    if [ ! -d OpenBLAS-0.3.27 ]; then
       wget https://github.com/OpenMathLib/OpenBLAS/archive/refs/tags/v0.3.27.tar.gz
       tar xzf v0.3.27.tar.gz
       rm -f v0.3.27.tar.gz
@@ -16,7 +16,7 @@ function install_openblas {
 
 function install_netlib_lapack {
   cd $WD
-  if [ ! -d lapack-3.12.0]; then 
+  if [ ! -d lapack-3.12.0 ]; then 
     wget https://github.com/Reference-LAPACK/lapack/archive/refs/tags/v3.12.0.tar.gz
     tar xzf v3.12.0.tar.gz
     rm v3.12.0.tar.gz
