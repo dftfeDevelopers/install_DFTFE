@@ -108,7 +108,6 @@ function install_elpa {
         tar xzf elpa-$ver.tar.gz
         mv elpa-$ver elpa
         rm -f elpa-$ver.tar.gz
-        cd ..
     fi
     cd elpa
 
