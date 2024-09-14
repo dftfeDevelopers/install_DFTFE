@@ -2,12 +2,12 @@
 # Installation script for DFT-FE and its dependencies
 
 function install_openblas {
-    cd $WD/src
-    if(test ! -d OpenBLAS-v0.3.27) {
+    cd $WD
+    if [ ! -d OpenBLAS-0.3.27]; then
       wget https://github.com/OpenMathLib/OpenBLAS/archive/refs/tags/v0.3.27.tar.gz
       tar xzf v0.3.27.tar.gz
       rm -f v0.3.27.tar.gz
-    }
+    fi
     cd OpenBLAS-0.3.27
     make CC=gcc FC=gfortran CXX=g++ PREFIX=$INST -j16
     make install
