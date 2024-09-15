@@ -327,7 +327,7 @@ function compile_dftfe {
   libxcDir=$INST
   spglibDir=$INST
   xmlIncludeDir=/usr/include/libxml2
-  xmlLibDir=/usr/lib/aarch64-linux-gnu
+  xmlLibDir=/usr/lib64
 
   ELPA_PATH=$INST
   DCCL_PATH=$ROCM_PATH/include/rccl
