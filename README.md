@@ -3,6 +3,7 @@ and INST (installation directory)
 # Install DFT-FE dependencies
     source ./dftfeInstall.sh
     install_openblas
+    install_netlib_lapack
     install_alglib
     install_libxc
     install_spglib
