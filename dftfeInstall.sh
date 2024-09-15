@@ -144,7 +144,7 @@ function install_elpa {
 
     rm -fr build
     mkdir build && cd build
-    ../configure CXX=mpic++ CC=mpicc FC=mpif90 CFLAGS="-march=native -fPIC -O2" FCFLAGS="-march=native -O2 -fPIC" CXXFLAGS="-std=c++17 -march=native -fPIC -O2" LIBS="-L$INST/lib -lscalapack -lopenblas" -prefix=$INST --disable-avx512 --enable-c-tests=no --enable-option-checking=fatal --enable-shared --enable-cpp-tests=no
+    ../configure CXX=mpic++ CC=mpicc FC=mpif90 CFLAGS="-march=native -fPIC -O2" FCFLAGS="-march=native -O2 -fPIC" CXXFLAGS="-std=c++17 -march=native -fPIC -O2" LIBS="-L$INST/lib -lscalapack -lopenblas" -prefix=$INST --disable-sse --disable-sse-assembly --disable-avx --disable-avx2 --disable-avx512 --enable-c-tests=no --enable-option-checking=fatal --enable-shared --enable-cpp-tests=no
     make -j16
     make install
     cd $WD
