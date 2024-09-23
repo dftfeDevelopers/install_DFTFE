@@ -83,7 +83,7 @@ RUN apt-get install -y nodejs
 # Verify installation
 RUN node --version
 RUN npm --version
-WORKDIR /usr/src/app/DFTFE/
+WORKDIR /usr/src/app/
 COPY . .
 
 ## Start DFT-FE installation in the correct directory
