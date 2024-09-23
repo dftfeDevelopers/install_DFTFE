@@ -115,8 +115,8 @@ RUN bash -c "source ./dftfeInstall.sh && install_dealii"
 RUN bash -c "source ./dftfeInstall.sh && compile_dftfe"
 
 # Expose environment variables for the executables
-ENV DFTFE_REAL=$WD/src/dftfe_publicGithubDevelop/build/release/real/dftfe
-ENV DFTFE_COMPLEX=$WD/src/dftfe_publicGithubDevelop/build/release/complex/dftfe
+ENV DFTFE_REAL=$WD/dftfe_publicGithubDevelop/build/release/real/dftfe
+ENV DFTFE_COMPLEX=$WD/dftfe_publicGithubDevelop/build/release/complex/dftfe
 
 # # Create scratch directory with subdirectories
 RUN mkdir -p /usr/src/app/scratch/inputs /usr/src/app/scratch/outputs
