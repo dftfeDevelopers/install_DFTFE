@@ -115,8 +115,8 @@ batch script running GPU-enabled DFT-FE on 2 nodes is below:
     MPICH_GPU_SUPPORT_ENABLED=1
 
 
-    LD_LIBRARY_PATH = $LD_LIBRARY_PATH:$WD/env2/lib
-    LD_LIBRARY_PATH = $LD_LIBRARY_PATH:$WD/env2/lib64
-    BASE = $WD/src/dftfe/build/release/real
+    LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$WD/env2/lib
+    LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$WD/env2/lib64
+    BASE=$WD/src/dftfe/build/release/real
 
     srun  $BASE/dftfe parameterFile.prm > output
