@@ -13,7 +13,7 @@ cloning into the scratch directory
     cd $PSCRATCH
     git clone https://github.com/dftfeDevelopers/install_DFTFE.git install_DFTFE
     cd install_DFTFE
-    git checkout perlmutterScriptDealii9.5.2
+    git checkout perlmutterScriptDealii9.5.2_withPetscSlepsc
 
 ## Pre-requisites
 
