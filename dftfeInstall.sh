@@ -3,12 +3,12 @@
 
 function install_openblas {
     cd $WD
-    if [ ! -d OpenBLAS-0.3.27 ]; then
-      wget https://github.com/OpenMathLib/OpenBLAS/archive/refs/tags/v0.3.27.tar.gz
-      tar xzf v0.3.27.tar.gz
-      rm -f v0.3.27.tar.gz
+    if [ ! -d OpenBLAS-0.3.28 ]; then
+      wget https://github.com/OpenMathLib/OpenBLAS/archive/refs/tags/v0.3.28.tar.gz
+      tar xzf v0.3.28.tar.gz
+      rm -f v0.3.28.tar.gz
     fi
-    cd OpenBLAS-0.3.27
+    cd OpenBLAS-0.3.28
     make CC=gcc FC=gfortran CXX=g++ CFLAGS="-O2 -march=native" CXXFLAGS="-O2 -march=native" FCFLAGS="-O2 -march=native"  -j16
     make install PREFIX=$INST
     cd $WD
