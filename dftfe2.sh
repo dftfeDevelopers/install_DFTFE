@@ -58,7 +58,7 @@ function install_spglib {
   cd $WD/src
   if [ ! -d spglib ]; then
     git clone https://github.com/atztogo/spglib.git
-    rc -c cd spglib && git checkout 02159eef6e7349535049a43fe2272bb634c77945
+    cd spglib && git checkout 02159eef6e7349535049a43fe2272bb634c77945
   fi
   cd spglib
   rm -fr build
