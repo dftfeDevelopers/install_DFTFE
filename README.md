@@ -2,17 +2,13 @@ Set environment variables for WD (work directory where build happens)
 and INST (installation directory) 
 # Install DFT-FE dependencies
     source ./dftfeInstall.sh
-    install_openblas
-    install_netlib_lapack
     install_alglib
     install_libxc
     install_spglib
     install_p4est
-    install_scalapack
     install_elpa
     install_kokkos
     install_dealii
-    install_dftd4 (optional)
 
 # Install DFT-FE
     compile_dftfe

@@ -1,36 +1,6 @@
 #!/bin/bash
 # Installation script for DFT-FE and its dependencies
 
-function install_openblas {
-    cd $WD
-    if [ ! -d OpenBLAS-0.3.28 ]; then
-      wget https://github.com/OpenMathLib/OpenBLAS/archive/refs/tags/v0.3.28.tar.gz
-      tar xzf v0.3.28.tar.gz
-      rm -f v0.3.28.tar.gz
-    fi
-    cd OpenBLAS-0.3.28
-    make CC=gcc FC=gfortran CXX=g++ CFLAGS="-O2 -march=native" CXXFLAGS="-O2 -march=native" FCFLAGS="-O2 -march=native"  -j16
-    make install PREFIX=$INST
-    cd $WD
-}
-
-function install_netlib_lapack {
-  cd $WD
-  if [ ! -d lapack-3.12.0 ]; then 
-    wget https://github.com/Reference-LAPACK/lapack/archive/refs/tags/v3.12.0.tar.gz
-    tar xzf v3.12.0.tar.gz
-    rm v3.12.0.tar.gz
-  fi
-  cd lapack-3.12.0
-  rm -fr build
-  mkdir build && cd build
-  cmake -DCMAKE_C_COMPILER=gcc -DCMAKE_C_FLAGS="-O2 -fPIC" -DCMAKE_CXX_COMPILER=g++ -DCMAKE_CXX_FLAGS="-O2 -fPIC" -DCMAKE_INSTALL_PREFIX=$INST -DBUILD_SHARED_LIBS=ON -DBUILD_TESTING=OFF ..
-  make -j16
-  make install
-  cd $WD
-}
-
-
 function install_alglib {
   cd $WD
   if [ ! -d alglib-cpp ]; then 
@@ -65,22 +35,6 @@ function install_libxc {
 }
 
 
-function install_dftd4 {
-  cd $WD
-  if [ ! -d dftd4-3.6.0 ]; then
-    wget https://github.com/dftd4/dftd4/archive/refs/tags/v3.6.0.tar.gz
-    tar xzf v3.6.0.tar.gz
-    rm v3.6.0.tar.gz
-  fi
-  cd dftd4-3.6.0
-  rm -fr build
-  mkdir build && cd build
-  cmake -DCMAKE_Fortran_COMPILER=gfortran -DCMAKE_C_COMPILER=gcc -DBLAS_LIBRARIES=$INST/lib/libopenblas.so -DLAPACK_LIBRARIES=$INST/lib/libopenblas.so -DBUILD_SHARED_LIBS=ON -DCMAKE_INSTALL_PREFIX=$INST -DWITH_OpenMP=OFF ..
-  make -j16
-  make install
-  cd $WD
-}
-
 function install_spglib {
   cd $WD/src
   if [ ! -d spglib ]; then
@@ -107,26 +61,6 @@ function install_p4est {
   ./p4est-setup-ubuntu.sh p4est-2.8.6.tar.gz $INST
   cd $WD
  }
-
-
-# Install netlib-scalapack 2.2.0 version linking to openblas
-# note that the openblas (sourced via module) provides lapack
-function install_scalapack {
-  cd $WD
-  if [ ! -d scalapack-2.2.0 ]; then
-    wget https://github.com/Reference-ScaLAPACK/scalapack/archive/refs/tags/v2.2.0.tar.gz
-    tar xzf v2.2.0.tar.gz
-    rm -f v2.2.0.tar.gz
-  fi
-  cd scalapack-2.2.0
-  
-  mkdir build && cd build
-  cmake -DBUILD_SHARED_LIBS=ON -DBUILD_STATIC_LIBS=OFF -DBUILD_TESTING=OFF -DCMAKE_C_COMPILER=mpicc -DCMAKE_Fortran_COMPILER=mpif90 -DCMAKE_C_FLAGS="-fPIC -march=native" -DCMAKE_Fortran_FLAGS="-fPIC -march=native -fallow-argument-mismatch" -DUSE_OPTIMIZED_LAPACK_BLAS=ON  -DBLAS_LIBRARIES=$INST/lib/libopenblas.so -DLAPACK_LIBRARIES=$INST/lib/libopenblas.so -DCMAKE_INSTALL_PREFIX=$INST ..
-  make -j16
-  make install
-  cd $WD
-}
-
 
 # Install ELPA latest version (elpa-2024.03.001)
 function install_elpa {
