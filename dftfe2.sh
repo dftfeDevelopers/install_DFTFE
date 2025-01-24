@@ -180,9 +180,9 @@ function install_elpa {
     fi
     cd elpa
 
-    LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$INST/lib
-    LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$INST/lib64
-    LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$ROCM_PATH/lib
+    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$INST/lib
+    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$INST/lib64
+    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$ROCM_PATH/lib
 
     rm -fr build
     mkdir build && cd build
