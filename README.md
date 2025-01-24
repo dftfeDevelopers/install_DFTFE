@@ -34,16 +34,18 @@ The installation itself is contained within the functions in
 and then run the functions listed in that file manually, in order.
 For example, 
 
+    install_boost
+    install_openblas
+    install_netlib_lapack
     install_alglib
     install_libxc
     install_spglib
     install_p4est
     install_scalapack
-    install_ofi_rccl (optional)
     install_elpa
     install_kokkos
     install_dealii
-    install_dftd4 (optional)
+    install_dftd4
     compile_dftfe
 
 Each function follows a standard pattern - download source into `$WD/src`,

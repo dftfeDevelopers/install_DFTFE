@@ -3,6 +3,50 @@
 
 . ./env2/env.sh
 
+
+function install_boost {
+    cd $WD
+    if [ ! -d boost_1_75_0 ]; then
+      wget https://archives.boost.io/release/1.75.0/source/boost_1_75_0.tar.gz
+      tar -zxvf boost_1_75_0.tar.gz
+      rm -f boost_1_75_0.tar.gz
+    fi
+    cd boost_1_75_0
+    ./bootstrap.sh --prefix=$INST
+    ./b2 install
+    cd $WD
+}
+
+
+function install_openblas {
+    cd $WD
+    if [ ! -d OpenBLAS-0.3.28 ]; then
+      wget https://github.com/OpenMathLib/OpenBLAS/archive/refs/tags/v0.3.28.tar.gz
+      tar xzf v0.3.28.tar.gz
+      rm -f v0.3.28.tar.gz
+    fi
+    cd OpenBLAS-0.3.28
+    make CC=gcc FC=gfortran CXX=g++ CFLAGS="-O2 -march=native" CXXFLAGS="-O2 -march=native" FCFLAGS="-O2 -march=native"  -j16
+    make install PREFIX=$INST
+    cd $WD
+}
+
+function install_netlib_lapack {
+  cd $WD
+  if [ ! -d lapack-3.12.0 ]; then 
+    wget https://github.com/Reference-LAPACK/lapack/archive/refs/tags/v3.12.0.tar.gz
+    tar xzf v3.12.0.tar.gz
+    rm v3.12.0.tar.gz
+  fi
+  cd lapack-3.12.0
+  rm -fr build
+  mkdir build && cd build
+  cmake -DCMAKE_C_COMPILER=gcc -DCMAKE_C_FLAGS="-O2 -fPIC" -DCMAKE_CXX_COMPILER=g++ -DCMAKE_CXX_FLAGS="-O2 -fPIC" -DCMAKE_INSTALL_PREFIX=$INST -DBUILD_SHARED_LIBS=ON -DBUILD_TESTING=OFF ..
+  make -j16
+  make install
+  cd $WD
+}
+
 # Install alglib, libxc, spglib and p4est using the typical route (cf. manual)
 function install_alglib {
   cd $WD/src
@@ -48,7 +92,7 @@ function install_dftd4 {
   cd dftd4-3.6.0
   rm -fr build
   mkdir build && cd build
-  cmake -DCMAKE_Fortran_COMPILER=ftn -DCMAKE_C_COMPILER=cc -DBLAS_LIBRARIES=$OLCF_OPENBLAS_ROOT/lib/libopenblas.so -DLAPACK_LIBRARIES=$OLCF_OPENBLAS_ROOT/lib/libopenblas.so -DBUILD_SHARED_LIBS=ON -DCMAKE_INSTALL_PREFIX=$INST -DWITH_OpenMP=OFF ..
+  cmake -DCMAKE_Fortran_COMPILER=ftn -DCMAKE_C_COMPILER=cc -DBLAS_LIBRARIES=$INST/lib/libopenblas.so -DLAPACK_LIBRARIES=$INST/lib/libopenblas.so -DBUILD_SHARED_LIBS=ON -DCMAKE_INSTALL_PREFIX=$INST -DWITH_OpenMP=OFF ..
   make -j16
   make install
   cd $WD
@@ -94,7 +138,7 @@ function install_scalapack {
   cd scalapack-2.2.0
   
   mkdir build && cd build
-  cmake -DBUILD_SHARED_LIBS=ON -DBUILD_STATIC_LIBS=OFF -DBUILD_TESTING=OFF -DCMAKE_C_COMPILER=cc -DCMAKE_Fortran_COMPILER=ftn -DCMAKE_C_FLAGS="-fPIC -march=znver3" -DCMAKE_Fortran_FLAGS="-fPIC -march=znver3 -fallow-argument-mismatch" -DUSE_OPTIMIZED_LAPACK_BLAS=ON -DCMAKE_INSTALL_PREFIX=$INST ..
+  cmake -DBUILD_SHARED_LIBS=ON -DBUILD_STATIC_LIBS=OFF -DBUILD_TESTING=OFF -DCMAKE_C_COMPILER=cc -DCMAKE_Fortran_COMPILER=ftn -DCMAKE_C_FLAGS="-fPIC -march=znver3" -DCMAKE_Fortran_FLAGS="-fPIC -march=znver3 -fallow-argument-mismatch" -DUSE_OPTIMIZED_LAPACK_BLAS=ON -DBLAS_LIBRARIES=$INST/lib/libopenblas.so -DLAPACK_LIBRARIES=$INST/lib/libopenblas.so  -DCMAKE_INSTALL_PREFIX=$INST ..
   make -j16
   make install
   cd $WD
@@ -142,7 +186,7 @@ function install_elpa {
 
     rm -fr build
     mkdir build && cd build
-    ../configure CXX=hipcc CC=hipcc FC=ftn CFLAGS="-march=znver3 -fPIC -O2 -I$ROCM_PATH/include --amdgpu-target=gfx90a -I$MPICH_DIR/include" FCFLAGS="-march=znver3 -O2 -fPIC" CXXFLAGS="-std=c++17 -march=znver3 -fPIC -O2 -I$ROCM_PATH/include --amdgpu-target=gfx90a -I$MPICH_DIR/include" LIBS="-L$ROCM_PATH/lib -lamdhip64 -lrocblas -L$MPICH_DIR/lib -lmpi $CRAY_XPMEM_POST_LINK_OPTS -lxpmem $PE_MPICH_GTL_DIR_amd_gfx90a $PE_MPICH_GTL_LIBS_amd_gfx90a -L$INST/lib -lscalapack -L$OLCF_OPENBLAS_ROOT/lib -lopenblas -L$INST/lib64" --enable-amd-gpu --prefix=$INST --disable-avx512 --enable-c-tests=no --enable-option-checking=fatal --enable-shared --enable-cpp-tests=no --enable-hipcub
+    ../configure CXX=hipcc CC=hipcc FC=ftn CFLAGS="-march=znver3 -fPIC -O2 -I$ROCM_PATH/include --amdgpu-target=gfx90a -I$MPICH_DIR/include" FCFLAGS="-march=znver3 -O2 -fPIC" CXXFLAGS="-std=c++17 -march=znver3 -fPIC -O2 -I$ROCM_PATH/include --amdgpu-target=gfx90a -I$MPICH_DIR/include" LIBS="-L$ROCM_PATH/lib -lamdhip64 -lrocblas -L$MPICH_DIR/lib -lmpi $CRAY_XPMEM_POST_LINK_OPTS -lxpmem $PE_MPICH_GTL_DIR_amd_gfx90a $PE_MPICH_GTL_LIBS_amd_gfx90a -L$INST/lib -lscalapack -lopenblas -L$INST/lib64" --enable-amd-gpu --prefix=$INST --disable-avx512 --enable-c-tests=no --enable-option-checking=fatal --enable-shared --enable-cpp-tests=no --enable-hipcub
 #              --enable-gpu-streams=amd
     make -j16
     make install
@@ -179,7 +223,7 @@ function install_dealii {
   cd dealii-$ver
   rm -fr build
   mkdir build && cd build
-  cmake -DCMAKE_CXX_STANDARD=17 -DCMAKE_CXX_FLAGS="-march=native -std=c++17" -DCMAKE_C_FLAGS=-march=native -DDEAL_II_ALLOW_PLATFORM_INTROSPECTION=OFF         -DDEAL_II_FORCE_BUNDLED_BOOST=OFF -DDEAL_II_WITH_TASKFLOW=OFF -DKOKKOS_DIR=$INST -DCMAKE_BUILD_TYPE=Release -DDEAL_II_CXX_FLAGS_RELEASE=-O2 -DCMAKE_C_COMPILER=cc -DCMAKE_CXX_COMPILER=CC -DCMAKE_Fortran_COMPILER=ftn -DDEAL_II_WITH_TBB=OFF -DDEAL_II_COMPONENT_EXAMPLES=OFF -DDEAL_II_WITH_MPI=ON -DDEAL_II_WITH_64BIT_INDICES=ON -DP4EST_DIR=$INST -DDEAL_II_WITH_LAPACK=ON -DLAPACK_DIR="$OLCF_OPENBLAS_ROOT;$INST" -DLAPACK_FOUND=true -DLAPACK_LIBRARIES="$OLCF_OPENBLAS_ROOT/lib/libopenblas.so" -DCMAKE_INSTALL_PREFIX=$INST ..
+  cmake -DCMAKE_CXX_STANDARD=17 -DCMAKE_CXX_FLAGS="-march=native -std=c++17" -DCMAKE_C_FLAGS=-march=native -DDEAL_II_ALLOW_PLATFORM_INTROSPECTION=OFF         -DDEAL_II_FORCE_BUNDLED_BOOST=OFF -DDEAL_II_WITH_TASKFLOW=OFF -DKOKKOS_DIR=$INST -DCMAKE_BUILD_TYPE=Release -DDEAL_II_CXX_FLAGS_RELEASE=-O2 -DCMAKE_C_COMPILER=cc -DCMAKE_CXX_COMPILER=CC -DCMAKE_Fortran_COMPILER=ftn -DDEAL_II_WITH_TBB=OFF -DDEAL_II_COMPONENT_EXAMPLES=OFF -DDEAL_II_WITH_MPI=ON -DDEAL_II_WITH_64BIT_INDICES=ON -DP4EST_DIR=$INST -DDEAL_II_WITH_LAPACK=ON -DLAPACK_DIR="$INST" -DLAPACK_FOUND=true -DLAPACK_LIBRARIES="$INST/lib/libopenblas.so;$INST/lib/liblapack.so" -DCMAKE_INSTALL_PREFIX=$INST ..
   make -j16 
   make install
   mv $INST/*.log $INST/share/deal.II/
@@ -205,7 +249,7 @@ function install_torch {
   CXX=`{which g++} # note: CC adds mpi linking info.
   CC=`{which gcc}
   BLAS=OpenBLAS
-  OpenBLAS_HOME=$OLCF_OPENBLAS_ROOT
+  OpenBLAS_HOME=$INST
   USE_CUDA=0
   USE_ROCM=0
   USE_CUDNN=0
