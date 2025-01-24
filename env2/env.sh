@@ -1,9 +1,7 @@
-module load PrgEnv-gnu/8.5.0
+module load PrgEnv-gnu/8.6.0
 module load craype-accel-amd-gfx90a
-module load rocm
-module load openblas
+module load rocm/6.0.3
 module load cmake
-module load boost
 module unload cray-libsci
 
 export MPICH_GPU_SUPPORT_ENABLED=1
