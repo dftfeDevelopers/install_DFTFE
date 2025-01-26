@@ -429,3 +429,25 @@ fn compile_dftfe{
   echo 'Build complete.'
   cd $WD
 }
+
+
+fn install_all{
+    echo "Starting the full DFTFE installation process..."
+
+    # Install all dependencies and DFTFE
+    install_alglib
+    install_libxc
+    install_spglib
+    install_p4est
+    install_scalapack
+    install_elpa
+    install_kokkos
+    install_petsc
+    install_slepc
+    install_dealii_real
+    install_dealii_complex
+    install_dftd4
+    compile_dftfe
+
+    echo "Full installation process completed."
+}

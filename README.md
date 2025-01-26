@@ -77,6 +77,11 @@ For example,
     install_dftd4 (optional)
     compile_dftfe
 
+or install everything in one shot using
+    
+    install_all
+  
+
 Each function follows a standard pattern - download source into `$WD/src`,
 patch, compile, and install into `$INST`.  It is HIGHLY recommended
 to check all warnings and errors from these installs to be sure
