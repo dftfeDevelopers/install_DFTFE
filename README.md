@@ -12,7 +12,7 @@ cloning into the scatch directory
     cd $myscratch
     git clone https://github.com/dftfeDevelopers/install_DFTFE.git install_DFTFE
     cd install_DFTFE
-    git checkout greatlakesScript
+    git checkout greatlakesScriptDealii9.5.2
 
 ## Pre-requisites
 Log into an **interactive 1 node job (CAUTION:without interactive job the
