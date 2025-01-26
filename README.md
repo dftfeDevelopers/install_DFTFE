@@ -44,10 +44,11 @@ Make sure that your module environment contains some version of the
 pre-requisites mentioned there.
 
     $vim env2/env.rc 
-    module load gcc
-    module load mkl
-    module load openmpi
-    module load cmake
+    module load gcc/13.2.0
+    module load mkl/2023.2.1
+    module load openmpi/5.0.3
+    module load cmake/3.26.3
+    module load boost/1.78.0
 
     WD=$myscratch/install_DFTFE (definitely change this path)
     INST=$WD/env2
