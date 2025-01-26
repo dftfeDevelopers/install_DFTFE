@@ -54,7 +54,11 @@ pre-requisites mentioned there.
     INST=$WD/env2
 
 The above environment file is used both by the install and run
-phases of DFT-FE.
+phases of DFT-FE. Additional instructions for DFT-FE developers:
+Add the following to your .bashrc
+
+    export PATH=$PATH:/home/vikramg/DFT-softwares-gcc/numdiff/install
+
 ## Running the installation
 The installation itself is contained within the functions in
 `dftfe2.rc`. Source the `dftfe2.rc` script inside `install_DFTFE` folder using
