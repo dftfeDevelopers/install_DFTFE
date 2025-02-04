@@ -5,20 +5,19 @@ export PYTHON=python3
 
 c_compiler=fcc
 mpi_c_compiler=mpifcc
-c_flags="-Kopenmp,fast -Nclang -fPIC"
-export fcc_ENV="-Kopenmp,fast -Nclang -fPIC"
-
+c_flags="-Kopenmp,PIC -Nclang -O3"
+export fcc_ENV=-Nclang
 cxx_compiler=FCC
 mpi_cxx_compiler=mpiFCC
-cxx_flags="-Kopenmp,fast -Nclang -std=c++17 -fPIC"
-export FCC_ENV="-Kopenmp,fast -Nclang -std=c++17 -fPIC"
-
+cxx_flags="-Kopenmp,PIC -Nclang -std=c++17 -O3 --linkfortran"
+export FCC_ENV=-Nclang
 fortran_compiler=frt
 mpi_fortran_compiler=mpifrt
-fortran_flags="-Kopenmp,fast,SVE -fPIC"
+fortran_flags="-Kopenmp,SVE,PIC -Nlibomp -O3 --linkstl=libstdc++"
+export FORT90C="-X08 -fw"
 
 prefix="$PWD"
-nprocs=8
+nprocs=12
 
 #DFT-FE options, all of these have to be set
 withHigherQuadPSP=OFF
@@ -31,14 +30,14 @@ dealiiDir=""
 alglibDir=""
 libxcDir=""
 spglibDir=""
-xmlIncludeDir=""
-xmlLibDir=""
+xmlIncludeDir="/usr/include/libxml2"
+xmlLibDir="/usr/lib64"
 elpaDir=""
 dftdDir=""
 numdiffDir=""
 dcclDir=""
-blasLapackFlags="-SSL2BLAMP -SCALAPACK"
-scalapackFlags="-SSL2BLAMP -SCALAPACK"
+blasLapackFlags="-lfjscalapacksve -lfjlapackexsve -SSL2BLAMP"
+scalapackFlags="-lfjscalapacksve -lfjlapackexsve"
 
 #Paths to pre-compiled dealii dependencies if any
 kokkosDir=""
@@ -49,7 +48,7 @@ boostDir=""
 currentDir=$PWD
 cd $prefix
 dependencyDir=$prefix/dependencies
-dftfeDir=$prefix/dftfe
+dftfeDir=$prefix/dftfe_fugaku
 mkdir -p $dependencyDir
 mkdir -p $dftfeDir
 mkdir -p $dftfeDir/src
@@ -172,7 +171,7 @@ if [[ $downloadDependencies ]]; then
      wget -N -q --show-progress https://raw.githubusercontent.com/spack/spack/0f54995e53d48095a30f1d0203e4f9bdb95e29fa/var/spack/repos/builtin/packages/boost/fujitsu_version_analysis-1.77.patch
      wget -N -q --show-progress https://raw.githubusercontent.com/spack/spack/0f54995e53d48095a30f1d0203e4f9bdb95e29fa/var/spack/repos/builtin/packages/boost/bootstrap-compiler.patch
     fi
-    wget -N -q --show-progress https://github.com/dealii/dealii/releases/download/v9.6.2/dealii-9.6.2.tar.gz &
+    wget -N -q --show-progress https://github.com/dealii/dealii/releases/download/v9.5.2/dealii-9.5.2.tar.gz &
   fi
   if [ -z $elpaDir ]; then
     wget -N -q --show-progress https://elpa.mpcdf.mpg.de/software/tarball-archive/Releases/2024.05.001/elpa-2024.05.001.tar.gz &
@@ -180,7 +179,7 @@ if [[ $downloadDependencies ]]; then
   wait
   cd $dftfeDir
   if [ -z "$( ls -A 'src' )" ]; then
-    git clone --branch publicGithubDevelop https://knikhil1995@bitbucket.org/dftfedevelopers/dftfe.git src
+    git clone --branch fugakuTesting https://knikhil1995@bitbucket.org/dftfedevelopers/dftfe.git src
   else
     cd src
     git pull
@@ -201,9 +200,8 @@ else
     echo "Extraction done"
     echo "Compiling Alglib"
     cd alglib-cpp/src
-    $cxx_compiler $cxx_flags -c *.cpp
-    ar rcs libAlglib.a *.o
-    mv libAlglib.a $dependencyDir/lib
+    $cxx_compiler $cxx_flags -shared -o libAlglib.so *.cpp
+    mv libAlglib.so $dependencyDir/lib
     cp *.h $dependencyDir/include
   fi
   alglibDir=$dependencyDir
@@ -221,7 +219,7 @@ else
     echo "Compiling libxc"
     cd libxc-6.2.2
     mkdir -p build && cd build
-    cmake -DCMAKE_C_COMPILER=$c_compiler -DCMAKE_C_FLAGS="$c_flags" -DCMAKE_CXX_COMPILER=$cxx_compiler -DCMAKE_CXX_FLAGS="$cxx_flags" -DCMAKE_INSTALL_PREFIX=$dependencyDir -DBUILD_SHARED_LIBS=OFF -DBUILD_TESTING=OFF ..
+    cmake -DCMAKE_C_COMPILER=$c_compiler -DCMAKE_C_FLAGS="$c_flags" -DCMAKE_CXX_COMPILER=$cxx_compiler -DCMAKE_CXX_FLAGS="$cxx_flags" -DCMAKE_INSTALL_PREFIX=$dependencyDir -DBUILD_SHARED_LIBS=ON -DBUILD_TESTING=OFF ..
     cmake --build . -j $nprocs
     cmake --install .
   fi
@@ -240,7 +238,7 @@ else
     echo "Compiling spglib"
     cd spglib-2.5.0
     mkdir -p build && cd build
-    cmake -DCMAKE_C_COMPILER=$c_compiler -DCMAKE_C_FLAGS="$c_flags" -DCMAKE_CXX_COMPILER=$cxx_compiler -DCMAKE_CXX_FLAGS="$cxx_flags" -DCMAKE_INSTALL_PREFIX=$dependencyDir -DSPGLIB_SHARED_LIBS=OFF ..
+    cmake -DCMAKE_C_COMPILER=$c_compiler -DCMAKE_C_FLAGS="$c_flags" -DCMAKE_CXX_COMPILER=$cxx_compiler -DCMAKE_CXX_FLAGS="$cxx_flags" -DCMAKE_INSTALL_PREFIX=$dependencyDir -DSPGLIB_SHARED_LIBS=ON ..
     cmake --build . -j$nprocs
     cmake --install .
   fi
@@ -290,7 +288,7 @@ else
 fi
 
 if [[ $dealiiDir ]]; then
-  echo "dealii path set to: $dealiiDir"
+  <F9>echo "dealii path set to: $dealiiDir"
 else
 
   if [[ $p4estDir ]]; then
@@ -303,7 +301,7 @@ else
       echo "Extraction done"
       cd p4est-2.8.6
       mkdir -p build && cd build
-      ../configure CC=$mpi_c_compiler CXX=$mpi_cxx_compiler FC=$mpi_fortran_compiler F77=$mpi_fortran_compiler --enable-mpi --enable-shared --disable-vtk-binary --without-blas CPPFLAGS=-DSC_LOG_PRIORITY=SC_LP_ESSENTIAL CFLAGS=-O2 --prefix=$dependencyDir --disable-openmp --enable-static --disable-shared
+      ../configure CC=$mpi_c_compiler CXX=$mpi_cxx_compiler FC=$mpi_fortran_compiler F77=$mpi_fortran_compiler --enable-mpi --enable-shared --disable-vtk-binary --without-blas CPPFLAGS=-DSC_LOG_PRIORITY=SC_LP_ESSENTIAL CFLAGS=-O2 --prefix=$dependencyDir --disable-openmp --disable-static --enable-shared
       make -j$nprocs
       make install
     fi
@@ -321,7 +319,7 @@ else
       echo "Extraction done"
       cd kokkos-4.3.00
       mkdir -p build && cd build
-      cmake -DCMAKE_C_COMPILER=$c_compiler -DCMAKE_C_FLAGS="$c_flags" -DCMAKE_CXX_COMPILER=$cxx_compiler -DCMAKE_CXX_FLAGS="$cxx_flags" -DCMAKE_INSTALL_PREFIX=$dependencyDir -DBUILD_SHARED_LIBS=OFF -DBUILD_STATIC_LIBS=ON ..
+      cmake -DCMAKE_C_COMPILER=$c_compiler -DCMAKE_C_FLAGS="$c_flags" -DCMAKE_CXX_COMPILER=$cxx_compiler -DCMAKE_CXX_FLAGS="$cxx_flags" -DCMAKE_INSTALL_PREFIX=$dependencyDir -DBUILD_SHARED_LIBS=ON -DBUILD_STATIC_LIBS=OFF ..
       cmake --build . -j$nprocs
       cmake --install .
     fi
@@ -342,7 +340,7 @@ else
       patch -s -p 1 -i  $currentDir/bootstrap-compiler.patch -d .
       CXX=$cxx_compiler CXX_FLAGS="$cxx_flags" ./bootstrap.sh --prefix=$dependencyDir --without-libraries=python --without-icu
       echo "using clang : : $cxx_compiler ;" > user-config.jam
-      ./b2 link=static -j$nprocs --disable-icu --user-config=user-config.jam toolset=clang cxxstd=17 variant=release -q install
+      ./b2 link=shared -j$nprocs --disable-icu --user-config=user-config.jam --layout=system visibility=hidden toolset=clang cxxstd=17 variant=release pch=off -q install
     fi
     boostDir=$dependencyDir
     echo "boost path set to: $boostDir"
@@ -351,11 +349,12 @@ else
   if [[ $installdealii ]]; then
     cd $dependencyDir/src
     echo "Extracting dealii"
-    tar xzf dealii-9.6.2.tar.gz  --checkpoint=.100
+    #tar xzf dealii-9.5.2.tar.gz  --checkpoint=.100
     echo "Extraction done"
-    cd dealii-9.6.2
+    cd dealii-9.5.2
+    rm -rf build
     mkdir -p build && cd build
-    cmake -DCMAKE_CXX_STANDARD=17 -DCMAKE_CXX_FLAGS="$cxx_flags" -DCMAKE_C_FLAGS="$c_flags" -DDEAL_II_ALLOW_PLATFORM_INTROSPECTION=OFF -DDEAL_II_FORCE_BUNDLED_BOOST=OFF -DDEAL_II_WITH_TASKFLOW=OFF -DKOKKOS_DIR=$kokkosDir -DBOOST_DIR=$boostDir -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=$mpi_c_compiler -DCMAKE_CXX_COMPILER=$mpi_cxx_compiler -DCMAKE_Fortran_COMPILER=$mpi_fortran_compiler -DDEAL_II_WITH_TBB=OFF -DDEAL_II_COMPONENT_EXAMPLES=OFF -DDEAL_II_WITH_MPI=ON -DDEAL_II_WITH_64BIT_INDICES=ON -DP4EST_DIR=$dependencyDir -DDEAL_II_WITH_LAPACK=ON -DLAPACK_FOUND=true -DLAPACK_LIBRARIES="$blasLapackFlags" -DCMAKE_INSTALL_PREFIX=$dependencyDir ..
+    cmake -DCMAKE_CXX_STANDARD=17 -DCMAKE_CXX_FLAGS="$cxx_flags" -DCMAKE_C_FLAGS="$c_flags" -DDEAL_II_ALLOW_PLATFORM_INTROSPECTION=ON -DDEAL_II_FORCE_BUNDLED_BOOST=OFF -DDEAL_II_WITH_TASKFLOW=OFF -DKOKKOS_DIR=$kokkosDir -DBOOST_DIR=$boostDir -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=$mpi_c_compiler -DCMAKE_CXX_COMPILER=$mpi_cxx_compiler -DCMAKE_Fortran_COMPILER=$mpi_fortran_compiler -DDEAL_II_WITH_TBB=OFF -DDEAL_II_COMPONENT_EXAMPLES=OFF -DDEAL_II_WITH_MPI=ON -DDEAL_II_WITH_64BIT_INDICES=ON -DP4EST_DIR=$dependencyDir -DDEAL_II_WITH_LAPACK=ON -DLAPACK_FOUND=true -DLAPACK_LIBRARIES="$blasLapackFlags" -DCMAKE_INSTALL_PREFIX=$dependencyDir -DBUILD_SHARED_LIBS=ON ..
     cmake --build . -j$nprocs
     cmake --install .
   fi
@@ -375,7 +374,8 @@ else
     cd elpa-2024.05.001
     patch -s -p 1 -i $currentDir/elpa_fujitsu.patch -d .
     mkdir -p build && cd build
-    CXX=$mpi_cxx_compiler CC=$mpi_c_compiler FC=$mpi_fortran_compiler CFLAGS="$c_flags" FCFLAGS="$fortran_flags" CXXFLAGS="$cxx_flags" SCALAPACK_FCFLAGS="$blasLapackFlags $scalapackFlags" SCALAPACK_LDFLAGS="$blasLapackFlags $scalapackFlags" ../configure --prefix=$dependencyDir --disable-avx-kernels --disable-avx2-kernels --disable-avx512-kernels --enable-c-tests=no --enable-cpp-tests=no --enable-openmp --enable-option-checking=fatal --disable-sse-kernels --disable-sse-assembly-kernels --with-mpi --enable-runtime-threading-support-checks --enable-allow-thread-limiting --without-threading-support-check-during-build --enable-static --disable-shared --host=aarch64-unknown-linux-gnu --disable-Fortran2008-features --enable-FUGAKU --with-pic
+    CXX=$mpi_cxx_compiler CC=$mpi_c_compiler FC=$mpi_fortran_compiler CFLAGS="$c_flags" FCFLAGS="$fortran_flags" CXXFLAGS="$cxx_flags" SCALAPACK_FCFLAGS="$scalapackFlags" SCALAPACK_LDFLAGS="$scalapackFlags" ../configure --prefix=$dependencyDir --disable-avx-kernels --disable-avx2-kernels --disable-avx512-kernels --enable-c-tests=no --enable-cpp-tests=no --disable-openmp --enable-option-checking=fatal --disable-sse-kernels --disable-sse-assembly-kernels --with-mpi --enable-runtime-threading-support-checks --enable-allow-thread-limiting --without-threading-support-check-during-build --enable-shared --disable-static --disable-Fortran2008-features --enable-FUGAKU --enable-sve512-kernels
+ 
     sed -i 's/\\$wl-soname \\$wl\\$soname/-fuse-ld=ld -Wl,-soname,\\$soname/g' libtool
     sed -i 's/\\$wl--whole-archive\\$convenience \\$wl--no-whole-archive//g' libtool
     make -j$nprocs
@@ -389,12 +389,12 @@ if [[ $installDFTFE ]]; then
   cd $dftfeDir/install
   echo "Compiling DFTFE real executable"
   mkdir -p real && cd real
-  cmake -DCMAKE_CXX_STANDARD=17 -DCMAKE_CXX_COMPILER=$mpi_cxx_compiler -DCMAKE_CXX_FLAGS="$cxx_flags" -DCMAKE_BUILD_TYPE=Release -DDEAL_II_DIR=$dealiiDir -DALGLIB_DIR=$alglibDir -DLIBXC_DIR=$libxcDir -DSPGLIB_DIR=$spglibDir -DXML_LIB_DIR=$xmlLibDir -DXML_INCLUDE_DIR=$xmlIncludeDir -DWITH_MDI=OFF -DMDI_PATH= -DWITH_DCCL=$withDCCL -DWITH_TORCH=OFF -DCMAKE_PREFIX_PATH="$elpaDir;$dcclDir" -DWITH_GPU=OFF  -DWITH_TESTING=$testing -DMINIMAL_COMPILE=$minimal_compile -DHIGHERQUAD_PSP=$withHigherQuadPSP -DWITH_COMPLEX=OFF -DBUILD_SHARED_LIBS=OFF $dftfeDir/src
+  cmake -DCMAKE_CXX_STANDARD=17 -DCMAKE_CXX_COMPILER=$mpi_cxx_compiler -DCMAKE_CXX_FLAGS="$cxx_flags $blasLapackFlags" -DCMAKE_BUILD_TYPE=Release -DDEAL_II_DIR=$dealiiDir -DALGLIB_DIR=$alglibDir -DLIBXC_DIR=$libxcDir -DSPGLIB_DIR=$spglibDir -DXML_LIB_DIR=$xmlLibDir -DXML_INCLUDE_DIR=$xmlIncludeDir -DWITH_MDI=OFF -DMDI_PATH= -DWITH_DCCL=$withDCCL -DWITH_TORCH=OFF -DCMAKE_PREFIX_PATH="$elpaDir;$dcclDir" -DWITH_GPU=OFF  -DWITH_TESTING=$testing -DMINIMAL_COMPILE=$minimal_compile -DHIGHERQUAD_PSP=$withHigherQuadPSP -DWITH_COMPLEX=OFF -DBUILD_SHARED_LIBS=ON $dftfeDir/src
   make -j$nprocs
   cd $dftfeDir/install
   echo "Compiling DFTFE complex executable"
   mkdir -p complex && cd complex
-  cmake -DCMAKE_CXX_STANDARD=17 -DCMAKE_CXX_COMPILER=$mpi_cxx_compiler -DCMAKE_CXX_FLAGS="$cxx_flags" -DCMAKE_BUILD_TYPE=Release -DDEAL_II_DIR=$dealiiDir -DALGLIB_DIR=$alglibDir -DLIBXC_DIR=$libxcDir -DSPGLIB_DIR=$spglibDir -DXML_LIB_DIR=$xmlLibDir -DXML_INCLUDE_DIR=$xmlIncludeDir -DWITH_MDI=OFF -DMDI_PATH= -DWITH_DCCL=$withDCCL -DWITH_TORCH=OFF -DCMAKE_PREFIX_PATH="$elpaDir;$dcclDir" -DWITH_GPU=OFF -DWITH_TESTING=$testing -DMINIMAL_COMPILE=$minimal_compile -DHIGHERQUAD_PSP=$withHigherQuadPSP -DWITH_COMPLEX=ON -DBUILD_SHARED_LIBS=OFF $dftfeDir/src
+  cmake -DCMAKE_CXX_STANDARD=17 -DCMAKE_CXX_COMPILER=$mpi_cxx_compiler -DCMAKE_CXX_FLAGS="$cxx_flags $blasLapackFlags" -DCMAKE_BUILD_TYPE=Release -DDEAL_II_DIR=$dealiiDir -DALGLIB_DIR=$alglibDir -DLIBXC_DIR=$libxcDir -DSPGLIB_DIR=$spglibDir -DXML_LIB_DIR=$xmlLibDir -DXML_INCLUDE_DIR=$xmlIncludeDir -DWITH_MDI=OFF -DMDI_PATH= -DWITH_DCCL=$withDCCL -DWITH_TORCH=OFF -DCMAKE_PREFIX_PATH="$elpaDir;$dcclDir" -DWITH_GPU=OFF -DWITH_TESTING=$testing -DMINIMAL_COMPILE=$minimal_compile -DHIGHERQUAD_PSP=$withHigherQuadPSP -DWITH_COMPLEX=ON -DBUILD_SHARED_LIBS=ON $dftfeDir/src
   make -j$nprocs
 fi
 
