@@ -532,9 +532,10 @@ fn compile_dftfe{
     git pull
   }
   cd dftfe
-  rm -fr build
+  #rm -fr build
   SRC = `{pwd}
-  mkdir build && cd build
+  mkdir build
+  cd build
 
   LD_LIBRARY_PATH = $LD_LIBRARY_PATH:$INST/lib
   LD_LIBRARY_PATH = $LD_LIBRARY_PATH:$INST/lib64
