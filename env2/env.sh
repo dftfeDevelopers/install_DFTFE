@@ -1,4 +1,5 @@
-module load PrgEnv-gnu/8.5.0
+module load PrgEnv-gnu
+module load gcc-native/12.3
 module load craype-accel-amd-gfx90a
 module load rocm
 module load openblas
