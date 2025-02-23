@@ -13,7 +13,7 @@ cloning into the scratch directory
     cd $PSCRATCH
     git clone https://github.com/dftfeDevelopers/install_DFTFE.git install_DFTFE
     cd install_DFTFE
-    git checkout perlmutterScriptDealii9.5.2
+    git checkout perlmutterScriptDealii9.5.2_withPetscSlepsc
 
 ## Pre-requisites
 
@@ -96,7 +96,7 @@ want to enable k-points (implemented in the cplx version only).
 Assuming you have already sourced `env2/env.rc`, an example
 batch script running GPU-enabled DFT-FE on 2 nodes is below:
 
-    #!$HOME/$LMOD_SYSTEM_NAME/bin/rc
+    #!/bin/bash
     #SBATCH -A m2360_g
     #SBATCH -C gpu
     #SBATCH -q regular
@@ -110,13 +110,13 @@ batch script running GPU-enabled DFT-FE on 2 nodes is below:
     #SBATCH --gpu-bind=none
 
 
-    SLURM_CPU_BIND='cores'
-    OMP_NUM_THREADS=1
-    MPICH_GPU_SUPPORT_ENABLED=1
+    export SLURM_CPU_BIND='cores'
+    export OMP_NUM_THREADS=1
+    export MPICH_GPU_SUPPORT_ENABLED=1
 
 
-    LD_LIBRARY_PATH = $LD_LIBRARY_PATH:$WD/env2/lib
-    LD_LIBRARY_PATH = $LD_LIBRARY_PATH:$WD/env2/lib64
-    BASE = $WD/src/dftfe/build/release/real
+    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$WD/env2/lib
+    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$WD/env2/lib64
+    export BASE=$WD/src/dftfe/build/release/real
 
     srun  $BASE/dftfe parameterFile.prm > output
