@@ -12,7 +12,7 @@ cloning into the scatch directory
     cd /lustre/orion/[projid]/scratch/$USER
     git clone https://github.com/dftfeDevelopers/install_DFTFE.git install_DFTFE
     cd install_DFTFE
-    git checkout frontierScriptROCM6Dealii9.5.2
+    git checkout postModuleUpdate16July2024
 
 
 
@@ -54,8 +54,8 @@ you have not ended up with broken packages.
 
 ## Running DFT-FE
 
-DFT-FE is built in real and cplx versions, depending on whether you
-want to enable k-points (implemented in the cplx version only).
+DFT-FE is built in real and complex versions, depending on whether you
+want to enable k-points (implemented in the complex version only).
 
 An example batch script running GPU-enabled DFT-FE on 100 nodes is below:
 
@@ -73,13 +73,19 @@ An example batch script running GPU-enabled DFT-FE on 100 nodes is below:
     export MPICH_VERSION_DISPLAY=1
     export MPICH_ENV_DISPLAY=1
     export MPICH_OFI_NIC_POLICY=NUMA
+    export MPICH_GPU_SUPPORT_ENABLED=1
+    export MPICH_SMP_SINGLE_COPY_MODE=NONE
+
+    export FI_MR_CACHE_MONITOR=disabled
 
     export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$INST/lib
     export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$INST/lib/lib64
     export LD_LIBRARY_PATH=$CRAY_LD_LIBRARY_PATH:$LD_LIBRARY_PATH
 
+    export DFTFE_NUM_THREADS=1
+    export ELPA_DEFAULT_omp_threads=1
 
-    export BASE=$WD/src/dftfe_publicGithubDevelop/build/release/real
+    export BASE=$PWD/dftfe_publicGithubDevelop/build/release/real
 
     srun -n 800 -c 7 --gpu-bind=closest $BASE/dftfe parameters.prm > output
 
