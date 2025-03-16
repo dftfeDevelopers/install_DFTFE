@@ -304,7 +304,6 @@ function compile_dftfe_debug {
 
 
 function compile_dftfe {
-  cd $WD/src
   if [ ! -z $1 ]; then
     branch=$1
   else
@@ -320,8 +319,7 @@ function compile_dftfe {
   fi
   rm -fr build
   SRC=$PWD
-  mkdir build && cd build
-
+  mkdir build && cd build 
   dealiiDir=$INST
   alglibDir=$INST/lib/alglib
   libxcDir=$INST
