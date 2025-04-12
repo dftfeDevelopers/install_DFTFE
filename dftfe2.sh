@@ -40,12 +40,12 @@ function install_libxc {
 
 function install_dftd4 {
   cd $WD/src
-  if [ ! -d dftd4-3.6.0 ]; then
-    wget https://github.com/dftd4/dftd4/archive/refs/tags/v3.6.0.tar.gz
-    tar xzf v3.6.0.tar.gz
-    rm v3.6.0.tar.gz
+  if [ ! -d dftd4-3.7.0 ]; then
+    wget https://github.com/dftd4/dftd4/archive/refs/tags/v3.7.0.tar.gz
+    tar xzf v3.7.0.tar.gz
+    rm v3.7.0.tar.gz
   fi
-  cd dftd4-3.6.0
+  cd dftd4-3.7.0
   rm -fr build
   mkdir build && cd build
   cmake -DCMAKE_Fortran_COMPILER=ftn -DCMAKE_C_COMPILER=cc -DBLAS_LIBRARIES=$OLCF_OPENBLAS_ROOT/lib/libopenblas.so -DLAPACK_LIBRARIES=$OLCF_OPENBLAS_ROOT/lib/libopenblas.so -DBUILD_SHARED_LIBS=ON -DCMAKE_INSTALL_PREFIX=$INST -DWITH_OpenMP=OFF ..
@@ -122,16 +122,16 @@ function install_ofi_rccl {
   cd $WD
 }
 
-# Install ELPA latest version (elpa-2024.03.001) with AMD GPU support
+# Install ELPA latest version (elpa-2025.01.001) with AMD GPU support
 function install_elpa {
     cd $WD/src
     if [ ! -d elpa ]; then
-        ver=2024.03.001
+        ver=2025.01.001
         wget https://elpa.mpcdf.mpg.de/software/tarball-archive/Releases/$ver/elpa-$ver.tar.gz
         tar xzf elpa-$ver.tar.gz
         mv elpa-$ver elpa
         rm -f elpa-$ver.tar.gz
-        cd elpa && patch -p1 <$WD/src/elpa-$ver.patch
+        cd elpa
         cd ..
     fi
     cd elpa
@@ -142,7 +142,7 @@ function install_elpa {
 
     rm -fr build
     mkdir build && cd build
-    ../configure CXX=hipcc CC=hipcc FC=ftn CFLAGS="-march=znver3 -fPIC -O2 -I$ROCM_PATH/include --amdgpu-target=gfx90a -I$MPICH_DIR/include" FCFLAGS="-march=znver3 -O2 -fPIC" CXXFLAGS="-std=c++17 -march=znver3 -fPIC -O2 -I$ROCM_PATH/include --amdgpu-target=gfx90a -I$MPICH_DIR/include" LIBS="-L$ROCM_PATH/lib -lamdhip64 -lrocblas -L$MPICH_DIR/lib -lmpi $CRAY_XPMEM_POST_LINK_OPTS -lxpmem $PE_MPICH_GTL_DIR_amd_gfx90a $PE_MPICH_GTL_LIBS_amd_gfx90a -L$INST/lib -lscalapack -L$OLCF_OPENBLAS_ROOT/lib -lopenblas -L$INST/lib64" --enable-amd-gpu --prefix=$INST --disable-avx512 --enable-c-tests=no --enable-option-checking=fatal --enable-shared --enable-cpp-tests=no --enable-hipcub
+    ../configure CXX=hipcc CC=hipcc FC=ftn CFLAGS="-march=znver3 -fPIC -O2 $CRAY_ROCM_INCLUDE_OPTS -I$ROCM_PATH/include/rocsolver --amdgpu-target=gfx90a -I$MPICH_DIR/include" FCFLAGS="-march=znver3 -O2 -fPIC" CXXFLAGS="-std=c++17 -march=znver3 -fPIC -O2 $CRAY_ROCM_INCLUDE_OPTS -I$ROCM_PATH/include/rocsolver --amdgpu-target=gfx90a -I$MPICH_DIR/include" LIBS="-L$ROCM_PATH/lib -lamdhip64 -lrocblas -lrocsolver -L$MPICH_DIR/lib -lmpi $CRAY_XPMEM_POST_LINK_OPTS -lxpmem $PE_MPICH_GTL_DIR_amd_gfx90a $PE_MPICH_GTL_LIBS_amd_gfx90a -L$INST/lib -lscalapack -L$OLCF_OPENBLAS_ROOT/lib -lopenblas -L$INST/lib64" --enable-amd-gpu --prefix=$INST --disable-avx512 --enable-c-tests=no --enable-option-checking=fatal --enable-shared --enable-cpp-tests=no --enable-hipcub
 #              --enable-gpu-streams=amd
     make -j16
     make install
@@ -233,7 +233,7 @@ function compile_dftfe_debug {
   if [ ! -z $1 ]; then
     branch=$1
   else
-    branch=KerkerTesting
+    branch=migrateNewElpa
   fi
   if [ ! -d dftfe_$branch ]; then
     git clone -b $branch https://dsambit@bitbucket.org/dftfedevelopers/dftfe.git dftfe_$branch
