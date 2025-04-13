@@ -91,12 +91,12 @@ fn install_libxc {
 
 fn install_dftd4 {
   cd $WD/src
-  if(test ! -d dftd4-3.6.0) {
-    wget 'https://github.com/dftd4/dftd4/archive/refs/tags/v3.6.0.tar.gz'
-    tar xzf v3.6.0.tar.gz
-    rm v3.6.0.tar.gz
+  if(test ! -d dftd4-3.7.0) {
+    wget 'https://github.com/dftd4/dftd4/archive/refs/tags/v3.7.0.tar.gz'
+    tar xzf v3.7.0.tar.gz
+    rm v3.7.0.tar.gz
   }
-  cd dftd4-3.6.0
+  cd dftd4-3.7.0
   rm -fr build
   mkdir build && cd build
   cmake '-DCMAKE_Fortran_COMPILER=ftn' \
@@ -173,11 +173,11 @@ fn install_scalapack {
   cd $WD
 }
 
-# Install ELPA latest version (elpa-2024.03.001) with NVIDIA GPU support
+# Install ELPA latest version (elpa-2025.01.001) with NVIDIA GPU support
 fn install_elpa {
     cd $WD/src
     if(test ! -d elpa) {
-        ver=2024.03.001
+        ver=2025.01.001
         wget https://elpa.mpcdf.mpg.de/software/tarball-archive/Releases/$ver/elpa-$ver.tar.gz
         tar xzf elpa-$ver.tar.gz
         mv elpa-$ver elpa
@@ -404,7 +404,7 @@ fn install_dealii_complex {
 
 fn compile_dftfe_develop{
   cd $WD/src
-  branch = migrateLatestDealii
+  branch = migrateNewElpa
   if(! test -d dftfeDevelop) {
     git clone -b $branch https://dsambit@bitbucket.org/dftfedevelopers/dftfe.git dftfeDevelop
   } if not {
@@ -518,6 +518,7 @@ fn install_numdiff {
   ./configure '--prefix='$INST/numdiff_install
   make 
   make install
+  cd $WD
 }
 
 fn compile_dftfe{
