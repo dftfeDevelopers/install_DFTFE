@@ -7,9 +7,9 @@
 function install_alglib {
   cd $WD/src
   if [ ! -d alglib-cpp ]; then 
-    wget https://www.alglib.net/translator/re/alglib-3.20.0.cpp.gpl.tgz
-    tar xzf alglib-3.20.0.cpp.gpl.tgz
-    rm -f alglib-3.20.0.cpp.gpl.tgz
+    wget https://www.alglib.net/translator/re/alglib-4.04.0.cpp.gpl.tgz
+    tar xzf alglib-4.04.0.cpp.gpl.tgz
+    rm -f alglib-4.04.0.cpp.gpl.tgz
   fi
   cd alglib-cpp/src
   CC -o libAlglib.so -shared -fPIC -O2 *.cpp
@@ -23,12 +23,12 @@ function install_alglib {
 
 function install_libxc {
   cd $WD/src
-  if [ ! -d libxc-6.2.2 ]; then 
-    wget https://gitlab.com/libxc/libxc/-/archive/6.2.2/libxc-6.2.2.tar.gz
-    tar xzf libxc-6.2.2.tar.gz
-    rm libxc-6.2.2.tar.gz
+  if [ ! -d libxc-7.0.0 ]; then 
+    wget https://gitlab.com/libxc/libxc/-/archive/7.0.0/libxc-7.0.0.tar.gz
+    tar xzf libxc-7.0.0.tar.gz
+    rm libxc-7.0.0.tar.gz
   fi
-  cd libxc-6.2.2
+  cd libxc-7.0.0
   rm -fr build
   mkdir build && cd build
   cmake -DCMAKE_C_COMPILER=cc -DCMAKE_C_FLAGS="-O2 -fPIC" -DCMAKE_CXX_COMPILER=CC -DCMAKE_CXX_FLAGS="-O2 -fPIC" -DCMAKE_INSTALL_PREFIX=$INST -DBUILD_SHARED_LIBS=ON -DBUILD_TESTING=OFF ..
@@ -74,10 +74,10 @@ function install_p4est {
   rm -rf p4est
   mkdir p4est
   cd p4est
-  wget https://p4est.github.io/release/p4est-2.8.6.tar.gz
+  wget https://p4est.github.io/release/p4est-2.8.7.tar.gz
   wget https://raw.githubusercontent.com/dftfeDevelopers/dftfe/manual/p4est-setup-craycompiler.sh
   chmod u+x p4est-setup-craycompiler.sh
-  ./p4est-setup-craycompiler.sh p4est-2.8.6.tar.gz $INST
+  ./p4est-setup-craycompiler.sh p4est-2.8.7.tar.gz $INST
   cd $WD
  }
 
@@ -86,7 +86,7 @@ function install_p4est {
 # note that the openblas (sourced via module) provides lapack
 function install_scalapack {
   cd $WD/src
-  if [ ! -d scalapack-2.2.0 ]; then
+  if [ ! -d scalapack-2.2.2 ]; then
     wget https://github.com/Reference-ScaLAPACK/scalapack/archive/refs/tags/v2.2.2.tar.gz
     tar xzf v2.2.2.tar.gz
     rm -f v2.2.2.tar.gz
@@ -152,12 +152,12 @@ function install_elpa {
 
 function install_kokkos {
   cd $WD/src
-  if [ ! -d kokkos-4.3.00 ]; then 
-    wget https://github.com/kokkos/kokkos/archive/refs/tags/4.3.00.tar.gz
-    tar xzvf 4.3.00.tar.gz
-    rm 4.3.00.tar.gz
+  if [ ! -d kokkos-4.6.00 ]; then 
+    wget https://github.com/kokkos/kokkos/archive/refs/tags/4.6.00.tar.gz
+    tar xzvf 4.6.00.tar.gz
+    rm 4.6.00.tar.gz
   fi
-  cd kokkos-4.3.00
+  cd kokkos-4.6.00
   rm -fr build
   mkdir build && cd build
   cmake -DCMAKE_C_COMPILER=cc -DCMAKE_C_FLAGS="-O2 -fPIC" -DCMAKE_CXX_COMPILER=CC -DCMAKE_CXX_FLAGS="-O2 -fPIC" -DCMAKE_INSTALL_PREFIX=$INST ..
@@ -171,7 +171,7 @@ function install_kokkos {
 
 function install_dealii {
   cd $WD/src
-  ver=9.5.2
+  ver=9.6.2
   if [ ! -d dealii-$ver ]; then
       wget https://github.com/dealii/dealii/releases/download/v$ver/dealii-$ver.tar.gz
       tar xzf dealii-$ver.tar.gz 
