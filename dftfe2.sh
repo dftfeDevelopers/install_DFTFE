@@ -82,16 +82,16 @@ function install_p4est {
  }
 
 
-# Install netlib-scalapack 2.2.0 version linking to openblas
+# Install netlib-scalapack 2.2.2 version linking to openblas
 # note that the openblas (sourced via module) provides lapack
 function install_scalapack {
   cd $WD/src
   if [ ! -d scalapack-2.2.0 ]; then
-    wget https://github.com/Reference-ScaLAPACK/scalapack/archive/refs/tags/v2.2.0.tar.gz
-    tar xzf v2.2.0.tar.gz
-    rm -f v2.2.0.tar.gz
+    wget https://github.com/Reference-ScaLAPACK/scalapack/archive/refs/tags/v2.2.2.tar.gz
+    tar xzf v2.2.2.tar.gz
+    rm -f v2.2.2.tar.gz
   fi
-  cd scalapack-2.2.0
+  cd scalapack-2.2.2
   
   mkdir build && cd build
   cmake -DBUILD_SHARED_LIBS=ON -DBUILD_STATIC_LIBS=OFF -DBUILD_TESTING=OFF -DCMAKE_C_COMPILER=cc -DCMAKE_Fortran_COMPILER=ftn -DCMAKE_C_FLAGS="-fPIC -march=znver3" -DCMAKE_Fortran_FLAGS="-fPIC -march=znver3 -fallow-argument-mismatch" -DUSE_OPTIMIZED_LAPACK_BLAS=ON -DCMAKE_INSTALL_PREFIX=$INST ..
