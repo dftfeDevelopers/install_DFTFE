@@ -1,7 +1,8 @@
+module load cpe/25.03
 module load PrgEnv-gnu
-module load gcc-native/12.3
+module load gcc-native
 module load craype-accel-amd-gfx90a
-module load rocm
+module load rocm/6.3.1
 module load openblas
 module load cmake
 module load boost
