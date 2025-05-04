@@ -594,6 +594,7 @@ fn compile_dftfe{
       -DNUMDIFF_EXECUTABLE=$INST/numdiff_install/bin/numdiff\
       -DMINIMAL_COMPILE=OFF \
       -DHIGHERQUAD_PSP=ON \
+      -DUSE_64BIT_INT=ON \
   )  
 
   fn cmake_real {
