@@ -340,7 +340,7 @@ fn install_dealii_complex {
 
 fn compile_dftfe{
   cd $WD/src
-  branch = publicGithubDevelop
+  branch = release1.2
   if(! test -d dftfe) {
     git clone -b $branch https://github.com/dftfeDevelopers/dftfe.git dftfe
   } if not {
