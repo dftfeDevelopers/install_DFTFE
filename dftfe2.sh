@@ -307,7 +307,7 @@ function compile_dftfe {
   if [ ! -z $1 ]; then
     branch=$1
   else
-    branch=publicGithubDevelop
+    branch=release1.2
   fi
   if [ ! -d dftfe_$branch ]; then
     git clone -b $branch https://github.com/dftfeDevelopers/dftfe dftfe_$branch
