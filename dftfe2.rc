@@ -313,7 +313,7 @@ fn install_slepc {
 
 fn install_dealii_real {
   cd $WD/src
-  ver=9.5.2
+  ver=9.6.2
   if(test ! -d dealii-$ver) {
       wget https://github.com/dealii/dealii/releases/download/v$ver/dealii-$ver.tar.gz
       tar xzf dealii-$ver.tar.gz 
@@ -358,7 +358,7 @@ fn install_dealii_real {
 
 fn install_dealii_complex {
   cd $WD/src
-  ver=9.5.2
+  ver=9.6.2
   if(test ! -d dealii-$ver) {
       wget https://github.com/dealii/dealii/releases/download/v$ver/dealii-$ver.tar.gz
       tar xzf dealii-$ver.tar.gz 
