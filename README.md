@@ -12,7 +12,7 @@ cloning into the scatch directory
     cd /lustre/orion/[projid]/scratch/$USER
     git clone https://github.com/dftfeDevelopers/install_DFTFE.git install_DFTFE
     cd install_DFTFE
-    git checkout frontier_uInt64
+    git checkout frontierDevelop
 
 
 
