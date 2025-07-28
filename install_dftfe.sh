@@ -213,7 +213,7 @@ if [[ $downloadDependencies ]]; then
   wait
   cd $dftfeDir
   if [ -z "$( ls -A 'src' )" ]; then
-    git clone --branch syclMacroTesting https://bitbucket.org/dftfedevelopers/dftfe.git src
+    git clone --branch publicGithubDevelop https://bitbucket.org/dftfedevelopers/dftfe.git src
   else
     cd src
     git pull
