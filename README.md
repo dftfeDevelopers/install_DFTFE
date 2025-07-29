@@ -5,7 +5,7 @@ of [DFT-FE](https://github.com/dftfeDevelopers/dftfe) on ALCF Aurora machine.
 
 To use this script the cmake and boost modules need to be loaded
 
-    module load cmake boost
+    module load cmake boost ninja
 
 DFT-FE and its dependencies can be installed by running
 
