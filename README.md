@@ -29,7 +29,7 @@ To install DFT-FE, navigate to `$MYPROJECTDIR/install_DFTFE` and either run:
 ```bash
 ./install_dftfe.sh [OPTIONS]
 ```
-or submit the job script. The following options are available to download, compile, and install DFT-FE and its dependencies. After downloading the dependencies and DFT-FE source, you can install them individually if `--all` is not used:
+or submit the job script. The following options are available to download, compile, and install DFT-FE and its dependencies:
 ```bash
 --download          | Download all required dependencies and DFT-FE
 --all               | Download and install all dependencies and DFT-FE
@@ -39,6 +39,7 @@ or submit the job script. The following options are available to download, compi
 --nprocs=N          | Optional: Set the number of parallel tasks for compilation. Default: 2.
 --clean-build-files | Remove all source and build files after compilation
 ```
+After downloading the dependencies and DFT-FE source, you can compile and install them individually if `--all` is not used:
 ```bash
 --blaslapack
 --scalapack
