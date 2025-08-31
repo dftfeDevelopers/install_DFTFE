@@ -236,7 +236,7 @@ if [[ $downloadDependencies ]]; then
   wait
   cd $dftfeDir
   if [ -z "$( ls -A 'src' )" ]; then
-    git clone -b $branch https://nishantgupta13@bitbucket.org/dftfedevelopers/dftfe.git src
+    git clone -b $branch https://knikhil1995:ATBBvqEtywTjyx5ZaDWy98tzCgF6EB0E134B@bitbucket.org/dftfedevelopers/dftfe.git src
   else
     cd src
     git pull
