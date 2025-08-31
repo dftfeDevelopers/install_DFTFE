@@ -90,7 +90,7 @@ done
 currentDir=$PWD
 cd $prefix
 dependencyDir=$prefix/dependencies
-dftfeDir="$prefix/dftfe_${branch}"
+dftfeDir=$prefix/dftfe
 mkdir -p $dependencyDir
 mkdir -p $dftfeDir
 mkdir -p $dftfeDir/src
