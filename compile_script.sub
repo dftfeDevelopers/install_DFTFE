@@ -1,0 +1,40 @@
+#!/bin/bash -l
+#PBS -l select=1:system=polaris
+#PBS -l place=scatter
+#PBS -l walltime=00:30:00
+#PBS -l filesystems=home:eagle
+#PBS -q debug-scaling
+#PBS -A DFTCalculations
+
+# load the same modules as the executable was built
+module use /soft/modulefiles
+module load spack-pe-base cmake
+module load PrgEnv-gnu/8.6.0
+module load cudatoolkit-standalone/12.9.1
+
+export PYTHON=python3
+export NCCL_NET_GDR_LEVEL=PHB
+export NCCL_CROSS_NIC=1
+export NCCL_COLLNET_ENABLE=1
+export NCCL_NET="AWS Libfabric"
+export LD_LIBRARY_PATH=/soft/libraries/aws-ofi-nccl/v1.9.1-aws/lib:$LD_LIBRARY_PATH
+export LD_LIBRARY_PATH=/soft/libraries/hwloc/lib/:$LD_LIBRARY_PATH
+export FI_CXI_DISABLE_HOST_REGISTER=1
+export FI_MR_CACHE_MONITOR=userfaultfd
+export FI_CXI_DEFAULT_CQ_SIZE=131072
+export LIBRARY_PATH=$LD_LIBRARY_PATH:$LIBRARY_PATH
+# Enable GPU-MPI (if supported by application)
+export MPICH_GPU_SUPPORT_ENABLED=1
+
+# Change to working directory
+cd ${PBS_O_WORKDIR}
+# MPI and OpenMP settings
+NNODES=`wc -l < $PBS_NODEFILE`
+NRANKS_PER_NODE=$(nvidia-smi -L | wc -l)
+NDEPTH=8
+NTHREADS=1
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH
+echo "LD_LIBRARY_PATH: ${LD_LIBRARY_PATH}" 
+NTOTRANKS=$(( NNODES * NRANKS_PER_NODE ))
+echo "NUM_OF_NODES= ${NNODES} TOTAL_NUM_RANKS= ${NTOTRANKS} RANKS_PER_NODE= ${NRANKS_PER_NODE} THREADS_PER_RANK= ${NTHREADS}"
+./install_dftfe.sh --all --nprocs=16 --branch=publicGithubDevelop --clean-build-files
