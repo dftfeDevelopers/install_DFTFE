@@ -1,22 +1,17 @@
 # Install DFT-FE on Polaris
 
-This repository provides a **bash-based install script** to build
-[DFT-FE](https://github.com/dftfeDevelopers/dftfe) and its dependencies
-on the **ALCF Polaris** supercomputer.
+This repository provides a **bash-based install script** to build [DFT-FE](https://github.com/dftfeDevelopers/dftfe) and its dependencies on the **ALCF Polaris** supercomputer.
+To use this script, clone the repository on the system where you plan to install DFT-FE. For example, to install into `$MYPROJECTDIR/install_DFTFE`:
 
-To use this script, clone the repository on the system where you plan to install DFT-FE.
-For example, to install into `$MYPROJECTDIR/install_DFTFE`:
-
+```bash
 cd "$MYPROJECTDIR"
 git clone https://github.com/dftfeDevelopers/install_DFTFE.git install_DFTFE
 cd install_DFTFE
 git checkout polarisScript
+```
+# Pre-requisites
 
-## Pre-requisites
-
-Because it's a better shell, the scripts are written
-in the [rc](http://doc.cat-v.org/plan_9/4th_edition/papers/rc)
-shell language.  Install `rc` by running
+Because it's a better shell, the scripts are written in the [rc](http://doc.cat-v.org/plan_9/4th_edition/papers/rc) shell language.  Install `rc` by running
 
     export LMOD_SYSTEM_NAME=polaris
     module load PrgEnv-gnu
@@ -43,31 +38,35 @@ This environment file is used both by the install and run
 phases of DFT-FE.
 
 ## Running the installation
-The installation itself is contained within the functions in
-`dftfe2.rc`.  Source this script using
 
-    . ./dftfe2.rc
+./install_dftfe.sh [OPTIONS]
 
-and then run the functions listed in that file manually, in order.
-For example, 
+```bash
+--branch=$BRANCH    | Optional: Specify the DFT-FE branch to download or compile. If provided, the
+                    | same branch must be used consistently with --download, --all, or --dftfe.
+                    | Default: `publicGithubDevelop`.
+--nprocs=N          | Optional: Set the number of parallel tasks for compilation. Default: 2.
 
-    install_blis
-    install_libflame
-    install_alglib
-    install_libxc
-    install_spglib
-    install_p4est
-    install_scalapack
-    install_elpa
-    install_dealii
-    install_dftd4 #(optional)
-    compile_dftfe
-
-Each function follows a standard pattern - download source into `$WD/src`,
-patch, compile, and install into `$INST`.  It is HIGHLY recommended
-to check all warnings and errors from these installs to be sure
-you have not ended up with broken packages.
-
+--download          | Download all required dependencies and the DFT-FE
+--all               | Download and install all dependencies and DFT-FE
+--clean-build-files | Remove all source and build files after compilation
+```
+After downloading dependencies and DFT-FE source, you can install dependencies and DFT-FE individually (if not using --all):
+```bash
+--blaslapack
+--scalapack
+--alglib
+--spglib
+--libxml2
+--numdiff
+--libxc
+--p4est
+--kokkos
+--boost
+--dealii
+--elpa
+--dftfe | Compile and install DFT-FE branch specified by `--branch` (default `publicGithubDevelop`))
+```
 
 ## Running DFT-FE
 
