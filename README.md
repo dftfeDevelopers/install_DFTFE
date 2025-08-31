@@ -7,12 +7,10 @@ on the **ALCF Polaris** supercomputer.
 To use this script, clone the repository on the system where you plan to install DFT-FE.
 For example, to install into `$MYPROJECTDIR/install_DFTFE`:
 
-```bash
 cd "$MYPROJECTDIR"
 git clone https://github.com/dftfeDevelopers/install_DFTFE.git install_DFTFE
 cd install_DFTFE
 git checkout polarisScript
-
 
 ## Pre-requisites
 
