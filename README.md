@@ -1,19 +1,18 @@
-# Install DFT-FE
+# Install DFT-FE on Polaris
 
-These install scripts provide a set of executable
-functions that install the necessary dependencies
-of [DFT-FE](https://github.com/dftfeDevelopers/dftfe)
-on ALCF Polaris.
+This repository provides a **bash-based install script** to build
+[DFT-FE](https://github.com/dftfeDevelopers/dftfe) and its dependencies
+on the **ALCF Polaris** supercomputer.
 
-To use these scripts, we assume you have cloned this
-repository onto a system where you intend to install DFT-FE.
-For example, I installed it into `$myprojectdir/install_DFTFE` after 
-cloning into the $myprojectdir directory
+To use this script, clone the repository on the system where you plan to install DFT-FE.
+For example, to install into `$MYPROJECTDIR/install_DFTFE`:
 
-    cd $myprojectdir
-    git clone https://github.com/dftfeDevelopers/install_DFTFE.git install_DFTFE
-    cd install_DFTFE
-    git checkout polarisScript
+```bash
+cd "$MYPROJECTDIR"
+git clone https://github.com/dftfeDevelopers/install_DFTFE.git install_DFTFE
+cd install_DFTFE
+git checkout polarisScript
+
 
 ## Pre-requisites
 
