@@ -2,37 +2,17 @@
 trap "pkill -9 wget; exit" INT
 set -e
 
-module use /soft/modulefiles
-module load spack-pe-base cmake
-module load PrgEnv-gnu/8.6.0
-module load cudatoolkit-standalone/12.9.1
+#LOAD MODULES
+#EXPORT ENVIRONMENTS
 
-export PYTHON=python3
-export NCCL_NET_GDR_LEVEL=PHB
-export NCCL_CROSS_NIC=1
-export NCCL_COLLNET_ENABLE=1
-export NCCL_NET="AWS Libfabric"
-export LD_LIBRARY_PATH=/soft/libraries/aws-ofi-nccl/v1.9.1-aws/lib:$LD_LIBRARY_PATH
-export LD_LIBRARY_PATH=/soft/libraries/hwloc/lib/:$LD_LIBRARY_PATH
-export FI_CXI_DISABLE_HOST_REGISTER=1
-export FI_MR_CACHE_MONITOR=userfaultfd
-export FI_CXI_DEFAULT_CQ_SIZE=131072
-export LIBRARY_PATH=$LD_LIBRARY_PATH:$LIBRARY_PATH
-export MPICH_GPU_SUPPORT_ENABLED=1
-export CRAY_ACCEL_TARGET=nvidia80
-export CRAY_TCMALLOC_MEMFS_FORCE=1
-export CRAYPE_LINK_TYPE=dynamic
-export CRAY_ACCEL_VENDOR=nvidia
-export PE_PRODUCT_LIST=$PE_PRODUCT_LIST:CRAY_ACCEL
-
-c_compiler=cc
-mpi_c_compiler=cc
+c_compiler=gcc
+mpi_c_compiler=mpicc
 c_flags="-fPIC -O2 -march=native"
-cxx_compiler=CC
-mpi_cxx_compiler=CC
+cxx_compiler=g++
+mpi_cxx_compiler=mpicxx
 cxx_flags="-fPIC -O2 -march=native"
-fortran_compiler=ftn
-mpi_fortran_compiler=ftn
+fortran_compiler=gfortran
+mpi_fortran_compiler=mpifort
 fortran_flags="-fPIC -O2 -march=native -fallow-argument-mismatch"
 device_compiler=nvcc
 device_flags="-arch=sm_80 -O2 -march=native -ccbin=$mpi_cxx_compiler"
@@ -69,7 +49,7 @@ xmlLibDir=""
 elpaDir=""
 dftdDir=""
 numdiffDir=""
-dcclDir="/soft/libraries/nccl/nccl_2.21.5-1+cuda12.2_x86_64"
+dcclDir="" # SET NCCL PATH
 blasLapackFlags=""
 scalapackFlags=""
 
@@ -79,7 +59,7 @@ p4estDir=""
 boostDir=""
 
 # Parse branch flag
-branch="publicGithubDevelop"
+branch="release1.2"
 
 # Installation script for DFT-FE and its dependencies
 currentDir=$PWD
