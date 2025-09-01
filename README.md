@@ -1,5 +1,5 @@
-# Install DFT-FE on Polaris
-This repository provides a **bash-based install script** to build [DFT-FE](https://github.com/dftfeDevelopers/dftfe) and its dependencies on the **ALCF Polaris** supercomputer.
+# Install DFT-FE on NSM Machines
+This repository provides a **bash-based install script** to build [DFT-FE](https://github.com/dftfeDevelopers/dftfe) and its dependencies on **NSM** machines.
 To use this script, clone the repository on the system where you plan to install DFT-FE. For example, to install into `$MYPROJECTDIR/install_DFTFE`:
 ```bash
 cd "$MYPROJECTDIR"
@@ -10,9 +10,8 @@ chmod +x install_dftfe.sh
 ```
 
 # Prerequisites
-The install and job scripts automatically load the required modules and set paths for DFT-FE:
+The following modules need to be loaded:
 ```bash
-
 GCC
 Open MPI
 NVCC
@@ -20,12 +19,11 @@ CUDA MATH LIBRARY
 ```
 
 ## Installation
-Installation can be done from the login node (use `--nprocs=2` (default)). Preferably, it should be performed on a compute node using the provided job script `compile_script.sub`.
-To install DFT-FE, navigate to `$MYPROJECTDIR/install_DFTFE` and either run:
+To install DFT-FE, navigate to `$MYPROJECTDIR/install_DFTFE` and either run (use `--nprocs=2` (default)):
 ```bash
 ./install_dftfe.sh [OPTIONS]
 ```
-or submit the job script. The following options are available to download, compile, and install DFT-FE and its dependencies:
+or submit a job script. The following options are available to download, compile, and install DFT-FE and its dependencies:
 ```bash
 --download          | Download all required dependencies and DFT-FE
 --all               | Download and install all dependencies and DFT-FE
