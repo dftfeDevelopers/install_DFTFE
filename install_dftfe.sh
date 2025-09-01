@@ -211,7 +211,7 @@ if [[ $downloadDependencies ]]; then
   wait
   cd $dftfeDir
   if [ -z "$( ls -A 'src' )" ]; then
-    git clone https://github.com/dftfeDevelopers/install_DFTFE src
+    git clone https://github.com/dftfeDevelopers/dftfe.git src
   else
     cd src
     git pull
