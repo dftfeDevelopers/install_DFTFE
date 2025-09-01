@@ -60,13 +60,15 @@ After downloading the dependencies and DFT-FE source, you can compile and instal
 DFT-FE is built in real and complex versions, depending on whether you want to enable k-points (supported only in the complex version). An example PBS job submission script for running GPU-enabled DFT-FE on a single node is shown below:
 ```bash
 #!/bin/bash -l
-#PBS -l select=8:system=polaris
+#PBS -l select=4:system=polaris
 #PBS -l place=scatter
-#PBS -l walltime=00:10:00
+#PBS -l walltime=00:59:59
 #PBS -l filesystems=home:eagle
 #PBS -q debug-scaling
 #PBS -A DFTCalculations
-module load craype-accel-nvidia80
+#PBS -e error.log
+#PBS -o output.log
+
 module use /soft/modulefiles
 module load spack-pe-base cmake
 module load PrgEnv-gnu/8.6.0
@@ -83,6 +85,7 @@ export FI_CXI_DISABLE_HOST_REGISTER=1
 export FI_MR_CACHE_MONITOR=userfaultfd
 export FI_CXI_DEFAULT_CQ_SIZE=131072
 export LIBRARY_PATH=$LD_LIBRARY_PATH:$LIBRARY_PATH
+
 # Enable GPU-MPI (if supported by application)
 export MPICH_GPU_SUPPORT_ENABLED=1
 export CRAY_ACCEL_TARGET=nvidia80
@@ -90,9 +93,11 @@ export CRAY_TCMALLOC_MEMFS_FORCE=1
 export CRAYPE_LINK_TYPE=dynamic
 export CRAY_ACCEL_VENDOR=nvidia
 export PE_PRODUCT_LIST=$PE_PRODUCT_LIST:CRAY_ACCEL
+
 # Change to working directory
 cd ${PBS_O_WORKDIR}
 ls ${PBS_O_WORKDIR}
+
 # MPI and OpenMP settings
 NNODES=`wc -l < $PBS_NODEFILE`
 NRANKS_PER_NODE=$(nvidia-smi -L | wc -l)
@@ -101,9 +106,12 @@ NTHREADS=8
 export DFTFE_NUM_THREADS=8
 NTOTRANKS=$(( NNODES * NRANKS_PER_NODE ))
 echo "NUM_OF_NODES= ${NNODES} TOTAL_NUM_RANKS= ${NTOTRANKS} RANKS_PER_NODE= ${NRANKS_PER_NODE} THREADS_PER_RANK= ${NTHREADS}"
-exe=/home/phanim/softwares/DFTFEinstallation/dftfe_PawReimplementation/install/real/dftfe
+
+exe=/home/phanim/softwares/DFTFEinstallation/dftfe_publicGithubDevelop/install/real/dftfe
+
 # For applications that internally handle binding MPI/OpenMP processes to GPUs
-#mpiexec -n ${NTOTRANKS} --ppn ${NRANKS_PER_NODE} --depth=${NDEPTH} --cpu-bind depth --env OMP_NUM_THREADS=${NTHREADS} -env OMP_PLACES=threads ./hello_affinity
+# mpiexec -n ${NTOTRANKS} --ppn ${NRANKS_PER_NODE} --depth=${NDEPTH} --cpu-bind depth --env OMP_NUM_THREADS=${NTHREADS} -env OMP_PLACES=threads ./hello_affinity
+
 # For applications that need mpiexec to bind MPI ranks to GPUs
-mpiexec -n ${NTOTRANKS} --ppn ${NRANKS_PER_NODE} --depth=${NDEPTH} --cpu-bind depth --env OMP_NUM_THREADS=${NTHREADS} -env OMP_PLACES=threads ./set_affinity_gpu_polaris.sh $exe parameterFileGPU_Poly6Mesh2D0.prm > Trial.op
+mpiexec -n ${NTOTRANKS} --ppn ${NRANKS_PER_NODE} --depth=${NDEPTH} --cpu-bind depth --env OMP_NUM_THREADS=${NTHREADS} -env OMP_PLACES=threads ./set_affinity_gpu_polaris.sh $exe parameterFileGPU.prm > output
 ```
