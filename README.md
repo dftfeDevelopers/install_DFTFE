@@ -12,15 +12,11 @@ chmod +x install_dftfe.sh
 # Prerequisites
 The install and job scripts automatically load the required modules and set paths for DFT-FE:
 ```bash
-module use /soft/modulefiles
-module load spack-pe-base cmake
-module load PrgEnv-gnu/8.6.0
-module load cudatoolkit-standalone/12.9.1
 
-export LD_LIBRARY_PATH=/soft/libraries/aws-ofi-nccl/v1.9.1-aws/lib:$LD_LIBRARY_PATH  # AWS OFI NCCL plugin
-export LD_LIBRARY_PATH=/soft/libraries/hwloc/lib/:$LD_LIBRARY_PATH                   # hwloc
-
-dcclDir="/soft/libraries/nccl/nccl_2.21.5-1+cuda12.2_x86_64"                         # DCCL
+GCC
+Open MPI
+NVCC
+CUDA MATH LIBRARY
 ```
 
 ## Installation
