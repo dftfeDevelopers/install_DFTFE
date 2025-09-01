@@ -37,7 +37,7 @@ testing=ON
 minimal_compile=ON
 
 #Option to link to DCCL library (Only for GPU compilation)
-withDCCL=ON
+withDCCL=OFF
 
 #Paths to pre-compiled dftfe dependencies if any
 dealiiDir=""
