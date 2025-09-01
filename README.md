@@ -5,7 +5,7 @@ To use this script, clone the repository on the system where you plan to install
 cd "$MYPROJECTDIR"
 git clone https://github.com/dftfeDevelopers/install_DFTFE.git install_DFTFE
 cd install_DFTFE
-git checkout polarisScript
+git checkout nsm_A100
 chmod +x install_dftfe.sh
 ```
 
@@ -33,9 +33,6 @@ or submit the job script. The following options are available to download, compi
 ```bash
 --download          | Download all required dependencies and DFT-FE
 --all               | Download and install all dependencies and DFT-FE
---branch=$BRANCH    | Optional: Specify the DFT-FE branch to download or compile. If provided, the
-                    | same branch must be used consistently with --download, --all, or --dftfe.
-                    | Default: `publicGithubDevelop`.
 --nprocs=N          | Optional: Set the number of parallel tasks for compilation. Default: 2.
 --clean-build-files | Remove all source and build files after compilation
 ```

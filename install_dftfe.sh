@@ -80,11 +80,6 @@ boostDir=""
 
 # Parse branch flag
 branch="publicGithubDevelop"
-for arg in "$@"; do
-  if [[ "$arg" == --branch=* ]]; then
-    branch="${arg#--branch=}"
-  fi
-done
 
 # Installation script for DFT-FE and its dependencies
 currentDir=$PWD
@@ -236,7 +231,7 @@ if [[ $downloadDependencies ]]; then
   wait
   cd $dftfeDir
   if [ -z "$( ls -A 'src' )" ]; then
-    git clone -b "$branch" https://nishantgupta13:ATBBTbueHu6RwXsU58CzRee3ntER0DD7086F@bitbucket.org/dftfedevelopers/dftfe.git src
+    git clone https://github.com/dftfeDevelopers/install_DFTFE src
   else
     cd src
     git pull
