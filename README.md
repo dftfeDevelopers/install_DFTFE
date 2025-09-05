@@ -1,7 +1,7 @@
 # Install DFT-FE
 
 This install script installs the necessary dependencies
-of [DFT-FE](https://github.com/dftfeDevelopers/dftfe) on ALCF Aurora machine.
+of [DFT-FE](https://github.com/dftfeDevelopers/dftfe) on ALCF Aurora machine. Install in the flare filesystem.
 
 To use this script the cmake and boost modules need to be loaded
 
@@ -37,7 +37,7 @@ An example batch script running GPU-enabled DFT-FE on 64 nodes is below:
     #PBS -l select=64
     #PBS -l place=scatter
     #PBS -l walltime=00:35:00
-    #PBS -l filesystems=home
+    #PBS -l filesystems=flare
     #PBS -j oe
     #PBS -q prod
     #PBS -A DFTCalc2
