@@ -27,6 +27,14 @@ or submit a job script. The following options are available to download, compile
 ```bash
 --download          | Download all required dependencies and DFT-FE
 --all               | Download and install all dependencies and DFT-FE
+--branch=$BRANCH    | Optional: Specify the DFT-FE branch to download or compile.
+                    | Default: `release1.2` (latest release).
+                    | To use the development version with the latest features,
+                    | set `--branch=publicGithubDevelop`.
+                    | Any DFT-FE branch can be compiled once dependencies
+                    | are installed; reinstalling dependencies is not required.
+                    | Note: The same branch must be used consistently with
+                    | --download, --all, or --dftfe.
 --nprocs=N          | Optional: Set the number of parallel tasks for compilation. Default: 2.
 --clean-build-files | Remove all source and build files after compilation
 ```
