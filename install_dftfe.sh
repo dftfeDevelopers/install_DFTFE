@@ -60,6 +60,11 @@ boostDir=""
 
 # Parse branch flag
 branch="release1.2"
+for arg in "$@"; do
+  if [[ "$arg" == --branch=* ]]; then
+    branch="${arg#--branch=}"
+  fi
+done
 
 # Installation script for DFT-FE and its dependencies
 currentDir=$PWD
