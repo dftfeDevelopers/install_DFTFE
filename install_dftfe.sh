@@ -197,51 +197,51 @@ if [[ $downloadDependencies ]]; then
   echo "Downloading required dependencies"
   cd $dependencyDir/src
   if [ -z $alglibDir ]; then
-    wget -N -q --show-progress https://www.alglib.net/translator/re/alglib-4.06.0.cpp.gpl.tgz &
+    wget -N -q https://www.alglib.net/translator/re/alglib-4.06.0.cpp.gpl.tgz &
   fi
   if [ -z $libxcDir ]; then
-    wget -N -q --show-progress https://gitlab.com/libxc/libxc/-/archive/7.0.0/libxc-7.0.0.tar.gz &
+    wget -N -q https://gitlab.com/libxc/libxc/-/archive/7.0.0/libxc-7.0.0.tar.gz &
   fi
   if [ -z $spglibDir ]; then
-    wget -N -q --show-progress https://github.com/spglib/spglib/archive/refs/tags/v2.6.0.tar.gz &
+    wget -N -q https://github.com/spglib/spglib/archive/refs/tags/v2.6.0.tar.gz &
   fi
   if [ -z $numdiffDir ]; then
-    wget -N -q --show-progress https://nongnu.askapache.com/numdiff/numdiff-5.9.0.tar.gz &
+    wget -N -q https://nongnu.askapache.com/numdiff/numdiff-5.9.0.tar.gz &
   fi
   if [ -z $xmlLibDir ]; then
-    wget -N -q --show-progress https://github.com/GNOME/libxml2/archive/refs/tags/v2.13.5.tar.gz &
+    wget -N -q https://github.com/GNOME/libxml2/archive/refs/tags/v2.13.5.tar.gz &
   fi
   if [ -z $dftdDir ]; then
-    wget -N -q --show-progress https://github.com/dftd3/simple-dftd3/archive/refs/tags/v1.2.1.tar.gz &
-    wget -N -q --show-progress https://github.com/dftd4/dftd4/archive/refs/tags/v3.7.0.tar.gz &
+    wget -N -q https://github.com/dftd3/simple-dftd3/archive/refs/tags/v1.2.1.tar.gz &
+    wget -N -q https://github.com/dftd4/dftd4/archive/refs/tags/v3.7.0.tar.gz &
   fi
   if [ -z $dealiiRealDir ]; then
     if [ -z $p4estDir ]; then
-     wget -N -q --show-progress https://p4est.github.io/release/p4est-2.8.7.tar.gz &
+     wget -N -q https://p4est.github.io/release/p4est-2.8.7.tar.gz &
     fi
     if [ -z $kokkosDir ]; then
-     wget -N -q --show-progress https://github.com/kokkos/kokkos/archive/refs/tags/4.3.00.tar.gz &
+     wget -N -q https://github.com/kokkos/kokkos/archive/refs/tags/4.3.00.tar.gz &
     fi
     if [ -z $boostDir ]; then
-     wget -N -q --show-progress https://sourceforge.net/projects/boost/files/boost/1.86.0/boost_1_86_0.tar.bz2 &
+     wget -N -q https://sourceforge.net/projects/boost/files/boost/1.86.0/boost_1_86_0.tar.bz2 &
     fi
     if [ -z $petscRealDir ]; then
-     wget -N -q --show-progress https://web.cels.anl.gov/projects/petsc/download/release-snapshots/petsc-3.24.1.tar.gz &
+     wget -N -q https://web.cels.anl.gov/projects/petsc/download/release-snapshots/petsc-3.24.1.tar.gz &
     fi
     if [ -z $slepcRealDir ]; then
-     wget -N -q --show-progress https://slepc.upv.es/download/distrib/slepc-3.24.0.tar.gz &
+     wget -N -q https://slepc.upv.es/download/distrib/slepc-3.24.0.tar.gz &
     fi
-    wget -N -q --show-progress https://github.com/dealii/dealii/releases/download/v9.7.1/dealii-9.7.1.tar.gz &
+    wget -N -q https://github.com/dealii/dealii/releases/download/v9.7.1/dealii-9.7.1.tar.gz &
   fi
   if [ -z "$blasLapackFlags" ]; then
-    wget -N -q --show-progress https://github.com/flame/blis/archive/refs/tags/2.0.tar.gz &
-    wget -N -q --show-progress https://github.com/flame/libflame/archive/5.2.0.tar.gz &
+    wget -N -q https://github.com/flame/blis/archive/refs/tags/2.0.tar.gz &
+    wget -N -q https://github.com/flame/libflame/archive/5.2.0.tar.gz &
   fi
   if [ -z "$scalapackFlags" ]; then
-    wget -N -q --show-progress https://github.com/Reference-ScaLAPACK/scalapack/archive/refs/tags/v2.2.2.tar.gz &
+    wget -N -q https://github.com/Reference-ScaLAPACK/scalapack/archive/refs/tags/v2.2.2.tar.gz &
   fi
   if [ -z $elpaDir ]; then
-    wget -N -q --show-progress https://elpa.mpcdf.mpg.de/software/tarball-archive/Releases/2025.06.001/elpa-2025.06.001.tar.gz &
+    wget -N -q https://elpa.mpcdf.mpg.de/software/tarball-archive/Releases/2025.06.001/elpa-2025.06.001.tar.gz &
   fi
   wait
   cd $dftfeDir
