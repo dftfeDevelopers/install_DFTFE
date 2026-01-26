@@ -77,8 +77,7 @@ For example,
     install_petsc
     install_slepc
     install_numdiff
-    install_dealii_real
-    install_dealii_complex
+    install_dealii
     install_dftd4 #(optional)
     compile_dftfe
 

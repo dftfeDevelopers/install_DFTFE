@@ -135,10 +135,10 @@ fn install_p4est{
   rm -rf p4est
   mkdir p4est
   cd p4est
-  wget 'https://p4est.github.io/release/p4est-2.8.6.tar.gz'
+  wget 'https://p4est.github.io/release/p4est-2.8.7.tar.gz'
   wget 'https://raw.githubusercontent.com/dftfeDevelopers/dftfe/manual/p4est-setup-craycompiler.sh'
   chmod u+x p4est-setup-craycompiler.sh
-  ./p4est-setup-craycompiler.sh p4est-2.8.6.tar.gz $INST
+  ./p4est-setup-craycompiler.sh p4est-2.8.7.tar.gz $INST
   cd $WD
  }
 
@@ -311,9 +311,51 @@ fn install_slepc {
 
 # Install latest release dealii from https://github.com/dealii/dealii
 
+fn install_dealii{
+  cd $WD/src    
+  ver=9.6.2 
+  if(test ! -d dealii-$ver) {
+      wget https://github.com/dealii/dealii/releases/download/v$ver/dealii-$ver.tar.gz
+      tar xzf dealii-$ver.tar.gz
+  }
+  cd dealii-$ver
+  rm -fr build 
+  mkdir build
+  cd build
+  cmake '-DCMAKE_CXX_STANDARD=17' \
+        '-DCMAKE_CXX_FLAGS=-std=c++17' \
+        '-DCMAKE_C_FLAGS=-std=c++17' \
+        '-DDEAL_II_FORCE_BUNDLED_BOOST=OFF' \
+        '-DDEAL_II_ALLOW_PLATFORM_INTROSPECTION=OFF' \
+        '-DKOKKOS_DIR='$INST \
+        '-DDEAL_II_WITH_TASKFLOW=OFF' \
+        '-DCMAKE_BUILD_TYPE=Release' \
+        '-DDEAL_II_CXX_FLAGS_RELEASE=-O2' \
+        '-DCMAKE_C_COMPILER=cc' \
+        '-DCMAKE_CXX_COMPILER=CC' \
+        '-DCMAKE_Fortran_COMPILER=ftn' \
+        '-DDEAL_II_WITH_TBB=OFF' \
+        '-DDEAL_II_COMPONENT_EXAMPLES=OFF' \
+        '-DDEAL_II_WITH_MPI=ON' \
+        '-DDEAL_II_WITH_64BIT_INDICES=ON' \
+        '-DP4EST_DIR='$INST \
+        '-DDEAL_II_WITH_LAPACK=ON' \
+        '-DLAPACK_DIR='$OLCF_OPENBLAS_ROOT';'$INST \
+        '-DLAPACK_FOUND=true' \
+        '-DLAPACK_LIBRARIES='$INST/lib/libblis.so';'$INST/lib/libflame.so\
+        '-DCMAKE_INSTALL_PREFIX='$INST/dealii \
+        ..
+  # may add to lapack libraries ';'$INST/lib64/liblapack.so \
+  make -j16 || echo 1
+  make install
+  mv $INST/dealii/ ^ (detailed.log summary.log README.md LICENSE.md) $INST/dealii/share/deal.II/
+  cd $WD
+}
+
+
 fn install_dealii_real {
   cd $WD/src
-  ver=9.5.2
+  ver=9.6.2
   if(test ! -d dealii-$ver) {
       wget https://github.com/dealii/dealii/releases/download/v$ver/dealii-$ver.tar.gz
       tar xzf dealii-$ver.tar.gz 
@@ -358,7 +400,7 @@ fn install_dealii_real {
 
 fn install_dealii_complex {
   cd $WD/src
-  ver=9.5.2
+  ver=9.6.2
   if(test ! -d dealii-$ver) {
       wget https://github.com/dealii/dealii/releases/download/v$ver/dealii-$ver.tar.gz
       tar xzf dealii-$ver.tar.gz 
@@ -476,7 +518,7 @@ fn compile_dftfe_develop{
   fn cmake_real {
     mkdir -p real && cd real
     cmake $cmake_flags \
-      -DWITH_COMPLEX=OFF -DDEAL_II_DIR=$INST/dealii_real\
+      -DWITH_COMPLEX=OFF -DDEAL_II_DIR=$INST/dealii\
       $1
     make -j8
     cd ..
@@ -485,7 +527,7 @@ fn compile_dftfe_develop{
   fn cmake_cplx {
     mkdir -p complex && cd complex
     cmake $cmake_flags \
-      -DWITH_COMPLEX=ON -DDEAL_II_DIR=$INST/dealii_complex\
+      -DWITH_COMPLEX=ON -DDEAL_II_DIR=$INST/dealii\
       $1
     make -j8
     cd ..
@@ -520,6 +562,100 @@ fn install_numdiff {
   make install
   cd $WD
 }
+
+fn compile_dftfe_debug{
+  cd /global/homes/d/dsambit/dftfeHalfPrecisionDevelop
+  SRC = `{pwd}
+  cd $WD/src/dftfeDebug
+  mkdir build
+  cd build
+
+  LD_LIBRARY_PATH = $LD_LIBRARY_PATH:$INST/lib
+  LD_LIBRARY_PATH = $LD_LIBRARY_PATH:$INST/lib64
+  LD_LIBRARY_PATH = $LD_LIBRARY_PATH:$INST/numdiff_install
+  alglibDir=$INST/lib/alglib
+  libxcDir=$INST
+  spglibDir=$INST
+  xmlIncludeDir=/usr/include/libxml2
+  xmlLibDir=/usr/lib64
+
+  ELPA_PATH=$INST
+  DCCL_PATH=$NCCL_DIR
+  TORCH_PATH=''
+
+  #Compiler options and flags
+  cxx_compiler = CC
+  cxx_flags = '-march=znver3 -fPIC'
+  cxx_flagsRelease = '-fPIC -target-accel=nvidia80 -I'$MPICH_DIR'/include'
+  device_flags ='-I'$MPICH_DIR'/include -arch=sm_80'
+  device_architectures =80
+
+  # build type: "Release" or "Debug"
+  build_type=Release
+  out=`{echo $build_type | tr '[:upper:]' '[:lower:]'}
+
+  # Note: MDI_PATH is not used by project.
+  cmake_flags = ( \
+      -DCMAKE_CXX_STANDARD=17 \
+      -DCMAKE_CXX_COMPILER=$cxx_compiler \
+      -DCMAKE_CXX_FLAGS=$cxx_flags \
+      -DCMAKE_CXX_FLAGS_RELEASE=$cxx_flagsRelease \
+      -DCMAKE_BUILD_TYPE=$build_type \
+      -DALGLIB_DIR=$alglibDir \
+      -DLIBXC_DIR=$libxcDir \
+      -DSPGLIB_DIR=$spglibDir \
+      -DXML_LIB_DIR=$xmlLibDir \
+      -DXML_INCLUDE_DIR=$xmlIncludeDir \
+      -DWITH_MDI=OFF \
+      -DMDI_PATH= \
+      -DWITH_DCCL=ON \
+      -DWITH_DCCL_P2P=OFF \
+      -DWITH_TORCH=OFF \
+      -DCMAKE_PREFIX_PATH=$ELPA_PATH';'$DCCL_PATH';'$TORCH_PATH \
+      -DWITH_GPU=ON \
+      -DGPU_LANG=cuda \
+      -DGPU_VENDOR=nvidia \
+      -DWITH_GPU_AWARE_MPI=OFF \
+      -DCMAKE_CUDA_FLAGS=$device_flags \
+      -DCMAKE_CUDA_ARCHITECTURES=$device_architectures \
+      -DWITH_TESTING=ON \
+      -DNUMDIFF_EXECUTABLE=$INST/numdiff_install/bin/numdiff\
+      -DMINIMAL_COMPILE=OFF \
+      -DHIGHERQUAD_PSP=ON \
+      -DUSE_64BIT_INT=ON \
+  )
+
+  fn cmake_real {
+    mkdir -p real && cd real
+    cmake $cmake_flags \
+      -DWITH_COMPLEX=OFF -DDEAL_II_DIR=$INST/dealii \
+      $1
+    make -j8
+    cd ..
+  }
+
+  fn cmake_cplx {
+    mkdir -p complex && cd complex
+    cmake $cmake_flags \
+      -DWITH_COMPLEX=ON -DDEAL_II_DIR=$INST/dealii \
+      $1
+    make -j8
+    cd ..
+  }
+
+  mkdir -p $out
+  cd $out
+
+  echo 'Building Real executable in $build_type mode...'
+  cmake_real $SRC
+
+  echo 'Building Complex executable in $build_type mode...'
+  cmake_cplx $SRC
+
+  echo 'Build complete.'
+  cd $WD
+}
+
 
 fn compile_dftfe{
   cd $WD/src
@@ -600,7 +736,7 @@ fn compile_dftfe{
   fn cmake_real {
     mkdir -p real && cd real
     cmake $cmake_flags \
-      -DWITH_COMPLEX=OFF -DDEAL_II_DIR=$INST/dealii_real \
+      -DWITH_COMPLEX=OFF -DDEAL_II_DIR=$INST/dealii \
       $1
     make -j8
     cd ..
@@ -609,7 +745,7 @@ fn compile_dftfe{
   fn cmake_cplx {
     mkdir -p complex && cd complex
     cmake $cmake_flags \
-      -DWITH_COMPLEX=ON -DDEAL_II_DIR=$INST/dealii_complex \
+      -DWITH_COMPLEX=ON -DDEAL_II_DIR=$INST/dealii \
       $1
     make -j8
     cd ..
