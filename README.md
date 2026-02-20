@@ -39,7 +39,6 @@ For example,
     install_spglib
     install_p4est
     install_scalapack
-    install_ofi_rccl (optional)
     install_elpa
     install_kokkos
     install_dealii
