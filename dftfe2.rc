@@ -204,7 +204,7 @@ fn install_elpa {
                '--enable-option-checking=fatal' --enable-shared \
                '--enable-cpp-tests=no' '--enable-nvidia-gpu' \
                '--enable-gpu-streams=nvidia' \
-               '--with-NVIDIA-GPU-compute-capability=sm_80'
+               '--with-NVIDIA-GPU-compute-capability=sm_80' \
                '--with-cuda-path='$CUDA_HOME \
                '--with-cuda-sdk-path='$CUDA_HOME \
                '--enable-option-checking=fatal' \
