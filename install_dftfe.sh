@@ -27,7 +27,7 @@ withGPU=ON
 gpuLang="sycl"
 gpuVendor="intel"
 withGPUAwareMPI=OFF
-withHigherQuadPSP=OFF
+withHigherQuadPSP=ON
 testing=ON
 minimal_compile=ON
 
