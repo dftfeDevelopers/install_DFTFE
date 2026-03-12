@@ -161,7 +161,7 @@ fn install_scalapack {
     '-DBUILD_TESTING=OFF' \
     '-DCMAKE_C_COMPILER=cc' \
     '-DCMAKE_Fortran_COMPILER=ftn' \
-    '-DCMAKE_C_FLAGS=-fPIC -march=znver3' \
+    '-DCMAKE_C_FLAGS=-fPIC -march=znver3 -Wno-implicit-function-declaration' \
     '-DCMAKE_Fortran_FLAGS=-fPIC -march=znver3 -fallow-argument-mismatch' \
     '-DUSE_OPTIMIZED_LAPACK_BLAS=ON' \
     '-DBLAS_LIBRARIES='$INST'/lib/libblis.so' \
