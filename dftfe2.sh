@@ -126,7 +126,7 @@ function install_ofi_rccl {
 function install_elpa {
     cd $WD/src
     if [ ! -d elpa ]; then
-        ver=2025.06.002
+        ver=2026.02.001
         wget https://elpa.mpcdf.mpg.de/software/tarball-archive/Releases/$ver/elpa-$ver.tar.gz
         tar xzf elpa-$ver.tar.gz
         mv elpa-$ver elpa
