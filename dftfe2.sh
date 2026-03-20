@@ -7,9 +7,9 @@
 function install_alglib {
   cd $WD/src
   if [ ! -d alglib-cpp ]; then 
-    wget https://www.alglib.net/translator/re/alglib-4.04.0.cpp.gpl.tgz
-    tar xzf alglib-4.04.0.cpp.gpl.tgz
-    rm -f alglib-4.04.0.cpp.gpl.tgz
+    wget https://www.alglib.net/translator/re/alglib-4.06.0.cpp.gpl.tgz
+    tar xzf alglib-4.06.0.cpp.gpl.tgz
+    rm -f alglib-4.06.0.cpp.gpl.tgz
   fi
   cd alglib-cpp/src
   CC -o libAlglib.so -shared -fPIC -O2 *.cpp
@@ -126,7 +126,7 @@ function install_ofi_rccl {
 function install_elpa {
     cd $WD/src
     if [ ! -d elpa ]; then
-        ver=2025.01.001
+        ver=2025.06.002
         wget https://elpa.mpcdf.mpg.de/software/tarball-archive/Releases/$ver/elpa-$ver.tar.gz
         tar xzf elpa-$ver.tar.gz
         mv elpa-$ver elpa
@@ -171,7 +171,7 @@ function install_kokkos {
 
 function install_dealii {
   cd $WD/src
-  ver=9.6.2
+  ver=9.7.1
   if [ ! -d dealii-$ver ]; then
       wget https://github.com/dealii/dealii/releases/download/v$ver/dealii-$ver.tar.gz
       tar xzf dealii-$ver.tar.gz 
@@ -179,7 +179,7 @@ function install_dealii {
   cd dealii-$ver
   rm -fr build
   mkdir build && cd build
-  cmake -DCMAKE_CXX_STANDARD=17 -DCMAKE_CXX_FLAGS="-march=native -std=c++17" -DCMAKE_C_FLAGS=-march=native -DDEAL_II_ALLOW_PLATFORM_INTROSPECTION=OFF         -DDEAL_II_FORCE_BUNDLED_BOOST=OFF -DDEAL_II_WITH_TASKFLOW=OFF -DKOKKOS_DIR=$INST -DCMAKE_BUILD_TYPE=Release -DDEAL_II_CXX_FLAGS_RELEASE=-O2 -DCMAKE_C_COMPILER=cc -DCMAKE_CXX_COMPILER=CC -DCMAKE_Fortran_COMPILER=ftn -DDEAL_II_WITH_TBB=OFF -DDEAL_II_COMPONENT_EXAMPLES=OFF -DDEAL_II_WITH_MPI=ON -DDEAL_II_WITH_64BIT_INDICES=ON -DP4EST_DIR=$INST -DDEAL_II_WITH_LAPACK=ON -DLAPACK_DIR="$OLCF_OPENBLAS_ROOT;$INST" -DLAPACK_FOUND=true -DLAPACK_LIBRARIES="$OLCF_OPENBLAS_ROOT/lib/libopenblas.so" -DCMAKE_INSTALL_PREFIX=$INST ..
+  cmake -DCMAKE_CXX_STANDARD=17 -DCMAKE_CXX_FLAGS="-march=native -std=c++17" -DCMAKE_C_FLAGS=-march=native -DDEAL_II_ALLOW_PLATFORM_INTROSPECTION=OFF -DDEAL_II_WITH_COMPLEX_VALUES=ON -DDEAL_II_FORCE_BUNDLED_BOOST=OFF -DDEAL_II_WITH_TASKFLOW=OFF -DKOKKOS_DIR=$INST -DCMAKE_BUILD_TYPE=Release -DDEAL_II_CXX_FLAGS_RELEASE=-O2 -DCMAKE_C_COMPILER=cc -DCMAKE_CXX_COMPILER=CC -DCMAKE_Fortran_COMPILER=ftn -DDEAL_II_WITH_TBB=OFF -DDEAL_II_COMPONENT_EXAMPLES=OFF -DDEAL_II_WITH_MPI=ON -DDEAL_II_WITH_64BIT_INDICES=ON -DP4EST_DIR=$INST -DDEAL_II_WITH_LAPACK=ON -DLAPACK_DIR="$OLCF_OPENBLAS_ROOT;$INST" -DLAPACK_FOUND=true -DLAPACK_LIBRARIES="$OLCF_OPENBLAS_ROOT/lib/libopenblas.so" -DCMAKE_INSTALL_PREFIX=$INST ..
   make -j16 
   make install
   mv $INST/*.log $INST/share/deal.II/
@@ -310,7 +310,7 @@ function compile_dftfe {
     branch=publicGithubDevelop
   fi
   if [ ! -d dftfe_$branch ]; then
-    git clone -b $branch https://github.com/dftfeDevelopers/dftfe dftfe_$branch
+    git clone -b $branch https://bitbucket.org/dftfedevelopers/dftfe.git dftfe_$branch
     cd dftfe_$branch
   else
     cd dftfe_$branch
@@ -319,7 +319,7 @@ function compile_dftfe {
   fi
   rm -fr build
   SRC=$PWD
-  mkdir build && cd build 
+  mkdir -p build && cd build 
   dealiiDir=$INST
   alglibDir=$INST/lib/alglib
   libxcDir=$INST
