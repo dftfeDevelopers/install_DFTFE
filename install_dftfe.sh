@@ -5,15 +5,28 @@ set -e
 #LOAD MODULES
 #EXPORT ENVIRONMENTS
 
-c_compiler=gcc
+#intel compiler flags
+c_compiler=icx
 mpi_c_compiler=mpicc
-c_flags="-fPIC -O2 -march=native"
-cxx_compiler=g++
+c_flags="-fPIC -O2 -xHost -qopenmp -fp-model=precise"
+cxx_compiler=icpx
 mpi_cxx_compiler=mpicxx
-cxx_flags="-fPIC -O2 -march=native"
-fortran_compiler=gfortran
+cxx_flags="-fPIC -O2 -xHost -qopenmp -fp-model=precise"
+fortran_compiler=ifx
 mpi_fortran_compiler=mpifort
-fortran_flags="-fPIC -O2 -march=native -fallow-argument-mismatch"
+fortran_flags="-fPIC -O2 -xHost -qopenmp -assume dummy_aliases -fp-model=precise"
+
+#gcc compiler flags
+#c_compiler=gcc
+#mpi_c_compiler=mpicc
+#c_flags="-fPIC -O2 -march=native -fopenmp"
+#cxx_compiler=g++
+#mpi_cxx_compiler=mpicxx
+#cxx_flags="-fPIC -O2 -march=native -fopenmp"
+#fortran_compiler=gfortran
+#mpi_fortran_compiler=mpifort
+#fortran_flags="-fPIC -O2 -march=native -fopenmp -fallow-argument-mismatch"
+
 device_compiler=nvcc
 device_flags="-arch=sm_80 -O2 -march=native -ccbin=$mpi_cxx_compiler"
 device_architectures="80"
