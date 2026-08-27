@@ -6,33 +6,46 @@ set -e
 #EXPORT ENVIRONMENTS
 
 #intel compiler flags
-c_compiler=icx
-mpi_c_compiler=mpicc
-c_flags="-fPIC -O2 -xHost -qopenmp -fp-model=precise"
-cxx_compiler=icpx
-mpi_cxx_compiler=mpicxx
-cxx_flags="-fPIC -O2 -xHost -qopenmp -fp-model=precise"
-fortran_compiler=ifx
-mpi_fortran_compiler=mpifort
-fortran_flags="-fPIC -O2 -xHost -qopenmp -assume dummy_aliases -fp-model=precise"
+#c_compiler=icx
+#mpi_c_compiler=mpicc
+#c_flags="-fPIC -O2 -xHost -qopenmp -fp-model=precise"
+#cxx_compiler=icpx
+#mpi_cxx_compiler=mpicxx
+#cxx_flags="-fPIC -O2 -xHost -qopenmp -fp-model=precise"
+#fortran_compiler=ifx
+#mpi_fortran_compiler=mpifort
+#fortran_flags="-fPIC -O2 -xHost -qopenmp -assume dummy_aliases -fp-model=precise"
 
 #gcc compiler flags
-#c_compiler=gcc
-#mpi_c_compiler=mpicc
-#c_flags="-fPIC -O2 -march=native -fopenmp"
-#cxx_compiler=g++
-#mpi_cxx_compiler=mpicxx
-#cxx_flags="-fPIC -O2 -march=native -fopenmp"
-#fortran_compiler=gfortran
-#mpi_fortran_compiler=mpifort
-#fortran_flags="-fPIC -O2 -march=native -fopenmp -fallow-argument-mismatch"
+# SYSROOT_INC supplies an additional include directory, added with -idirafter
+# rather than -I/-isystem/CPATH: libstdc++'s C-compat wrappers (<cstdlib>,
+# <cmath>, ...) resolve the underlying C header with #include_next, which only
+# continues searching directories positioned AFTER gcc's own bundled c++ headers.
+# -I/-isystem/CPATH all insert too early for that chain to reach them; only
+# -idirafter lands at the correct (last) position.
+# Populate it from the LOGIN node, e.g.
+#   mkdir -p $HOME/dftfe/sysroot/usr
+#   cp -a /usr/include $HOME/dftfe/sysroot/usr/
+#   cp -a /usr/lib64   $HOME/dftfe/sysroot/usr/
+#   ln -s usr/lib64    $HOME/dftfe/sysroot/lib64
+# Override with:  export DFTFE_SYSROOT_INC=/path/to/sysroot/usr/include
+SYSROOT_INC=${DFTFE_SYSROOT_INC:-$HOME/dftfe/sysroot/usr/include}
+c_compiler=gcc
+mpi_c_compiler=mpicc
+c_flags="-fPIC -O2 -march=native -fopenmp -idirafter $SYSROOT_INC"
+cxx_compiler=g++
+mpi_cxx_compiler=mpicxx
+cxx_flags="-fPIC -O2 -march=native -fopenmp -idirafter $SYSROOT_INC"
+fortran_compiler=gfortran
+mpi_fortran_compiler=mpifort
+fortran_flags="-fPIC -O2 -march=native -fopenmp -fallow-argument-mismatch -idirafter $SYSROOT_INC"
 
 device_compiler=nvcc
-device_flags="-arch=sm_80 -O2 -march=native -ccbin=$mpi_cxx_compiler"
+device_flags="-arch=sm_80 -O2 -march=native -ccbin=$mpi_cxx_compiler -Xcompiler -idirafter -Xcompiler $SYSROOT_INC"
 device_architectures="80"
 
 prefix="$PWD"
-nprocs=2  # default
+nprocs=44  # default
 for arg in "$@"; do
   if [[ "$arg" == --nprocs=* ]]; then
     nprocs="${arg#--nprocs=}"
@@ -72,7 +85,7 @@ p4estDir=""
 boostDir=""
 
 # Parse branch flag
-branch="release1.2"
+branch="publicGithubDevelop"
 for arg in "$@"; do
   if [[ "$arg" == --branch=* ]]; then
     branch="${arg#--branch=}"
@@ -341,7 +354,7 @@ else
     echo "Compiling spglib"
     cd spglib-2.5.0
     mkdir -p build && cd build
-    cmake -DCMAKE_C_COMPILER=$c_compiler -DCMAKE_C_FLAGS="$c_flags" -DCMAKE_CXX_COMPILER=$cxx_compiler -DCMAKE_CXX_FLAGS="$cxx_flags" -DCMAKE_INSTALL_PREFIX=$dependencyDir -DBUILD_SHARED_LIBS=ON ..
+    cmake -DCMAKE_C_COMPILER=$c_compiler -DCMAKE_C_FLAGS="$c_flags" -DCMAKE_CXX_COMPILER=$cxx_compiler -DCMAKE_CXX_FLAGS="$cxx_flags" -DCMAKE_INSTALL_PREFIX=$dependencyDir -DBUILD_SHARED_LIBS=ON -DSPGLIB_WITH_TESTS=OFF ..
     cmake --build . -j$nprocs
     cmake --install .
   fi
@@ -474,7 +487,7 @@ else
     mkdir -p build && cd build
     export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$dependencyDir/lib
     export LIBRARY_PATH=$LIBRARY_PATH:$dependencyDir/lib
-    CC=$mpi_c_compiler FC=$mpi_fortran_compiler CFLAGS="$c_flags" FCFLAGS="$fortran_flags" SCALAPACK_FCFLAGS="$blasLapackFlags $scalapackFlags" SCALAPACK_LDFLAGS="$blasLapackFlags $scalapackFlags -lstdc++" ../configure --prefix=$dependencyDir --enable-avx-kernels --enable-avx2-kernels --disable-avx512-kernels --enable-c-tests=no --enable-cpp-tests=no --enable-openmp --enable-option-checking=fatal --disable-sse-kernels --disable-sse-assembly-kernels --with-mpi --enable-runtime-threading-support-checks --enable-allow-thread-limiting --without-threading-support-check-during-build --disable-static --enable-shared --enable-nvidia-gpu-kernels --enable-gpu-streams=nvidia --with-NVIDIA-GPU-compute-capability=sm_80 --with-cuda-path=$CUDA_HOME --with-cuda-sdk-path=$CUDA_HOME 
+    CC=$mpi_c_compiler FC=$mpi_fortran_compiler CFLAGS="$c_flags" FCFLAGS="$fortran_flags" SCALAPACK_FCFLAGS="$blasLapackFlags $scalapackFlags" SCALAPACK_LDFLAGS="$blasLapackFlags $scalapackFlags -lstdc++" ../configure --prefix=$dependencyDir --enable-avx-kernels --enable-avx2-kernels --enable-avx512-kernels --enable-c-tests=no --enable-cpp-tests=no --enable-openmp --enable-option-checking=fatal --disable-sse-kernels --disable-sse-assembly-kernels --with-mpi --enable-runtime-threading-support-checks --enable-allow-thread-limiting --without-threading-support-check-during-build --disable-static --enable-shared --enable-nvidia-gpu-kernels --enable-gpu-streams=nvidia --with-NVIDIA-GPU-compute-capability=sm_80 --with-cuda-path=$CUDA_HOME --with-cuda-sdk-path=$CUDA_HOME 
     make VERBOSE=1 -j$nprocs
     make install
   fi
