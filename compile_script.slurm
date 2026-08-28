@@ -7,6 +7,7 @@
 #SBATCH -p terai
 #SBATCH -N 1
 #SBATCH -n 48
+#SBATCH --mem=175G
 #SBATCH -t 1-00:00:00
 #SBATCH -J dftfe-build
 #SBATCH -o dftfe-build-%j.out
@@ -34,5 +35,5 @@ if [ ! -e "$DFTFE_SYSROOT_INC/stdio.h" ]; then
 fi
 
 cd "$MYPROJECTDIR/install_DFTFE" || exit 1
-./install_dftfe.sh --download --all --nprocs=44
+bash ./install_dftfe.sh --download --all --nprocs=44
 echo "install_dftfe.sh exit=$?"
