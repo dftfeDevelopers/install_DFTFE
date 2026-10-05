@@ -41,7 +41,7 @@ mpi_fortran_compiler=mpifort
 fortran_flags="-fPIC -O2 -march=native -fopenmp -fallow-argument-mismatch -idirafter $SYSROOT_INC"
 
 device_compiler=nvcc
-device_flags="-arch=sm_80 -O2 -march=native -ccbin=$mpi_cxx_compiler -Xcompiler -idirafter -Xcompiler $SYSROOT_INC"
+device_flags="-arch=sm_80 -O2 -Xcompiler -march=native -ccbin=$mpi_cxx_compiler -Xcompiler -idirafter -Xcompiler $SYSROOT_INC"
 device_architectures="80"
 
 prefix="$PWD"
@@ -95,7 +95,8 @@ done
 # Installation script for DFT-FE and its dependencies
 currentDir=$PWD
 cd $prefix
-dependencyDir=$prefix/dependencies
+dependencyDir=${DFTFE_DEPS_DIR:-$prefix/dependencies}
+elpaPrefix=${DFTFE_ELPA_DIR:-$dependencyDir}
 dftfeDir="$prefix/dftfe_$branch"
 mkdir -p $dependencyDir
 mkdir -p $dftfeDir
@@ -237,7 +238,7 @@ if [[ $downloadDependencies ]]; then
     wget -N -q --show-progress https://github.com/Reference-ScaLAPACK/scalapack/archive/refs/tags/v2.2.0.tar.gz &
   fi
   if [ -z $elpaDir ]; then
-    wget -N -q --show-progress https://elpa.mpcdf.mpg.de/software/tarball-archive/Releases/2025.06.001/elpa-2025.06.001.tar.gz &
+    wget -N -q --show-progress https://elpa.mpcdf.mpg.de/software/tarball-archive/Releases/2026.02.002/elpa-2026.02.002.tar.gz &
   fi
   wait
   cd $dftfeDir
@@ -480,18 +481,18 @@ else
   if [[ $installElpa ]]; then
     cd $dependencyDir/src
     echo "Extracting ELPA"
-    tar xzf elpa-2025.06.001.tar.gz --checkpoint=.100
+    tar xzf elpa-2026.02.002.tar.gz --checkpoint=.100
     echo "Extraction done"
     echo "Compiling ELPA"
-    cd elpa-2025.06.001
+    cd elpa-2026.02.002
     mkdir -p build && cd build
     export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$dependencyDir/lib
     export LIBRARY_PATH=$LIBRARY_PATH:$dependencyDir/lib
-    CC=$mpi_c_compiler FC=$mpi_fortran_compiler CFLAGS="$c_flags" FCFLAGS="$fortran_flags" SCALAPACK_FCFLAGS="$blasLapackFlags $scalapackFlags" SCALAPACK_LDFLAGS="$blasLapackFlags $scalapackFlags -lstdc++" ../configure --prefix=$dependencyDir --enable-avx-kernels --enable-avx2-kernels --enable-avx512-kernels --enable-c-tests=no --enable-cpp-tests=no --enable-openmp --enable-option-checking=fatal --disable-sse-kernels --disable-sse-assembly-kernels --with-mpi --enable-runtime-threading-support-checks --enable-allow-thread-limiting --without-threading-support-check-during-build --disable-static --enable-shared --enable-nvidia-gpu-kernels --enable-gpu-streams=nvidia --with-NVIDIA-GPU-compute-capability=sm_80 --with-cuda-path=$CUDA_HOME --with-cuda-sdk-path=$CUDA_HOME 
+    CC=$mpi_c_compiler FC=$mpi_fortran_compiler CFLAGS="$c_flags" FCFLAGS="$fortran_flags" SCALAPACK_FCFLAGS="$blasLapackFlags $scalapackFlags" SCALAPACK_LDFLAGS="$blasLapackFlags $scalapackFlags -lstdc++" ../configure --prefix=$elpaPrefix --enable-avx-kernels --enable-avx2-kernels --enable-avx512-kernels --enable-c-tests=no --enable-cpp-tests=no --enable-openmp --enable-option-checking=fatal --disable-sse-kernels --disable-sse-assembly-kernels --with-mpi --enable-runtime-threading-support-checks --enable-allow-thread-limiting --without-threading-support-check-during-build --disable-static --enable-shared --enable-nvidia-gpu-kernels --enable-gpu-streams=nvidia --with-NVIDIA-GPU-compute-capability=sm_80 --with-cuda-path=$CUDA_HOME --with-cuda-sdk-path=$CUDA_HOME 
     make VERBOSE=1 -j$nprocs
     make install
   fi
-  elpaDir=$dependencyDir
+  elpaDir=$elpaPrefix
   echo "ELPA path set to: $elpaDir"
 fi
 
