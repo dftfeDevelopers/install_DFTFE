@@ -83,9 +83,11 @@ fi
 
 # unpack <archive> <dir>: extract into $srcDir/<dir> and cd into a fresh build directory
 unpack() {
-  rm -rf "$srcDir/$2"
-  mkdir -p "$srcDir/$2"
-  tar xf "$srcDir/$1" -C "$srcDir/$2" --strip-components=1
+  rm -rf "$srcDir/$2" "$srcDir/tmp"
+  mkdir -p "$srcDir/tmp"
+  tar xf "$srcDir/$1" -C "$srcDir/tmp"
+  mv "$srcDir"/tmp/* "$srcDir/$2"
+  rmdir "$srcDir/tmp"
   mkdir -p "$srcDir/$2/build"
   cd "$srcDir/$2/build"
 }
