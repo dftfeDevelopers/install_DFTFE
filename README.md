@@ -1,5 +1,5 @@
 # Install DFT-FE on Polaris
-Bash scripts to build [DFT-FE](https://github.com/dftfeDevelopers/dftfe) and its dependencies on the **ALCF Polaris** supercomputer (GPU build with CUDA and NCCL).
+Bash script to build [DFT-FE](https://github.com/dftfeDevelopers/dftfe) and its dependencies on the **ALCF Polaris** supercomputer.
 
 Clone the repository where DFT-FE should be installed, for example `$MYPROJECTDIR/install_DFTFE`:
 ```bash
@@ -10,15 +10,6 @@ git checkout polarisScript
 chmod +x install_dftfe.sh
 ```
 Everything is installed in this directory: the dependencies in `dependencies/`, DFT-FE in `dftfe_<branch>/` and the build logs in `logs/`.
-
-## Environment
-`dftfe_env_polaris.sh` loads the modules (PrgEnv-gnu 8.7.0 with GCC 14, CUDA 13.0, CMake) and sets the paths. `install_dftfe.sh` sources it. Source it in job scripts too, so that DFT-FE runs with the modules it was built with.
-- It starts with `module reset`, so modules already loaded in your shell are replaced by the system defaults.
-- It unloads `darshan` (ALCF's I/O profiler), so it is not linked into the build.
-- cuBLAS and NCCL come from the NVIDIA HPC SDK that provides `cuda/13.0`.
-- BLAS, LAPACK and ScaLAPACK come from Cray LibSci.
-- Serial packages are built with `gcc-14`, the compiler behind the Cray wrappers.
-- The aws-ofi-nccl plugin is used only if it loads.
 
 ## Installation
 Install on a compute node with the job script `compile_script.sub`, which runs `./install_dftfe.sh --all`:
@@ -42,14 +33,14 @@ To build only some packages, give them instead of `--build`:
 `--dftd` builds DFT-D3 and DFT-D4. It is optional and not part of `--build` or `--all`.
 
 Package versions and DFT-FE options are set in `install_dftfe.sh`:
+- `withHigherQuadPSP` and `minimalCompile` are for DFT-FE branches not yet up to date with `publicGithubDevelop`.
 - `elpaWithOpenMP=ON` builds ELPA with OpenMP; `OFF` builds it with NCCL.
-- `withHigherQuadPSP` and `minimalCompile` are only used by DFT-FE branches older than `publicGithubDevelop`.
 
 ### deal.II 9.8
-deal.II 9.8 removed `IndexSet::fill_index_vector()`. It was deprecated in deal.II 9.5, which added `IndexSet::get_index_vector()` to replace it. DFT-FE requires deal.II 9.5.1 or newer, so DFT-FE branches should call `get_index_vector()`. A branch that still calls `fill_index_vector()` (in `src/dft/initUnmovedTriangulation.cc`) does not compile against deal.II 9.8. Update the branch, or build it with deal.II 9.7.1.
+`IndexSet::fill_index_vector()` works up to deal.II 9.7, with a deprecation notice since 9.5, and was removed in deal.II 9.8. Its replacement, `IndexSet::get_index_vector()`, exists since 9.5, and DFT-FE requires deal.II 9.5.1 or newer, so DFT-FE branches should use `get_index_vector()`. Branches that still call `fill_index_vector()` need deal.II 9.7.1.
 
 ## Running DFT-FE
-The executables are `dftfe_<branch>/install/real/dftfe` and `dftfe_<branch>/install/complex/dftfe`. Use the complex one for k-points. Example PBS job script:
+The executables are `dftfe_<branch>/install/real/dftfe` and `dftfe_<branch>/install/complex/dftfe`. Use the complex one for k-points. Source `dftfe_env_polaris.sh` in job scripts, so that DFT-FE runs with the modules it was built with. Example PBS job script:
 ```bash
 #!/bin/bash -l
 #PBS -l select=4:system=polaris
