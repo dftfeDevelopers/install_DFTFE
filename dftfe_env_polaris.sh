@@ -1,11 +1,11 @@
 # DFT-FE environment for ALCF Polaris. Sourced by install_dftfe.sh; source it in job scripts too.
 module reset
-module unload darshan
 module use /soft/modulefiles
 module load PrgEnv-gnu/8.7.0 gcc-native/14
 module load cuda/13.0
 module load craype-x86-milan craype-accel-nvidia80
 module load spack-pe-base cmake
+module unload darshan
 
 export DFTFE_PREFIX=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 export DFTFE_DEPS=$DFTFE_PREFIX/dependencies
